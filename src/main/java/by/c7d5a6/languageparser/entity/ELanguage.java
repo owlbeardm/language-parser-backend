@@ -11,9 +11,9 @@ import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 
 
-@Entity(name = by.c7d5a6.languageparser.entity.Language.ENTITY_NAME)
-@Table(name = by.c7d5a6.languageparser.entity.Language.TABLE_NAME)
-public class Language extends BaseEntity implements Serializable, IdLongVerPossessor {
+@Entity(name = ELanguage.ENTITY_NAME)
+@Table(name = ELanguage.TABLE_NAME)
+public class ELanguage extends BaseEntity implements Serializable, IdLongVerPossessor {
 
     protected static final String ENTITY_NAME = "Language";
     protected static final String TABLE_NAME = "language_tbl";
