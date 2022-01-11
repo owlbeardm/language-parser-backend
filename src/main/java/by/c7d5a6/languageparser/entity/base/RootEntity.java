@@ -11,6 +11,7 @@ import javax.persistence.MappedSuperclass;
 /**
  * Superclass for global annotations
  */
+@SuppressWarnings("ALL")
 @MappedSuperclass
 @TypeDefs({
         @TypeDef(
