@@ -9,8 +9,8 @@ import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 
-@Entity(name = EWord.ENTITY_NAME)
-@Table(name = EWord.TABLE_NAME)
+@Entity(name = EPOS.ENTITY_NAME)
+@Table(name = EPOS.TABLE_NAME)
 public class EPOS extends BaseEntity implements Serializable, IdLongVerPossessor {
 
     protected static final String ENTITY_NAME = "PartOfSpeech";
