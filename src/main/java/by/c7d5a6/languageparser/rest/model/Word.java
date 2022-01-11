@@ -4,8 +4,7 @@ public class Word extends Base {
 
     private Language language;
     private Boolean isForgotten;
-    // TODO:
-    //  partOfSpeech: PartOfSpeech;
+    private POS partOfSpeech;
     private String word;
 
     public Language getLanguage() {
@@ -30,5 +29,13 @@ public class Word extends Base {
 
     public void setWord(String word) {
         this.word = word;
+    }
+
+    public POS getPartOfSpeech() {
+        return partOfSpeech;
+    }
+
+    public void setPartOfSpeech(POS partOfSpeech) {
+        this.partOfSpeech = partOfSpeech;
     }
 }

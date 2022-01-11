@@ -26,8 +26,9 @@ public class EWord extends BaseEntity implements Serializable, IdLongVerPossesso
     @Column(name = "forgotten_yn")
     private boolean forgotten;
 
-    //TODO:
-    //    part_of_speech text NOT NULL,
+    @ManyToOne
+    @JoinColumn(name = "pos_id")
+    private EPOS partOfSpeech;
 
 
     public String getWord() {
@@ -52,5 +53,13 @@ public class EWord extends BaseEntity implements Serializable, IdLongVerPossesso
 
     public void setForgotten(boolean forgotten) {
         this.forgotten = forgotten;
+    }
+
+    public EPOS getPartOfSpeech() {
+        return partOfSpeech;
+    }
+
+    public void setPartOfSpeech(EPOS partOfSpeech) {
+        this.partOfSpeech = partOfSpeech;
     }
 }
