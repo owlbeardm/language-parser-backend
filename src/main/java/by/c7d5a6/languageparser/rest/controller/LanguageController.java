@@ -19,7 +19,6 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/language")
 @Tag(name = "Languages", description = "Language related operations")
-@SecurityRequirement(name = "secure")
 public class LanguageController {
 
     private static final Logger logger = LoggerFactory.getLogger(LanguageController.class);
@@ -40,17 +39,17 @@ public class LanguageController {
     }
 
     @Operation(summary = "Get all languages to which path from the given language is possible")
-    @GetMapping("/all/{from}")
-    public List<Language> getAllLanguagesFrom(@PathVariable Language from) {
-        logger.info("Getting all languages from {}", from);
-        return languageService.getAllLanguagesFrom(from);
+    @GetMapping("/allfrom/{fromId}")
+    public List<Language> getAllLanguagesFrom(@PathVariable long fromId) {
+        logger.info("Getting all languages from {}", fromId);
+        return languageService.getAllLanguagesFrom(fromId);
     }
 
     @Operation(summary = "Get all paths from language to other given language")
-    @GetMapping("/paths/{from}/{to}")
-    public List<List<Language>> getAllPaths(@PathVariable Language from, @PathVariable Language to) {
-        logger.info("Getting all paths from {} to {}", from, to);
-        return languageService.getAllPaths(from, to);
+    @GetMapping("/paths/{fromId}/{toId}")
+    public List<List<Language>> getAllPaths(@PathVariable long fromId, @PathVariable long toId) {
+        logger.info("Getting all paths from {} to {}", fromId, toId);
+        return languageService.getAllPaths(fromId, toId);
     }
 
 

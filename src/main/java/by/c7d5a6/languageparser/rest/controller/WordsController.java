@@ -30,8 +30,9 @@ public class WordsController {
 
     @Operation(summary = "Get all words from language by text")
     @GetMapping("/all/{from}/{text}")
-    public List<Word> getAllWords(@PathVariable("from") String from, @PathVariable("text") String text) {
-        return wordService.getAllWords(from, text);
+    public List<Word> getAllWords(@PathVariable("from") String fromId, @PathVariable("text") String text) {
+        logger.info("Get all words from {} by {}", fromId, text);
+        return wordService.getAllWords(fromId, text);
     }
 
 }

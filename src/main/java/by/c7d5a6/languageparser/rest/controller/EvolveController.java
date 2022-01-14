@@ -29,6 +29,7 @@ public class EvolveController {
     @Operation(summary = "Trace word by list of languages")
     @GetMapping("/trace/{word}")
     public List<WordTraceResult> trace(@PathVariable String word, @RequestParam(name = "languages") List<Language> languages) {
+        logger.info("Trace {} by list of languages", word);
         return evolutionService.trace(word, languages);
     }
 
