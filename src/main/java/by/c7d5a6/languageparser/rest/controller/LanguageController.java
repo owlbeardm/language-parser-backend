@@ -38,19 +38,7 @@ public class LanguageController {
         return languageService.getAllLanguages();
     }
 
-    @Operation(summary = "Get all languages to which path from the given language is possible")
-    @GetMapping("/allfrom/{fromId}")
-    public List<Language> getAllLanguagesFrom(@PathVariable long fromId) {
-        logger.info("Getting all languages from {}", fromId);
-        return languageService.getAllLanguagesFrom(fromId);
-    }
 
-    @Operation(summary = "Get all paths from language to other given language")
-    @GetMapping("/paths/{fromId}/{toId}")
-    public List<List<Language>> getAllPaths(@PathVariable long fromId, @PathVariable long toId) {
-        logger.info("Getting all paths from {} to {}", fromId, toId);
-        return languageService.getAllPaths(fromId, toId);
-    }
 
 
 }
