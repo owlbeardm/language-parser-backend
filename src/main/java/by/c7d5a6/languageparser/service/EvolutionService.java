@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 
 import java.lang.invoke.MethodHandles;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class EvolutionService extends BaseService {
@@ -15,6 +16,6 @@ public class EvolutionService extends BaseService {
     private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     public List<WordTraceResult> trace(String word, List<Language> languages) {
-        throw new UnsupportedOperationException("Not implemented yet");
+        return languages.stream().map(language -> {return new WordTraceResult(language, word);}).collect(Collectors.toList());
     }
 }

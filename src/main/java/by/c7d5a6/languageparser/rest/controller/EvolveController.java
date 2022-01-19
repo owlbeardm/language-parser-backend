@@ -50,5 +50,11 @@ public class EvolveController {
         return languageService.getAllRoutes(fromId, toId);
     }
 
+    @Operation(summary = "Trace word changes by list of languages")
+    @PostMapping("/trace/{word}")
+    public List<WordTraceResult> trace(@PathVariable String word, @RequestBody List<Language> languages) {
+        logger.info("Trace {} by list of languages", word);
+        return evolutionService.trace(word, languages);
+    }
 
 }

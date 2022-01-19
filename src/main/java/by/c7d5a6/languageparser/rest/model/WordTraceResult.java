@@ -4,14 +4,19 @@ import java.io.Serializable;
 
 public class WordTraceResult implements Serializable {
 
-    private Word word;
+    private String word;
     private Language from;
 
-    public Word getWord() {
+    public WordTraceResult(Language language, String word) {
+        this.from = language;
+        this.word = word;
+    }
+
+    public String getWord() {
         return word;
     }
 
-    public void setWord(Word word) {
+    public void setWord(String word) {
         this.word = word;
     }
 
