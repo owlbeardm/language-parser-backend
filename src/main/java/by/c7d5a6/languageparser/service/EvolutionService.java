@@ -16,6 +16,7 @@ public class EvolutionService extends BaseService {
     private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     public List<WordTraceResult> trace(String word, List<Language> languages) {
+        // TODO: implement
         return languages.stream().map(language -> {return new WordTraceResult(language, word);}).collect(Collectors.toList());
     }
 }

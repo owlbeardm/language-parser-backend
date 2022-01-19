@@ -29,13 +29,6 @@ public class EvolveController {
         this.languageService = languageService;
     }
 
-    @Operation(summary = "Trace word by list of languages")
-    @GetMapping("/trace/{word}")
-    public List<WordTraceResult> trace(@PathVariable String word, @RequestParam(name = "languages") List<Language> languages) {
-        logger.info("Trace {} by list of languages", word);
-        return evolutionService.trace(word, languages);
-    }
-
     @Operation(summary = "Get all languages to which path from the given language is possible")
     @GetMapping("/allfrom/{fromId}")
     public List<Language> getAllLanguagesFrom(@PathVariable long fromId) {
