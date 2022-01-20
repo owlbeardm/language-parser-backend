@@ -6,13 +6,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.AuthenticationManagerResolver;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
-import org.springframework.security.oauth2.jwt.JwtDecoder;
-import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
-import org.springframework.security.oauth2.server.resource.authentication.JwtIssuerAuthenticationManagerResolver;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -49,6 +45,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                         .mvcMatchers("/api/auth/**").permitAll()
                         .mvcMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                         .mvcMatchers(HttpMethod.GET, "/**").permitAll()
+                        .mvcMatchers(HttpMethod.POST, "/api/evolve/trace/**").permitAll()
                         .anyRequest().authenticated()
                 )
 //                .oauth2ResourceServer(oauth2 -> oauth2
