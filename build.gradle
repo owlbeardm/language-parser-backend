@@ -46,6 +46,7 @@ dependencies {
     implementation group: 'org.web3j', name: 'core', version: '4.8.9'
     implementation group: 'org.web3j', name: 'crypto', version: '4.8.9'
     implementation 'org.springframework.boot:spring-boot-starter-security'
+    implementation 'org.modelmapper:modelmapper:3.0.0'
     runtimeOnly 'org.postgresql:postgresql'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'com.h2database:h2:1.4.200'

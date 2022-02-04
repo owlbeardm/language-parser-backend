@@ -1,5 +1,6 @@
 package by.c7d5a6.languageparser.rest.controller;
 
+import by.c7d5a6.languageparser.entity.EWord;
 import by.c7d5a6.languageparser.rest.model.Word;
 import by.c7d5a6.languageparser.service.WordService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -28,11 +29,16 @@ public class WordsController {
         this.wordService = wordService;
     }
 
-    @Operation(summary = "Get all words from language by text")
-    @GetMapping("/all/{from}/{text}")
-    public List<Word> getAllWords(@PathVariable("from") String fromId, @PathVariable("text") String text) {
-        logger.info("Get all words from {} by {}", fromId, text);
-        return wordService.getAllWords(fromId, text);
+    @Operation(summary = "Get all words from language")
+    @GetMapping("/all/{from}")
+    public List<Word> getAllWordsFromLang(@PathVariable Long from) {
+        return wordService.getAllWordsFromLang(from);
     }
 
+//    @Operation(summary = "Get all words from language by text")
+//    @GetMapping("/all/{from}/{text}")
+//    public List<Word> getAllWords(@PathVariable("from") String fromId, @PathVariable("text") String text) {
+//        logger.info("Get all words from {} by {}", fromId, text);
+//        return wordService.getAllWords(fromId, text);
+//    }
 }

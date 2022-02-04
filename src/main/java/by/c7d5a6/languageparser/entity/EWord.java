@@ -23,7 +23,7 @@ public class EWord extends BaseEntity implements Serializable, IdLongVerPossesso
     @JoinColumn(name = "lang_id")
     private ELanguage language;
 
-    @Column(name = "forgotten_yn")
+    @Column(name = "forgotten")
     private boolean forgotten;
 
     @ManyToOne

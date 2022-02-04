@@ -1,5 +1,8 @@
 package by.c7d5a6.languageparser;
 
+import org.modelmapper.ModelMapper;
+import org.modelmapper.config.Configuration;
+import org.modelmapper.convention.MatchingStrategies;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.web.client.RestTemplateBuilder;
@@ -21,5 +24,16 @@ public class LanguageParserApplication {
 				.setConnectTimeout(Duration.ofMillis(5000))
 				.setReadTimeout(Duration.ofMillis(5000))
 				.build();
+	}
+
+	@Bean
+	public ModelMapper modelMapper() {
+		ModelMapper mapper = new ModelMapper();
+		mapper.getConfiguration()
+				.setMatchingStrategy(MatchingStrategies.STRICT)
+				.setFieldMatchingEnabled(true)
+				.setSkipNullEnabled(true)
+				.setFieldAccessLevel(Configuration.AccessLevel.PRIVATE);
+		return mapper;
 	}
 }

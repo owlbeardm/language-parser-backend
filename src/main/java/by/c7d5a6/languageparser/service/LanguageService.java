@@ -5,6 +5,7 @@ import by.c7d5a6.languageparser.entity.ELanguageConnection;
 import by.c7d5a6.languageparser.repository.LanguageConnectionRepository;
 import by.c7d5a6.languageparser.repository.LanguageRepository;
 import by.c7d5a6.languageparser.rest.model.Language;
+import by.c7d5a6.languageparser.rest.model.Word;
 import com.google.common.collect.Lists;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,15 +38,6 @@ public class LanguageService extends BaseService {
         return all.stream().map(this::convertToRestModel).collect(Collectors.toList());
     }
 
-    private Language convertToRestModel(ELanguage eLang) {
-        Language language = new Language();
-        language.setId(eLang.getId());
-        language.setVersion(eLang.getVersion());
-        language.setDisplayName(eLang.getDisplayName());
-        language.setNativeName(eLang.getNativeName());
-        language.setComment(eLang.getComment());
-        return language;
-    }
 
     public List<List<Language>> getAllPaths(long fromId, long toId) {
         throw new UnsupportedOperationException("Not implemented yet");
@@ -104,5 +96,9 @@ public class LanguageService extends BaseService {
 
     private void createLanguagesGraph() {
 
+    }
+
+    private Language convertToRestModel(ELanguage eLang) {
+        return mapper.map(eLang, Language.class);
     }
 }
