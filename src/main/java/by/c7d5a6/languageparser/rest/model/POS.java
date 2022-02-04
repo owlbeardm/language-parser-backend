@@ -1,5 +1,7 @@
 package by.c7d5a6.languageparser.rest.model;
 
+import by.c7d5a6.languageparser.rest.model.base.Base;
+
 public class POS extends Base {
 
     private String name;

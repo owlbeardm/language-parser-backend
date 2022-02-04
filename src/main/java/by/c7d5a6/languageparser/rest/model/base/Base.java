@@ -1,4 +1,4 @@
-package by.c7d5a6.languageparser.rest.model;
+package by.c7d5a6.languageparser.rest.model.base;
 
 import javax.validation.constraints.NotNull;
 import java.io.Serializable;

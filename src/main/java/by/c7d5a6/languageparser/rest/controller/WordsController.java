@@ -2,12 +2,14 @@ package by.c7d5a6.languageparser.rest.controller;
 
 import by.c7d5a6.languageparser.entity.EWord;
 import by.c7d5a6.languageparser.rest.model.Word;
+import by.c7d5a6.languageparser.rest.model.base.PageResult;
 import by.c7d5a6.languageparser.service.WordService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -32,6 +34,12 @@ public class WordsController {
     @Operation(summary = "Get all words from language")
     @GetMapping("/all/{from}")
     public List<Word> getAllWordsFromLang(@PathVariable Long from) {
+        return wordService.getAllWordsFromLang(from);
+    }
+
+    @Operation(summary = "Get page of words with translations from language")
+    @GetMapping("/page/{from}")
+    public PageResult<WordWithTranslations> getAllWordsFromLang(@PathVariable Long from) {
         return wordService.getAllWordsFromLang(from);
     }
 

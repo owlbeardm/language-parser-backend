@@ -1,6 +1,8 @@
 package by.c7d5a6.languageparser.rest.model;
 
 
+import by.c7d5a6.languageparser.rest.model.base.Base;
+
 public class Word extends Base {
 
     private Language language;
