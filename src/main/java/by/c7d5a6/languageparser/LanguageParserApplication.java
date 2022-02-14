@@ -8,7 +8,9 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.web.client.RestTemplate;
+import org.h2.tools.Server;
 
+import java.sql.SQLException;
 import java.time.Duration;
 
 @SpringBootApplication
@@ -35,5 +37,10 @@ public class LanguageParserApplication {
 				.setSkipNullEnabled(true)
 				.setFieldAccessLevel(Configuration.AccessLevel.PRIVATE);
 		return mapper;
+	}
+
+	@Bean(initMethod = "start", destroyMethod = "stop")
+	public Server inMemoryH2DatabaseServer() throws SQLException {
+		return Server.createTcpServer("-tcp", "-tcpAllowOthers", "-tcpPort", "9091");
 	}
 }

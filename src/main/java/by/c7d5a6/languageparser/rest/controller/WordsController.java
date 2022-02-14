@@ -2,6 +2,7 @@ package by.c7d5a6.languageparser.rest.controller;
 
 import by.c7d5a6.languageparser.entity.EWord;
 import by.c7d5a6.languageparser.rest.model.Word;
+import by.c7d5a6.languageparser.rest.model.WordWithTranslations;
 import by.c7d5a6.languageparser.rest.model.base.PageResult;
 import by.c7d5a6.languageparser.service.WordService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -39,8 +40,9 @@ public class WordsController {
 
     @Operation(summary = "Get page of words with translations from language")
     @GetMapping("/page/{from}")
-    public PageResult<WordWithTranslations> getAllWordsFromLang(@PathVariable Long from) {
-        return wordService.getAllWordsFromLang(from);
+    public PageResult<WordWithTranslations> getAllWordsWithTranslationsFromLang(@PathVariable Long from) {
+        return null;
+//        return wordService.getAllWordsFromLang(from);
     }
 
 //    @Operation(summary = "Get all words from language by text")
