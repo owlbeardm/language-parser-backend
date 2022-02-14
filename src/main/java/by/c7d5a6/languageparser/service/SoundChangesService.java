@@ -30,7 +30,7 @@ public class SoundChangesService extends BaseService {
         return Arrays.stream(lines.split(System.lineSeparator())).map(this::getSoundChangesFromLine).collect(Collectors.toList());
     }
 
-    private ESoundChange getSoundChangesFromLine(String line) {
+    public ESoundChange getSoundChangesFromLine(String line) {
         String trimed = line.trim();
         trimed = ipaService.cleanIPA(trimed);
         trimed = replaceArrows(trimed);
