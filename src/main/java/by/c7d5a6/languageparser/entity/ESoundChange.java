@@ -1,6 +1,7 @@
 package by.c7d5a6.languageparser.entity;
 
 import by.c7d5a6.languageparser.entity.base.BaseEntity;
+import by.c7d5a6.languageparser.entity.enums.SoundChangeType;
 import by.c7d5a6.languageparser.entity.possessors.IdLongVerPossessor;
 
 import javax.persistence.*;
@@ -30,12 +31,23 @@ public class ESoundChange extends BaseEntity implements Serializable, IdLongVerP
     private Long priority;
 
     @NotNull
-    @Column(name = "sound_regex_from")
-    private String soundRegexFrom;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "type")
+    private SoundChangeType type;
+
+    @NotNull
+    @Column(name = "sound_from")
+    private String soundFrom;
 
     @NotNull
     @Column(name = "sound_to")
     private String soundTo;
+
+    @Column(name = "environment_before")
+    private String environmentBefore;
+
+    @Column(name = "environment_after")
+    private String environmentAfter;
 
     public ELanguage getLangFrom() {
         return langFrom;
@@ -61,12 +73,12 @@ public class ESoundChange extends BaseEntity implements Serializable, IdLongVerP
         this.priority = priority;
     }
 
-    public String getSoundRegexFrom() {
-        return soundRegexFrom;
+    public String getSoundFrom() {
+        return soundFrom;
     }
 
-    public void setSoundRegexFrom(String soundRegexFrom) {
-        this.soundRegexFrom = soundRegexFrom;
+    public void setSoundFrom(String soundFrom) {
+        this.soundFrom = soundFrom;
     }
 
     public String getSoundTo() {
@@ -75,5 +87,40 @@ public class ESoundChange extends BaseEntity implements Serializable, IdLongVerP
 
     public void setSoundTo(String soundTo) {
         this.soundTo = soundTo;
+    }
+
+    public String getEnvironmentBefore() {
+        return environmentBefore;
+    }
+
+    public void setEnvironmentBefore(String environmentBefore) {
+        this.environmentBefore = environmentBefore;
+    }
+
+    public String getEnvironmentAfter() {
+        return environmentAfter;
+    }
+
+    public void setEnvironmentAfter(String environmentAfter) {
+        this.environmentAfter = environmentAfter;
+    }
+
+    public SoundChangeType getType() {
+        return type;
+    }
+
+    public void setType(SoundChangeType type) {
+        this.type = type;
+    }
+
+    @Override
+    public String toString() {
+        return "ESoundChange{" +
+                ((langFrom != null) ? ("langFrom=" + langFrom.getDisplayName()) : "") +
+                ((langTo != null) ? (", langTo=" + langTo.getDisplayName()) : "") +
+                ", type=" + type +
+                ", priority=" + priority +
+                ", rules='" + soundFrom + " → " + soundTo + " / " + environmentBefore + '_' + environmentAfter + '\'' +
+                '}';
     }
 }

@@ -19,10 +19,12 @@ public class IPAService extends BaseService {
     public String cleanIPA(String ipaString) {
 //        IPA = IPA.normalize('NFD');
         return ipaString
+                .trim()
                 .replaceAll("ɡ", "g")
                 .replaceAll(":", "ː")
                 .replaceAll("’", "ʼ")
                 .replaceAll("ʱ", "̤")
+                .replaceAll("Ø", "∅")
                 .replaceAll("ɚ", "ə˞");
 //                .replaceAll("\\?", "ʔ");
 //                .replaceAll('!VOICELESS PALATAL FRICATIVE', 'ç');

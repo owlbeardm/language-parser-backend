@@ -52,7 +52,7 @@ public class EvolutionService extends BaseService {
     public String evolveWord(String word, List<ESoundChange> soundChanges) {
         String result = word;
         for (ESoundChange soundChange : soundChanges) {
-            Pattern pattern = Pattern.compile(soundChange.getSoundRegexFrom());
+            Pattern pattern = Pattern.compile(soundChange.getSoundFrom());
             Matcher matcher = pattern.matcher(result);
             result = matcher.replaceAll(soundChange.getSoundTo());
         }
