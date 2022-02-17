@@ -62,7 +62,7 @@ public class EvolveController {
     }
 
     @Operation(summary = "Get all sound changes in text form")
-    @GetMapping("/sc/raw/lang/{fromLangId}/{toLangId}")
+    @GetMapping(value = "/sc/raw/lang/{fromLangId}/{toLangId}", produces = "text/plain")
     public String getSoundChangesRawLinesByLangs(@PathVariable long fromLangId, @PathVariable long toLangId) {
         logger.info("Get all sound changes in text form from {} to {}", fromLangId, toLangId);
         return soundChangesService.getSoundChangesRawLinesByLangs(fromLangId, toLangId);
