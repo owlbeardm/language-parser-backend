@@ -1,9 +1,11 @@
 package by.c7d5a6.languageparser.rest.controller;
 
 import by.c7d5a6.languageparser.rest.model.Language;
+import by.c7d5a6.languageparser.rest.model.SoundChange;
 import by.c7d5a6.languageparser.rest.model.WordTraceResult;
 import by.c7d5a6.languageparser.service.EvolutionService;
 import by.c7d5a6.languageparser.service.LanguageService;
+import by.c7d5a6.languageparser.service.SoundChangesService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.slf4j.Logger;
@@ -22,11 +24,13 @@ public class EvolveController {
 
     private final EvolutionService evolutionService;
     private final LanguageService languageService;
+    private final SoundChangesService soundChangesService;
 
     @Autowired
-    public EvolveController(EvolutionService evolutionService, LanguageService languageService) {
+    public EvolveController(EvolutionService evolutionService, LanguageService languageService, SoundChangesService soundChangesService) {
         this.evolutionService = evolutionService;
         this.languageService = languageService;
+        this.soundChangesService = soundChangesService;
     }
 
     @Operation(summary = "Get all languages to which path from the given language is possible")
@@ -50,4 +54,38 @@ public class EvolveController {
         return evolutionService.trace(word, languages);
     }
 
+    @Operation(summary = "Get all sound changes")
+    @GetMapping("/sc/lang/{fromLangId}/{toLangId}")
+    public List<SoundChange> getSoundChangesByLangs(@PathVariable long fromLangId, @PathVariable long toLangId) {
+        logger.info("Get all sound changes from {} to {}", fromLangId, toLangId);
+        return soundChangesService.getSoundChangesByLangs(fromLangId, toLangId);
+    }
+
+    @Operation(summary = "Get all sound changes in text form")
+    @GetMapping("/sc/raw/lang/{fromLangId}/{toLangId}")
+    public String getSoundChangesRawLinesByLangs(@PathVariable long fromLangId, @PathVariable long toLangId) {
+        logger.info("Get all sound changes in text form from {} to {}", fromLangId, toLangId);
+        return soundChangesService.getSoundChangesRawLinesByLangs(fromLangId, toLangId);
+    }
+
+    @Operation(summary = "Save all sound changes from text form")
+    @PostMapping("/sc/raw/lang/{fromLangId}/{toLangId}")
+    public void saveSoundChangesRawLinesByLangs(@PathVariable long fromLangId, @PathVariable long toLangId, @RequestBody String rawLines) {
+        logger.info("Save all sound changes from text form from {} to {}", fromLangId, toLangId);
+        soundChangesService.saveSoundChangesRawLinesByLangs(fromLangId, toLangId, rawLines);
+    }
+
+    @Operation(summary = "Update sound change from text form")
+    @PostMapping("/sc/raw/{id}")
+    public void updateSoundChange(@PathVariable long id, @RequestBody String rawLine) {
+        logger.info("Update sound change {}", id);
+        soundChangesService.updateSoundChange(id, rawLine);
+    }
+
+    @Operation(summary = "Delete sound change")
+    @DeleteMapping("/sc/{id}")
+    public void deleteSoundChange(@PathVariable long id) {
+        logger.info("Delete sound change {}", id);
+        soundChangesService.deleteSoundChange(id);
+    }
 }

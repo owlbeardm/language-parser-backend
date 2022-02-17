@@ -46,7 +46,7 @@ public class EvolutionService extends BaseService {
     }
 
     private List<ESoundChange> getSoundChanges(Language languageFrom, Language languageTo) {
-        return soundChangeRepository.findByLangFrom_IdAndLangTo_Id(languageFrom.getId(), languageTo.getId());
+        return soundChangeRepository.findByLangFrom_IdAndLangTo_IdOrderByPriority(languageFrom.getId(), languageTo.getId());
     }
 
     public String evolveWord(String word, List<ESoundChange> soundChanges) {

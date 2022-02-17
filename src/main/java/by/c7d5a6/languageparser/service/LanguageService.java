@@ -98,7 +98,7 @@ public class LanguageService extends BaseService {
 
     }
 
-    private Language convertToRestModel(ELanguage eLang) {
-        return mapper.map(eLang, Language.class);
+    public Language convertToRestModel(ELanguage language) {
+        return mapper.map(language, Language.class);
     }
 }
