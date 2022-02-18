@@ -1,5 +1,6 @@
 package by.c7d5a6.languageparser.service;
 
+import by.c7d5a6.languageparser.entity.ELanguage;
 import by.c7d5a6.languageparser.entity.ESoundChange;
 import by.c7d5a6.languageparser.entity.enums.SoundChangeType;
 import by.c7d5a6.languageparser.repository.SoundChangeRepository;
@@ -12,6 +13,7 @@ import org.springframework.stereotype.Service;
 import java.lang.invoke.MethodHandles;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -81,7 +83,17 @@ public class SoundChangesService extends BaseService {
     }
 
     public void saveSoundChangesRawLinesByLangs(long fromLangId, long toLangId, String rawLines) {
-        throw new UnsupportedOperationException("Not implemented yet");
+        ELanguage langFrom = languageService.getLangById(fromLangId).orElseThrow(() -> new IllegalArgumentException("Language from with id " + fromLangId + " doesn't exist"));
+        ELanguage langTo = languageService.getLangById(toLangId).orElseThrow(() -> new IllegalArgumentException("Language to with id " + fromLangId + " doesn't exist"));
+        List<ESoundChange> soundChanges = getSoundChangesFromLines(rawLines);
+        soundChangeRepository.deleteByLangFrom_IdAndLangTo_Id(fromLangId, toLangId);
+        for (long i = 0; i < soundChanges.size(); i++) {
+            ESoundChange soundChange = soundChanges.get((int) i);
+            soundChange.setPriority(i);
+            soundChange.setLangFrom(langFrom);
+            soundChange.setLangTo(langTo);
+            soundChangeRepository.save(soundChange);
+        }
     }
 
     public void updateSoundChange(long id, String rawLine) {

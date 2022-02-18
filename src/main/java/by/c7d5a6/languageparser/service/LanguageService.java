@@ -5,7 +5,6 @@ import by.c7d5a6.languageparser.entity.ELanguageConnection;
 import by.c7d5a6.languageparser.repository.LanguageConnectionRepository;
 import by.c7d5a6.languageparser.repository.LanguageRepository;
 import by.c7d5a6.languageparser.rest.model.Language;
-import by.c7d5a6.languageparser.rest.model.Word;
 import com.google.common.collect.Lists;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,10 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.lang.invoke.MethodHandles;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -100,5 +96,9 @@ public class LanguageService extends BaseService {
 
     public Language convertToRestModel(ELanguage language) {
         return mapper.map(language, Language.class);
+    }
+
+    public Optional<ELanguage> getLangById(long fromLangId) {
+        return languageRepository.findById(fromLangId);
     }
 }

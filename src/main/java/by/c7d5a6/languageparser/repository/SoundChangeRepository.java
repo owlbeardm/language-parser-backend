@@ -7,4 +7,5 @@ import java.util.List;
 
 public interface SoundChangeRepository extends IdLongVerRepository<ESoundChange> {
     List<ESoundChange> findByLangFrom_IdAndLangTo_IdOrderByPriority(long langFromId, long langToId);
+    void deleteByLangFrom_IdAndLangTo_Id(long langFromId, long langToId);
 }
