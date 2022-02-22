@@ -1,6 +1,8 @@
 package by.c7d5a6.languageparser.rest.controller;
 
+import by.c7d5a6.languageparser.entity.enums.LanguageConnectionType;
 import by.c7d5a6.languageparser.rest.model.Language;
+import by.c7d5a6.languageparser.rest.model.LanguageConnection;
 import by.c7d5a6.languageparser.rest.model.SoundChange;
 import by.c7d5a6.languageparser.rest.model.WordTraceResult;
 import by.c7d5a6.languageparser.service.EvolutionService;
@@ -32,6 +34,28 @@ public class EvolveController {
         this.languageService = languageService;
         this.soundChangesService = soundChangesService;
     }
+
+    @Operation(summary = "Get connection between two languages")
+    @GetMapping("/connection/{fromLangId}/{toLangId}")
+    public LanguageConnection getConnectionByLangs(@PathVariable long fromLangId, @PathVariable long toLangId) {
+        logger.info("Get connection between {} and {}", fromLangId, toLangId);
+        return languageService.getConnection(fromLangId, toLangId);
+    }
+
+    @Operation(summary = "Update connection between two languages")
+    @PostMapping("/connection/{fromLangId}/{toLangId}")
+    public void updateConnectionByLangs(@PathVariable long fromLangId, @PathVariable long toLangId, @RequestBody LanguageConnectionType connectionType) {
+        logger.info("Update connection between {} and {}", fromLangId, toLangId);
+        languageService.updateConnection(fromLangId, toLangId, connectionType);
+    }
+
+    @Operation(summary = "Delete connection between two languages")
+    @DeleteMapping("/connection/{fromLangId}/{toLangId}")
+    public void deleteConnectionByLangs(@PathVariable long fromLangId, @PathVariable long toLangId) {
+        logger.info("Delete connection between {} and {}", fromLangId, toLangId);
+        languageService.deleteConnection(fromLangId, toLangId);
+    }
+
 
     @Operation(summary = "Get all languages to which path from the given language is possible")
     @GetMapping("/allfrom/{fromId}")

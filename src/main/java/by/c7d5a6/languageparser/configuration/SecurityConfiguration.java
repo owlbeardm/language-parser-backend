@@ -45,6 +45,8 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                         .mvcMatchers("/api/auth/**").permitAll()
                         .mvcMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                         .mvcMatchers(HttpMethod.GET, "/**").permitAll()
+                        .mvcMatchers(HttpMethod.POST, "/**").permitAll()
+                        .mvcMatchers(HttpMethod.DELETE, "/**").permitAll()
                         .mvcMatchers(HttpMethod.POST, "/api/evolve/trace/**").permitAll()
                         .mvcMatchers(HttpMethod.POST, "/api/evolve/sc/raw/**").permitAll()
                         .anyRequest().authenticated()

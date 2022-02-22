@@ -2,9 +2,11 @@ package by.c7d5a6.languageparser.service;
 
 import by.c7d5a6.languageparser.entity.ELanguage;
 import by.c7d5a6.languageparser.entity.ELanguageConnection;
+import by.c7d5a6.languageparser.entity.enums.LanguageConnectionType;
 import by.c7d5a6.languageparser.repository.LanguageConnectionRepository;
 import by.c7d5a6.languageparser.repository.LanguageRepository;
 import by.c7d5a6.languageparser.rest.model.Language;
+import by.c7d5a6.languageparser.rest.model.LanguageConnection;
 import com.google.common.collect.Lists;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -90,12 +92,38 @@ public class LanguageService extends BaseService {
         return result;
     }
 
-    private void createLanguagesGraph() {
+    public LanguageConnection getConnection(long fromLangId, long toLangId) {
+        return this.languageConnectionRepository.findByLangFrom_IdAndLangTo_Id(fromLangId, toLangId).map(this::convertToRestModel).orElse(null);
+    }
 
+    public void updateConnection(long fromLangId, long toLangId, LanguageConnectionType connectionType) {
+        this.languageConnectionRepository.findByLangFrom_IdAndLangTo_Id(fromLangId, toLangId).ifPresentOrElse(connection -> {
+            connection.setConnectionType(connectionType);
+            this.languageConnectionRepository.save(connection);
+        }, () -> {
+            ELanguage langFrom = this.languageRepository.findById(fromLangId).orElseThrow(() -> new IllegalArgumentException("Language with id " + fromLangId + " not found"));
+            ELanguage langTo = this.languageRepository.findById(toLangId).orElseThrow(() -> new IllegalArgumentException("Language with id " + toLangId + " not found"));
+            ELanguageConnection connection = new ELanguageConnection();
+            connection.setLangFrom(langFrom);
+            connection.setLangTo(langTo);
+            connection.setConnectionType(connectionType);
+            this.languageConnectionRepository.save(connection);
+        });
+    }
+
+    public void deleteConnection(long fromLangId, long toLangId) {
+        this.languageConnectionRepository.findByLangFrom_IdAndLangTo_Id(fromLangId, toLangId).ifPresent(this.languageConnectionRepository::delete);
+    }
+
+    private void createLanguagesGraph() {
     }
 
     public Language convertToRestModel(ELanguage language) {
         return mapper.map(language, Language.class);
+    }
+
+    public LanguageConnection convertToRestModel(ELanguageConnection language) {
+        return mapper.map(language, LanguageConnection.class);
     }
 
     public Optional<ELanguage> getLangById(long fromLangId) {

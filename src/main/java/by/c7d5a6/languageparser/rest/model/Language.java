@@ -37,4 +37,13 @@ public class Language extends Base implements Serializable {
     public void setComment(String comment) {
         this.comment = comment;
     }
+
+    @Override
+    public String toString() {
+        return "Language{" +
+                "displayName='" + displayName + '\'' +
+                ", nativeName='" + nativeName + '\'' +
+                ", comment='" + comment + '\'' +
+                '}';
+    }
 }
