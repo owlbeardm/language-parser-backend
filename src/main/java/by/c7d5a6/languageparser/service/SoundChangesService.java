@@ -13,7 +13,6 @@ import org.springframework.stereotype.Service;
 import java.lang.invoke.MethodHandles;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -96,12 +95,28 @@ public class SoundChangesService extends BaseService {
         }
     }
 
+    public String getSoundChangeRaw(long id) {
+        return soundChangeRepository.findById(id).map(this::soundChangeToRawLine).orElseThrow(() -> new IllegalArgumentException("Sound change with id " + id + " doesn't exist"));
+    }
+
     public void updateSoundChange(long id, String rawLine) {
-        throw new UnsupportedOperationException("Not implemented yet");
+        soundChangeRepository.findById(id).map((sc) -> {
+            ESoundChange soundChangesFromLine = this.getSoundChangesFromLine(rawLine);
+            sc.setSoundFrom(soundChangesFromLine.getSoundFrom());
+            sc.setSoundTo(soundChangesFromLine.getSoundTo());
+            sc.setEnvironmentBefore(soundChangesFromLine.getEnvironmentBefore());
+            sc.setEnvironmentAfter(soundChangesFromLine.getEnvironmentAfter());
+            sc.setType(soundChangesFromLine.getType());
+            return this.soundChangeRepository.save(sc);
+        }).orElseThrow(() -> new IllegalArgumentException("Sound change with id " + id + " doesn't exist"));
     }
 
     public void deleteSoundChange(long id) {
-        throw new UnsupportedOperationException("Not implemented yet");
+        soundChangeRepository.delete(soundChangeRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Sound change with id " + id + " doesn't exist")));
+    }
+
+    public SoundChange getSoundChange(long id) {
+        return soundChangeRepository.findById(id).map(this::convertToSoundChange).orElseThrow(() -> new IllegalArgumentException("Sound change with id " + id + " doesn't exist"));
     }
 
     private String replaceArrows(String trimed) {
@@ -120,7 +135,7 @@ public class SoundChangesService extends BaseService {
                 + (
                 ((soundChange.getEnvironmentBefore() != null && !soundChange.getEnvironmentBefore().isEmpty())
                         || (soundChange.getEnvironmentAfter() != null && !soundChange.getEnvironmentAfter().isEmpty()))
-                        ? (" " + soundChange.getEnvironmentBefore() + "_" + soundChange.getEnvironmentAfter())
+                        ? (" / " + soundChange.getEnvironmentBefore() + "_" + soundChange.getEnvironmentAfter())
                         : "");
     }
 
@@ -135,4 +150,7 @@ public class SoundChangesService extends BaseService {
     private SoundChange convertToSoundChange(ESoundChange soundChange) {
         return mapper.map(soundChange, SoundChange.class);
     }
+
+
+
 }

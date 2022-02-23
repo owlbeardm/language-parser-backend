@@ -52,10 +52,27 @@ public class EvolutionService extends BaseService {
     public String evolveWord(String word, List<ESoundChange> soundChanges) {
         String result = word;
         for (ESoundChange soundChange : soundChanges) {
-            Pattern pattern = Pattern.compile(soundChange.getSoundFrom());
-            Matcher matcher = pattern.matcher(result);
-            result = matcher.replaceAll(soundChange.getSoundTo());
+            result = evolveWordBySingleSoundChange(result, soundChange);
         }
         return result;
+    }
+
+    private String evolveWordBySingleSoundChange(String result, ESoundChange soundChange) {
+        String regexp = getRegexpFromSoundChange(soundChange);
+        Pattern pattern = Pattern.compile(regexp);
+        Matcher matcher = pattern.matcher(result);
+        switch (soundChange.getType()) {
+            case REPLACE_ALL -> result = matcher.replaceAll(soundChange.getSoundTo());
+            case REPLACE_FIRST -> result = matcher.replaceFirst(soundChange.getSoundTo());
+            case REPLACE_LAST -> throw new UnsupportedOperationException("Not implemented yet");
+        }
+        return result;
+    }
+
+    private String getRegexpFromSoundChange(ESoundChange soundChange) {
+        String regexpBefore = (soundChange.getEnvironmentBefore()!=null && !soundChange.getEnvironmentBefore().isEmpty()) ? "(?<=" + soundChange.getEnvironmentBefore() + ")" : "";
+        String regexpAfter = (soundChange.getEnvironmentAfter()!=null && !soundChange.getEnvironmentAfter().isEmpty()) ? "(?=" + soundChange.getEnvironmentAfter() + ")" : "";
+        String regexp = regexpBefore + soundChange.getSoundFrom() + regexpAfter;
+        return regexp;
     }
 }
