@@ -1,6 +1,7 @@
 package by.c7d5a6.languageparser.rest.controller;
 
 import by.c7d5a6.languageparser.rest.model.Language;
+import by.c7d5a6.languageparser.rest.model.POS;
 import by.c7d5a6.languageparser.rest.security.IsVerifiedUser;
 import by.c7d5a6.languageparser.service.LanguageService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -41,5 +42,21 @@ public class LanguageController {
         logger.info("Saving language");
         return languageService.saveOrUpdateLanguage(language);
     }
+
+    @Operation(summary = "Get all parts of speech")
+    @GetMapping("/pos")
+    public List<POS> getAllPartsOfSpeech() {
+        logger.info("Getting all parts of speech");
+        return languageService.getAllPartsOfSpeech();
+    }
+
+    @Operation(summary = "Get all parts of speech by language")
+    @GetMapping("/pos/{languageId}")
+    public List<POS> getAllPartsOfSpeechByLanguage(@PathVariable Long languageId) {
+        logger.info("Getting all parts of speech by language");
+        return languageService.getAllPartsOfSpeechByLanguage(languageId);
+    }
+
+
 
 }

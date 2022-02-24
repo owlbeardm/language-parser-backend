@@ -2,11 +2,14 @@ package by.c7d5a6.languageparser.service;
 
 import by.c7d5a6.languageparser.entity.ELanguage;
 import by.c7d5a6.languageparser.entity.ELanguageConnection;
+import by.c7d5a6.languageparser.entity.EPOS;
 import by.c7d5a6.languageparser.entity.enums.LanguageConnectionType;
 import by.c7d5a6.languageparser.repository.LanguageConnectionRepository;
 import by.c7d5a6.languageparser.repository.LanguageRepository;
+import by.c7d5a6.languageparser.repository.PartOfSpeechRepository;
 import by.c7d5a6.languageparser.rest.model.Language;
 import by.c7d5a6.languageparser.rest.model.LanguageConnection;
+import by.c7d5a6.languageparser.rest.model.POS;
 import com.google.common.collect.Lists;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,12 +26,14 @@ public class LanguageService extends BaseService {
     private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     private final LanguageRepository languageRepository;
+    private final PartOfSpeechRepository partOfSpeechRepository;
     private final LanguageConnectionRepository languageConnectionRepository;
 
     @Autowired
-    public LanguageService(LanguageRepository languageRepository, LanguageConnectionRepository languageConnectionRepository) {
+    public LanguageService(LanguageRepository languageRepository, LanguageConnectionRepository languageConnectionRepository, PartOfSpeechRepository partOfSpeechRepository) {
         this.languageRepository = languageRepository;
         this.languageConnectionRepository = languageConnectionRepository;
+        this.partOfSpeechRepository = partOfSpeechRepository;
     }
 
     public List<Language> getAllLanguages() {
@@ -118,6 +123,10 @@ public class LanguageService extends BaseService {
     private void createLanguagesGraph() {
     }
 
+    private POS convertToRestModel(EPOS epos) {
+        return mapper.map(epos, POS.class);
+    }
+
     public Language convertToRestModel(ELanguage language) {
         return mapper.map(language, Language.class);
     }
@@ -145,4 +154,11 @@ public class LanguageService extends BaseService {
         return convertToRestModel(lang);
     }
 
+    public List<POS> getAllPartsOfSpeech() {
+        return this.partOfSpeechRepository.findAll().stream().map(this::convertToRestModel).collect(Collectors.toList());
+    }
+
+    public List<POS> getAllPartsOfSpeechByLanguage(Long languageId) {
+        throw new UnsupportedOperationException();
+    }
 }
