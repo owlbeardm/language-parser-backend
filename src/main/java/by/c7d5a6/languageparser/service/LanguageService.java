@@ -129,4 +129,20 @@ public class LanguageService extends BaseService {
     public Optional<ELanguage> getLangById(long fromLangId) {
         return languageRepository.findById(fromLangId);
     }
+
+    public Language saveOrUpdateLanguage(Language language) {
+        ELanguage lang;
+        if (language.getId() == null) {
+            lang = new ELanguage();
+        } else {
+            lang = languageRepository.findById(language.getId()).orElseThrow(() -> new IllegalArgumentException("Language with id " + language.getId() + " not found"));
+        }
+        lang.setComment(language.getComment());
+        lang.setDisplayName(language.getDisplayName());
+        lang.setNativeName(language.getNativeName());
+//            lang.setFrequency(language.getFrequency());
+        lang = languageRepository.save(lang);
+        return convertToRestModel(lang);
+    }
+
 }

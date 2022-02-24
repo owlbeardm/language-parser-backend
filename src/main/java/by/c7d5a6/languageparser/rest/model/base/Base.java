@@ -1,14 +1,10 @@
 package by.c7d5a6.languageparser.rest.model.base;
 
-import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 
-public class Base implements Serializable  {
-    @NotNull
-    private long id;
-
-    @NotNull
-    private long version = 1;
+public class Base implements Serializable {
+    private Long id;
+    private Long version;
 
     public Base() {
     }
@@ -18,7 +14,7 @@ public class Base implements Serializable  {
         this.version = version;
     }
 
-    public long getId() {
+    public Long getId() {
         return id;
     }
 
@@ -26,11 +22,11 @@ public class Base implements Serializable  {
         this.id = id;
     }
 
-    public long getVersion() {
+    public Long getVersion() {
         return version;
     }
 
-    public void setVersion(long version) {
+    public void setVersion(Long version) {
         this.version = version;
     }
 }
