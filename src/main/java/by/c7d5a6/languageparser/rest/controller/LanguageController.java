@@ -57,6 +57,10 @@ public class LanguageController {
         return languageService.getAllPartsOfSpeechByLanguage(languageId);
     }
 
-
-
+    @Operation(summary = "Get language phonemes by id")
+    @GetMapping("/phoneme/{languageId}")
+    public List<String> getLanguagePhonemes(@PathVariable Long languageId) {
+        logger.info("Getting language phonemes by id");
+        return languageService.getLanguagePhonemes(languageId);
+    }
 }

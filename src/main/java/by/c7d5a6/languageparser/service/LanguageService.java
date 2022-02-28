@@ -28,12 +28,16 @@ public class LanguageService extends BaseService {
     private final LanguageRepository languageRepository;
     private final PartOfSpeechRepository partOfSpeechRepository;
     private final LanguageConnectionRepository languageConnectionRepository;
+    private final WordService wordService;
+    private final IPAService ipaService;
 
     @Autowired
-    public LanguageService(LanguageRepository languageRepository, LanguageConnectionRepository languageConnectionRepository, PartOfSpeechRepository partOfSpeechRepository) {
+    public LanguageService(LanguageRepository languageRepository, LanguageConnectionRepository languageConnectionRepository, PartOfSpeechRepository partOfSpeechRepository, WordService wordService, IPAService ipaService) {
         this.languageRepository = languageRepository;
         this.languageConnectionRepository = languageConnectionRepository;
         this.partOfSpeechRepository = partOfSpeechRepository;
+        this.wordService = wordService;
+        this.ipaService = ipaService;
     }
 
     public List<Language> getAllLanguages() {
@@ -160,5 +164,11 @@ public class LanguageService extends BaseService {
 
     public List<POS> getAllPartsOfSpeechByLanguage(Long languageId) {
         throw new UnsupportedOperationException();
+    }
+
+    public List<String> getLanguagePhonemes(Long languageId) {
+        ELanguage eLanguage = languageRepository.findById(languageId).orElseThrow(() -> new IllegalArgumentException("Language with id " + languageId + " not found"));
+        String languagePhonemes = this.wordService.getLanguagePhonemes(eLanguage);
+        return Arrays.stream(ipaService.getAllSounds()).sorted((o1, o2) -> o2.length() - o1.length()).filter(languagePhonemes::contains).collect(Collectors.toList());
     }
 }

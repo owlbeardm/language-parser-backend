@@ -1,5 +1,6 @@
 package by.c7d5a6.languageparser.service;
 
+import by.c7d5a6.languageparser.entity.ELanguage;
 import by.c7d5a6.languageparser.entity.EWord;
 import by.c7d5a6.languageparser.repository.WordsRepository;
 import by.c7d5a6.languageparser.rest.model.PaginationFilter;
@@ -40,5 +41,14 @@ public class WordService extends BaseService {
                 wordsRepository.findAll(filter.toPageable()),
                 this::convertToRestModel
         );
+    }
+
+    public String getLanguagePhonemes(ELanguage eLanguage) {
+        return this.wordsRepository
+                .findByLanguage_Id(eLanguage.getId())
+                .stream()
+                .map(EWord::getWord)
+                .reduce((a, b) -> a + " " + b)
+                .orElse("");
     }
 }
