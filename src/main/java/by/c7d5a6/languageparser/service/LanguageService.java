@@ -210,4 +210,13 @@ public class LanguageService extends BaseService {
         ELanguagePhoneme eLanguagePhoneme = languagePhonemeRepository.findById(phonemeId).orElseThrow(() -> new IllegalArgumentException("Phoneme with id " + phonemeId + " not found"));
         languagePhonemeRepository.delete(eLanguagePhoneme);
     }
+
+    public void deleteLanguage(Long languageId) {
+        ELanguage eLanguage = languageRepository.findById(languageId).orElseThrow(() -> new IllegalArgumentException("Language with id " + languageId + " not found"));
+        languageRepository.delete(eLanguage);
+    }
+
+    public boolean canDeleteLanguage(Long languageId) {
+        return true;
+    }
 }

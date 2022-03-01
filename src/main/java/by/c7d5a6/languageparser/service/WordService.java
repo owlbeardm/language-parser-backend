@@ -51,4 +51,13 @@ public class WordService extends BaseService {
                 .reduce((a, b) -> a + " " + b)
                 .orElse("");
     }
+
+    public void deleteWord(Long id) {
+        EWord eWord = this.wordsRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Word " + id + " not found"));
+        this.wordsRepository.delete(eWord);
+    }
+
+    public boolean canDeleteWord(Long wordId) {
+        return true;
+    }
 }

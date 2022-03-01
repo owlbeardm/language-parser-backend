@@ -50,6 +50,19 @@ public class WordsController {
         return wordService.getAllWords(filter);
     }
 
+    @Operation(summary = "Delete word by id")
+    @DeleteMapping("/{id}")
+    public void deleteWord(@PathVariable Long id) {
+        wordService.deleteWord(id);
+    }
+
+    @Operation(summary = "Can delete word")
+    @GetMapping("/{wordId}/candelete")
+    public boolean canDeleteWord(@PathVariable Long wordId) {
+        logger.info("Can delete word");
+        return wordService.canDeleteWord(wordId);
+    }
+
 //    @Operation(summary = "Get all words from language by text")
 //    @GetMapping("/all/{from}/{text}")
 //    public List<Word> getAllWords(@PathVariable("from") String fromId, @PathVariable("text") String text) {

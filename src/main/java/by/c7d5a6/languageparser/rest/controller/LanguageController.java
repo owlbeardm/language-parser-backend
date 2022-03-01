@@ -45,6 +45,20 @@ public class LanguageController {
         return languageService.saveOrUpdateLanguage(language);
     }
 
+    @Operation(summary = "Delete language by id")
+    @DeleteMapping("/{languageId}")
+    public void deleteLanguage(@PathVariable Long languageId) {
+        logger.info("Deleting language by id");
+        languageService.deleteLanguage(languageId);
+    }
+
+    @Operation(summary = "Can delete language")
+    @GetMapping("/{languageId}/candelete")
+    public boolean canDeleteLanguage(@PathVariable Long languageId) {
+        logger.info("Can delete language");
+        return languageService.canDeleteLanguage(languageId);
+    }
+
     @Operation(summary = "Get all parts of speech")
     @GetMapping("/pos")
     public List<POS> getAllPartsOfSpeech() {
