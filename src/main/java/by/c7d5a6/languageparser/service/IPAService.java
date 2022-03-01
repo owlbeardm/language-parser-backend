@@ -6,6 +6,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.lang.invoke.MethodHandles;
+import java.util.Arrays;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @Service
@@ -119,6 +121,11 @@ public class IPAService extends BaseService {
     ////////////////////////////////////////////////////////////////////////////////////////
     private final String[] allSounds = concatenate(consonants, vowel);
 
+    ///
+    // Additions
+    private final String[] constanantAddition = {"ʰ","ʷ","ʲ","ʷʰ"};
+    private final String[] vowelAddition = {"ː"};
+
     @Autowired
     public IPAService() {
     }
@@ -134,10 +141,9 @@ public class IPAService extends BaseService {
 //        IPA = IPA.normalize('NFD');
         return ipaString
                 .trim()
-                .replaceAll("ɡ", "g")
+                .replaceAll("g", "ɡ")
                 .replaceAll(":", "ː")
                 .replaceAll("’", "ʼ")
-                .replaceAll("ʱ", "̤")
                 .replaceAll("Ø", "∅")
                 .replaceAll("ɚ", "ə˞");
 //                .replaceAll("\\?", "ʔ");
@@ -334,5 +340,30 @@ public class IPAService extends BaseService {
 
     public String[] getAllSounds() {
         return allSounds;
+    }
+
+    public String[] getAllConstanantVariants() {
+        return getVariables(constanantAddition, consonants);
+    }
+
+    public String[] getAllVowelVariants() {
+        return getVariables(vowelAddition, vowel);
+    }
+
+    public String[] getAllSoundsWithVariants() {
+        return concatenate(getAllVowelVariants(), getAllConstanantVariants());
+    }
+
+    private String[] getVariables(String[] addition, String[] phonemes) {
+        String[] variables = Arrays.stream(addition)
+                .map((s) -> Arrays.stream(phonemes)
+                        .map((c) -> c + s)
+                        .collect(Collectors.toList()))
+                .reduce((l1, l2) -> Stream.concat(l1.stream(), l2.stream()).collect(Collectors.toList()))
+                .map((l) -> l.toArray(new String[0]))
+                .orElse(new String[0]);
+        logger.info("Variables: {}", Arrays.toString(variables));
+        return concatenate(phonemes,
+                variables);
     }
 }

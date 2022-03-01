@@ -1,6 +1,8 @@
 package by.c7d5a6.languageparser.rest.controller;
 
 import by.c7d5a6.languageparser.rest.model.Language;
+import by.c7d5a6.languageparser.rest.model.LanguagePhoneme;
+import by.c7d5a6.languageparser.rest.model.ListOfLanguagePhonemes;
 import by.c7d5a6.languageparser.rest.model.POS;
 import by.c7d5a6.languageparser.rest.security.IsVerifiedUser;
 import by.c7d5a6.languageparser.service.LanguageService;
@@ -59,8 +61,22 @@ public class LanguageController {
 
     @Operation(summary = "Get language phonemes by id")
     @GetMapping("/phoneme/{languageId}")
-    public List<String> getLanguagePhonemes(@PathVariable Long languageId) {
+    public ListOfLanguagePhonemes getLanguagePhonemes(@PathVariable Long languageId) {
         logger.info("Getting language phonemes by id");
         return languageService.getLanguagePhonemes(languageId);
+    }
+
+    @Operation(summary = "Save language phoneme")
+    @PostMapping("/phoneme/{languageId}")
+    public LanguagePhoneme saveLanguagePhoneme(@PathVariable Long languageId, @RequestBody String phoneme) {
+        logger.info("Saving language phoneme");
+        return languageService.saveLanguagePhoneme(languageId, phoneme);
+    }
+
+    @Operation(summary = "Delete language phoneme")
+    @DeleteMapping("/phoneme/{phonemeId}")
+    public void deleteLanguagePhoneme(@PathVariable Long phonemeId) {
+        logger.info("Deleting language phoneme");
+        languageService.deleteLanguagePhoneme(phonemeId);
     }
 }

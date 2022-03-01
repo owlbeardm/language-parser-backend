@@ -2,14 +2,14 @@ package by.c7d5a6.languageparser.service;
 
 import by.c7d5a6.languageparser.entity.ELanguage;
 import by.c7d5a6.languageparser.entity.ELanguageConnection;
+import by.c7d5a6.languageparser.entity.ELanguagePhoneme;
 import by.c7d5a6.languageparser.entity.EPOS;
 import by.c7d5a6.languageparser.entity.enums.LanguageConnectionType;
 import by.c7d5a6.languageparser.repository.LanguageConnectionRepository;
+import by.c7d5a6.languageparser.repository.LanguagePhonemeRepository;
 import by.c7d5a6.languageparser.repository.LanguageRepository;
 import by.c7d5a6.languageparser.repository.PartOfSpeechRepository;
-import by.c7d5a6.languageparser.rest.model.Language;
-import by.c7d5a6.languageparser.rest.model.LanguageConnection;
-import by.c7d5a6.languageparser.rest.model.POS;
+import by.c7d5a6.languageparser.rest.model.*;
 import com.google.common.collect.Lists;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,16 +28,19 @@ public class LanguageService extends BaseService {
     private final LanguageRepository languageRepository;
     private final PartOfSpeechRepository partOfSpeechRepository;
     private final LanguageConnectionRepository languageConnectionRepository;
+    private final LanguagePhonemeRepository languagePhonemeRepository;
     private final WordService wordService;
     private final IPAService ipaService;
 
+
     @Autowired
-    public LanguageService(LanguageRepository languageRepository, LanguageConnectionRepository languageConnectionRepository, PartOfSpeechRepository partOfSpeechRepository, WordService wordService, IPAService ipaService) {
+    public LanguageService(LanguageRepository languageRepository, LanguageConnectionRepository languageConnectionRepository, PartOfSpeechRepository partOfSpeechRepository, WordService wordService, IPAService ipaService, LanguagePhonemeRepository languagePhonemeRepository) {
         this.languageRepository = languageRepository;
         this.languageConnectionRepository = languageConnectionRepository;
         this.partOfSpeechRepository = partOfSpeechRepository;
         this.wordService = wordService;
         this.ipaService = ipaService;
+        this.languagePhonemeRepository = languagePhonemeRepository;
     }
 
     public List<Language> getAllLanguages() {
@@ -139,6 +142,10 @@ public class LanguageService extends BaseService {
         return mapper.map(language, LanguageConnection.class);
     }
 
+    public LanguagePhoneme convertToRestModel(ELanguagePhoneme eLanguagePhoneme) {
+        return mapper.map(eLanguagePhoneme, LanguagePhoneme.class);
+    }
+
     public Optional<ELanguage> getLangById(long fromLangId) {
         return languageRepository.findById(fromLangId);
     }
@@ -166,9 +173,39 @@ public class LanguageService extends BaseService {
         throw new UnsupportedOperationException();
     }
 
-    public List<String> getLanguagePhonemes(Long languageId) {
+    public ListOfLanguagePhonemes getLanguagePhonemes(Long languageId) {
         ELanguage eLanguage = languageRepository.findById(languageId).orElseThrow(() -> new IllegalArgumentException("Language with id " + languageId + " not found"));
-        String languagePhonemes = this.wordService.getLanguagePhonemes(eLanguage);
-        return Arrays.stream(ipaService.getAllSounds()).sorted((o1, o2) -> o2.length() - o1.length()).filter(languagePhonemes::contains).collect(Collectors.toList());
+        ListOfLanguagePhonemes resultList = new ListOfLanguagePhonemes();
+        resultList.setLangId(languageId);
+        String languagePhonemes = ipaService.cleanIPA(this.wordService.getLanguagePhonemes(eLanguage));
+        String[] allSoundsWithVariants = ipaService.getAllSoundsWithVariants();
+
+        List<String> sounds = Arrays.stream(allSoundsWithVariants).sorted((o1, o2) -> o2.length() - o1.length())
+                .filter(languagePhonemes::contains).collect(Collectors.toList());
+        resultList.setUsedMainPhonemes(sounds);
+        List<String> restSounds = Arrays.stream(sounds.stream().reduce(languagePhonemes, (result, element) -> result.replaceAll(element, "")).split("")).distinct().collect(Collectors.toList());
+        resultList.setRestUsedPhonemes(restSounds);
+
+        List<ELanguagePhoneme> elp = this.languagePhonemeRepository.findByLanguage_Id(languageId);
+        List<LanguagePhoneme> lpused = elp.stream().filter((lp)->Arrays.stream(allSoundsWithVariants).anyMatch(lp.getPhoneme()::equals)).map(this::convertToRestModel).collect(Collectors.toList());
+        resultList.setSelectedMainPhonemes(lpused);
+        List<LanguagePhoneme> lprest = elp.stream().filter((lp)-> Arrays.stream(allSoundsWithVariants).noneMatch(lp.getPhoneme()::equals)).map(this::convertToRestModel).collect(Collectors.toList());
+        resultList.setSelectedRestPhonemes(lprest);
+
+        return resultList;
+    }
+
+    public LanguagePhoneme saveLanguagePhoneme(Long languageId, String phoneme) {
+        ELanguage eLanguage = languageRepository.findById(languageId).orElseThrow(() -> new IllegalArgumentException("Language with id " + languageId + " not found"));
+        ELanguagePhoneme eLanguagePhoneme = new ELanguagePhoneme();
+        eLanguagePhoneme.setPhoneme(phoneme);
+        eLanguagePhoneme.setLanguage(eLanguage);
+        eLanguagePhoneme = languagePhonemeRepository.save(eLanguagePhoneme);
+        return convertToRestModel(eLanguagePhoneme);
+    }
+
+    public void deleteLanguagePhoneme(Long phonemeId) {
+        ELanguagePhoneme eLanguagePhoneme = languagePhonemeRepository.findById(phonemeId).orElseThrow(() -> new IllegalArgumentException("Phoneme with id " + phonemeId + " not found"));
+        languagePhonemeRepository.delete(eLanguagePhoneme);
     }
 }
