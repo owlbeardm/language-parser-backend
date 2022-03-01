@@ -25,8 +25,8 @@ public class IPAService extends BaseService {
     private final String[] plumonicConsonantsTapFlap = {"ⱱ̟", "ⱱ", "ɾ̼", "ɾ̥", "ɾ", "ɽ̊", "ɽ", "ɢ̆", "ʡ̆"};
     private final String[] plumonicConsonantsTrill = {"ʙ̥", "ʙ", "r̥", "r", "ɽ̊r̥", "ɽr", "ʀ̥", "ʀ", "ʜ", "ʢ"};
     private final String[] plumonicConsonantsLateralFricative = {"ɬ", "ɮ", "ɭ̊˔", "ɭ˔", "ʎ̝̊", "ʎ̝", "ʟ̝̊", "ʟ̝"};
-    private final String[] plumonicConsonantsLateralApproximant = {"l", "ɭ", "ʎ", "ʟ", "ʟ̠"};
-    private final String[] plumonicConsonantsLateralTapFlap = {"ɺ̥", "ɺ", "ɭ̥̆", "ɭ̆", "ʎ̆", "ʟ̆"};
+    private final String[] plumonicConsonantsLateralApproximant = {"l̥", "l", "ɭ", "ʎ", "ʟ", "ʟ̠"};
+    private final String[] plumonicConsonantsLateralTapFlap = {"ɺ̥", "ɺ", "ɭ̥̆", "ɭ̆", "ʎ̝̆̊", "ʟ̆"};
     private final String[] PlumonicConsonants = concatenate(
             plumonicConsonantsNasal,
             plumonicConsonantsPlosive,
@@ -41,15 +41,15 @@ public class IPAService extends BaseService {
     // Non-pulmonic consonants
     // Manner
     private final String[] ejectiveStop = {"pʼ", "tʼ", "ʈʼ", "cʼ", "kʼ", "qʼ", "ʡʼ"};
-    private final String[] ejectiveFricative = {"pʼ", "tʼ", "ʈʼ", "cʼ", "kʼ", "qʼ", "ʡʼ"};
-    private final String[] ejectiveStopLateralFricative = {"pʼ", "tʼ", "ʈʼ", "cʼ", "kʼ", "qʼ", "ʡʼ"};
+    private final String[] ejectiveFricative = {"ɸʼ", "fʼ", "θʼ", "sʼ", "ʃʼ", "ʂʼ", "ɕʼ", "xʼ", "χʼ"};
+    private final String[] ejectiveLateralFricative = {"ɬʼ"};
     private final String[] ejective = concatenate(
             ejectiveStop,
             ejectiveFricative,
-            ejectiveStopLateralFricative);
-    private final String[] clickTenuis = {"kʘ", "qʘ", "kǀ", "qǀ", "kǃ", "qǃ", "kǂ", "qǂ"};
-    private final String[] clickVoiced = {"ɡʘ", "ɢʘ", "ɡǀ", "ɢǀ", "ɡǃ", "ɢǃ", "ɡǂ", "ɢǂ"};
-    private final String[] clickNasal = {"ŋʘ", "ɴʘ", "ŋǀ", "ɴǀ", "ŋǃ", "ɴǃ", "ŋǂ", "ɴǂ"};
+            ejectiveLateralFricative);
+    private final String[] clickTenuis = {"kʘ", "qʘ", "kǀ", "qǀ", "kǃ", "qǃ", "k‼", "q‼", "kǂ", "qǂ"};
+    private final String[] clickVoiced = {"ɡʘ", "ɢʘ", "ɡǀ", "ɢǀ", "ɡǃ", "ɢǃ", "ɡ‼", "ɢ‼", "ɡǂ", "ɢǂ"};
+    private final String[] clickNasal = {"ŋʘ", "ɴʘ", "ŋǀ", "ɴǀ", "ŋǃ", "ɴǃ", "ŋ‼", "ɴ‼", "ŋǂ", "ɴǂ", "ʞ"};
     private final String[] clickTenuisLateral = {"kǁ", "qǁ"};
     private final String[] clickVoicedLateral = {"ɡǁ", "ɢǁ"};
     private final String[] clickNasalLateral = {"ŋǁ", "ɴǁ"};
@@ -61,21 +61,21 @@ public class IPAService extends BaseService {
             clickVoicedLateral,
             clickNasalLateral);
     private final String[] implosiveVoiced = {"ɓ", "ɗ", "ᶑ", "ʄ", "ɠ", "ʛ"};
-    private final String[] implosiveVoiceless = {"ɓ̥", "ɗ̥", "ᶑ̊", "ʄ̊", "ɠ̊", "ʛ̥"};
+    private final String[] implosiveVoiceless = {"ɓ̥", "ɗ̥̥", "ᶑ̊", "ʄ̊", "ɠ̊", "ʛ̥"};
     private final String[] implosive = concatenate(
             implosiveVoiced,
             implosiveVoiceless);
     // Affricates
     // Pulmonic
-    private final String[] affricatePulmonicSibilant = {"ʦ", "ʣ", "ʧ", "ʤ", "ʈʂ", "ɖʐ", "ʨ", "ʥ"};
-    private final String[] affricatePulmonicNonSibilant = {"pɸ", "bβ", "p̪f", "b̪v", "t̪θ", "d̪ð", "tɹ̝̊", "dɹ̝", "t̠ɹ̠̊˔", "d̠ɹ̠˔", "cç", "ɟʝ", "kx", "ɡɣ", "qχ", "ɢʁ", "ʡʢ", "ʔh"};
-    private final String[] affricatePulmonicLateral = {"tɬ", "dɮ", "ʈɭ̊˔", "ɖɭ˔", "cʎ̝̊", "ɟʎ̝", "kʟ̝̊", "ɡʟ̝"};
+    private final String[] affricatePulmonicSibilant = {"ʦ", "ʣ", "ʧ", "ʤ", "ʈ͡ʂ", "ɖ͡ʐ", "ʨ", "ʥ"};
+    private final String[] affricatePulmonicNonSibilant = {"p͡ɸ", "b͡β", "p̪͡f", "b̪͡v", "t̪͡θ", "d̪͡ð", "t͡ɹ̝̊", "d͡ɹ̝̠", "t̠͡ɹ̠̊˔", "d̠͡ɹ̠˔", "c͡ç", "ɟ͡ʝ", "k͡x", "ɡ͡ɣ", "q͡χ", "ɢ͡ʁ", "ʡ͡ʢ", "ʔ͡h"};
+    private final String[] affricatePulmonicLateral = {"t͡ɬ", "d͡ɮ", "ʈ͡ɭ̊˔", "ɖ͡ɭ˔", "c͡ʎ̝̊", "ɟ͡ʎ̝", "k͡ʟ̝̊", "ɡ͡ʟ̝"};
     private final String[] affricatePulmonic = concatenate(
             affricatePulmonicSibilant,
             affricatePulmonicNonSibilant,
             affricatePulmonicLateral);
-    private final String[] affricateEjectiveCentral = {"tsʼ", "t̠ʃʼ", "ʈʂʼ", "kxʼ", "qχʼ"};
-    private final String[] affricateEjectiveLateral = {"tɬʼ", "cʎ̝̊ʼ", "kʟ̝̊ʼ"};
+    private final String[] affricateEjectiveCentral = {"t̪͡θʼ", "t͡sʼ", "t̠͡ʃʼ", "ʈ͡ʂʼ", "k͡xʼ", "q͡χʼ"};
+    private final String[] affricateEjectiveLateral = {"t͡ɬʼ", "c͡ʎ̝̊ʼ", "k͡ʟ̝̊ʼ"};
     private final String[] affricateEjective = concatenate(
             affricateEjectiveCentral,
             affricateEjectiveLateral);
@@ -123,8 +123,8 @@ public class IPAService extends BaseService {
 
     ///
     // Additions
-    private final String[] constanantAddition = {"ʰ","ʷ","ʲ","ʷʰ"};
-    private final String[] vowelAddition = {"ː"};
+    private final String[] constanantAddition = {"ʰ", "ʷ", "ʲ", "ʷʰ"};
+    private final String[] vowelAddition = {"ː", "ʼ"};
 
     @Autowired
     public IPAService() {
@@ -203,7 +203,7 @@ public class IPAService extends BaseService {
     }
 
     public String[] getEjectiveStopLateralFricative() {
-        return ejectiveStopLateralFricative;
+        return ejectiveLateralFricative;
     }
 
     public String[] getEjective() {
@@ -362,7 +362,6 @@ public class IPAService extends BaseService {
                 .reduce((l1, l2) -> Stream.concat(l1.stream(), l2.stream()).collect(Collectors.toList()))
                 .map((l) -> l.toArray(new String[0]))
                 .orElse(new String[0]);
-        logger.info("Variables: {}", Arrays.toString(variables));
         return concatenate(phonemes,
                 variables);
     }

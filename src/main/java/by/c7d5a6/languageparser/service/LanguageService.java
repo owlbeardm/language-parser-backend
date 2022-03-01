@@ -178,15 +178,17 @@ public class LanguageService extends BaseService {
         ListOfLanguagePhonemes resultList = new ListOfLanguagePhonemes();
         resultList.setLangId(languageId);
         String languagePhonemes = ipaService.cleanIPA(this.wordService.getLanguagePhonemes(eLanguage));
+        List<ELanguagePhoneme> elp = this.languagePhonemeRepository.findByLanguage_Id(languageId);
         String[] allSoundsWithVariants = ipaService.getAllSoundsWithVariants();
+        List<String> allSoundsWithVariantsAndLanguagePhonemes = elp.stream().map(ELanguagePhoneme::getPhoneme).collect(Collectors.toList());
+        allSoundsWithVariantsAndLanguagePhonemes.addAll(Arrays.asList(allSoundsWithVariants));
 
-        List<String> sounds = Arrays.stream(allSoundsWithVariants).sorted((o1, o2) -> o2.length() - o1.length())
+        List<String> sounds = allSoundsWithVariantsAndLanguagePhonemes.stream().sorted((o1, o2) -> o2.length() - o1.length())
                 .filter(languagePhonemes::contains).collect(Collectors.toList());
         resultList.setUsedMainPhonemes(sounds);
         List<String> restSounds = Arrays.stream(sounds.stream().reduce(languagePhonemes, (result, element) -> result.replaceAll(element, "")).split("")).distinct().collect(Collectors.toList());
         resultList.setRestUsedPhonemes(restSounds);
 
-        List<ELanguagePhoneme> elp = this.languagePhonemeRepository.findByLanguage_Id(languageId);
         List<LanguagePhoneme> lpused = elp.stream().filter((lp)->Arrays.stream(allSoundsWithVariants).anyMatch(lp.getPhoneme()::equals)).map(this::convertToRestModel).collect(Collectors.toList());
         resultList.setSelectedMainPhonemes(lpused);
         List<LanguagePhoneme> lprest = elp.stream().filter((lp)-> Arrays.stream(allSoundsWithVariants).noneMatch(lp.getPhoneme()::equals)).map(this::convertToRestModel).collect(Collectors.toList());
