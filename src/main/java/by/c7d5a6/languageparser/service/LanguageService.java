@@ -5,10 +5,7 @@ import by.c7d5a6.languageparser.entity.ELanguageConnection;
 import by.c7d5a6.languageparser.entity.ELanguagePhoneme;
 import by.c7d5a6.languageparser.entity.EPOS;
 import by.c7d5a6.languageparser.entity.enums.LanguageConnectionType;
-import by.c7d5a6.languageparser.repository.LanguageConnectionRepository;
-import by.c7d5a6.languageparser.repository.LanguagePhonemeRepository;
-import by.c7d5a6.languageparser.repository.LanguageRepository;
-import by.c7d5a6.languageparser.repository.PartOfSpeechRepository;
+import by.c7d5a6.languageparser.repository.*;
 import by.c7d5a6.languageparser.rest.model.*;
 import com.google.common.collect.Lists;
 import org.slf4j.Logger;
@@ -26,7 +23,7 @@ public class LanguageService extends BaseService {
     private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     private final LanguageRepository languageRepository;
-    private final PartOfSpeechRepository partOfSpeechRepository;
+    private final POSRepository posRepository;
     private final LanguageConnectionRepository languageConnectionRepository;
     private final LanguagePhonemeRepository languagePhonemeRepository;
     private final WordService wordService;
@@ -34,10 +31,10 @@ public class LanguageService extends BaseService {
 
 
     @Autowired
-    public LanguageService(LanguageRepository languageRepository, LanguageConnectionRepository languageConnectionRepository, PartOfSpeechRepository partOfSpeechRepository, WordService wordService, IPAService ipaService, LanguagePhonemeRepository languagePhonemeRepository) {
+    public LanguageService(LanguageRepository languageRepository, LanguageConnectionRepository languageConnectionRepository, POSRepository posRepository, WordService wordService, IPAService ipaService, LanguagePhonemeRepository languagePhonemeRepository) {
         this.languageRepository = languageRepository;
         this.languageConnectionRepository = languageConnectionRepository;
-        this.partOfSpeechRepository = partOfSpeechRepository;
+        this.posRepository = posRepository;
         this.wordService = wordService;
         this.ipaService = ipaService;
         this.languagePhonemeRepository = languagePhonemeRepository;
@@ -166,7 +163,7 @@ public class LanguageService extends BaseService {
     }
 
     public List<POS> getAllPartsOfSpeech() {
-        return this.partOfSpeechRepository.findAll().stream().map(this::convertToRestModel).collect(Collectors.toList());
+        return this.posRepository.findAll().stream().map(this::convertToRestModel).collect(Collectors.toList());
     }
 
     public List<POS> getAllPartsOfSpeechByLanguage(Long languageId) {
