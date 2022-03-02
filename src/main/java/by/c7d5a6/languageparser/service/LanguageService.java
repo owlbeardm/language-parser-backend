@@ -183,15 +183,37 @@ public class LanguageService extends BaseService {
         List<String> allSoundsWithVariantsAndLanguagePhonemes = elp.stream().map(ELanguagePhoneme::getPhoneme).collect(Collectors.toList());
         allSoundsWithVariantsAndLanguagePhonemes.addAll(Arrays.asList(allSoundsWithVariants));
 
-        List<String> sounds = allSoundsWithVariantsAndLanguagePhonemes.stream().sorted((o1, o2) -> o2.length() - o1.length())
-                .filter(languagePhonemes::contains).collect(Collectors.toList());
-        resultList.setUsedMainPhonemes(sounds);
-        List<String> restSounds = Arrays.stream(sounds.stream().reduce(languagePhonemes, (result, element) -> result.replaceAll(element, "")).split("")).distinct().collect(Collectors.toList());
+        List<String> sounds = allSoundsWithVariantsAndLanguagePhonemes
+                .stream()
+                .sorted((o1, o2) -> o2.length() - o1.length())
+                .collect(Collectors.toList());
+        List<String> usedMainPhonemes = new ArrayList<>();
+        for (String sound : sounds) {
+            if (languagePhonemes.contains(sound)) {
+                usedMainPhonemes.add(sound);
+                languagePhonemes = languagePhonemes.replaceAll(sound, "");
+            }
+        }
+        resultList.setUsedMainPhonemes(usedMainPhonemes);
+        List<String> restSounds = Arrays
+                .stream(languagePhonemes.split(""))
+                .filter(s -> !s.isEmpty() && !s.trim().isEmpty())
+                .sorted((o1, o2) -> o2.length() - o1.length())
+                .distinct()
+                .collect(Collectors.toList());
         resultList.setRestUsedPhonemes(restSounds);
 
-        List<LanguagePhoneme> lpused = elp.stream().filter((lp)->Arrays.stream(allSoundsWithVariants).anyMatch(lp.getPhoneme()::equals)).map(this::convertToRestModel).collect(Collectors.toList());
+        List<LanguagePhoneme> lpused = elp
+                .stream()
+                .filter((lp) -> Arrays.stream(allSoundsWithVariants).anyMatch(lp.getPhoneme()::equals))
+                .map(this::convertToRestModel)
+                .collect(Collectors.toList());
         resultList.setSelectedMainPhonemes(lpused);
-        List<LanguagePhoneme> lprest = elp.stream().filter((lp)-> Arrays.stream(allSoundsWithVariants).noneMatch(lp.getPhoneme()::equals)).map(this::convertToRestModel).collect(Collectors.toList());
+        List<LanguagePhoneme> lprest = elp
+                .stream()
+                .filter((lp) -> Arrays.stream(allSoundsWithVariants).noneMatch(lp.getPhoneme()::equals))
+                .map(this::convertToRestModel)
+                .collect(Collectors.toList());
         resultList.setSelectedRestPhonemes(lprest);
 
         return resultList;
