@@ -123,7 +123,7 @@ public class IPAService extends BaseService {
 
     ///
     // Additions
-    private final String[] constanantAddition = {"ʰ", "ʷ", "ʲ", "ʷʰ"};
+    private final String[] constanantAddition = {"ʰ", "ʷ", "ʲ", "ʷʰ","ː"};
     private final String[] vowelAddition = {"ː", "ʼ"};
 
     @Autowired
