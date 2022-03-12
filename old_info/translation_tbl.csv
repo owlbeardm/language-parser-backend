@@ -1,0 +1,168 @@
+id,from_word_id,to_lang_id,to_word_id,comment,alt_translation
+17750,17730,9910,17740,,
+17950,17940,9910,,,Used to form adjectives from nouns indicating the possession of a thing or a quality.
+18250,18210,9910,18240,,
+18260,18180,9910,18240,,
+18270,18030,9910,18240,,
+18280,17960,9910,18240,,
+18390,18340,9910,18380,,
+18430,18420,9910,,Basic meaning unknown; may represent simply an extended form of the stem.,abstract ending
+18450,18440,9910,,perhaps an allomorph of -wa.,abstract ending
+18470,18460,9910,,combined with lengthening of the stem-vowel is used to derive what is properly verbal nouns.,verbal nouns ending
+18490,18480,9910,,abstract nouns.,abstract ending
+18510,18500,9910,,typically used to derive verbal nouns.,verbal nouns ending
+18530,18520,9910,,"ending denoting a thing having something to do with the root meaning, either having its properties or being produced by the verbal action in question, or even being a tool used to accomplish it.",abstract ending
+18550,18540,9910,,"usually denotes abstract, or at least rather intangible, things.",abstract ending
+18570,18560,9910,,evidently a nominal counterpart of the adjectival ending -na.,abstract ending
+18600,18590,9910,,ending seen on some nouns.,abstract ending
+18620,18610,9910,,"indicating that X-sta means ""set of Xs, system of X's"".",abstract ending
+18640,18630,9910,,This is almost certainly the same ending -t that is suffixed to the kalat-stems; see -at.,abstract ending
+18660,18650,9910,,possibly an allomorph of -ma used following n. Not to be confused with the adjectival ending -wa.,abstract ending
+18680,18670,9910,,basically abstracts.,abstract ending
+18690,18580,9910,,"it seems that X-rë means ""state of having/being X"". Not to be confused with the feminine ending -rë.",abstract ending
+18720,18700,9910,18710,,
+18750,18730,9910,18740,,
+19000,18970,9910,18710,,
+19100,19010,9910,19080,,
+19110,19050,9910,19090,,
+19140,19120,9910,19130,,
+19980,19960,9910,19970,metal,
+20030,17730,9910,20020,,
+20040,19150,9910,19130,a weapon,
+20050,19180,9910,19130,a weapon,
+20060,19210,9910,,a given name,defender
+20070,18790,9910,18740,,
+20080,18760,9910,18710,,
+20090,17760,9910,,,wild one
+20100,18850,9910,18740,,
+20110,18820,9910,18710,,
+20130,18940,9910,20120,,
+20150,18940,9910,20140,,
+20160,17790,9910,,,wild one
+20170,18910,9910,18740,,
+20180,19990,9910,19970,"",
+20200,19310,9910,20190,name of Queran diety,
+20210,17820,9910,,,wild one
+20220,19300,9910,,first declension,Used to form feminine forms of masculine nouns
+20230,19530,9910,,,Used to form feminine forms of masculine nouns
+20240,19560,9910,20190,name of Queran diety,
+20250,19380,9910,20120,,
+20260,19380,9910,20140,,
+20270,18970,9910,20120,,
+20280,18970,9910,20140,,
+20290,19350,9910,18740,,
+20300,19440,9910,19090,,
+20310,19410,9910,19080,,
+20350,20330,9910,20340,,
+20430,20380,9910,20420,,
+20450,20410,9910,20440,,
+20470,20370,9910,20460,,
+20490,20390,9910,20480,,
+20510,20400,9910,20500,,
+20540,20520,9910,20530,used with nouns,
+20570,20550,9910,20560,,
+20590,20550,9910,20580,,
+20610,20550,9910,20600,,
+20640,20620,9910,20630,,
+20660,20620,9910,20650,,
+20690,20670,9910,20680,,
+20730,20700,9910,20680,,
+20800,20740,9910,20680,,
+20810,20770,9910,20680,,
+20830,20820,9910,,,"Used to form a feminine abstract noun, usually from an adjective or a present participle stem, and occasionally from a root noun."
+20880,20840,9910,,,Name of the Nitholian region
+20980,20950,9910,,,Name of the Nitholian region
+20990,20920,9910,,,Name of the Nitholian region
+21000,20890,9910,,,Name of the Nitholian region
+21030,21010,9910,21020,,
+21170,21130,9910,,,Name of the Nitholian region
+21270,21240,9910,,,Name of the Nitholian region
+21300,21280,9910,21290,,
+21440,21430,9910,21020,,
+21550,21480,9910,21540,,
+21650,21620,9910,21540,,
+22090,22050,9910,,,Dwarven mountains
+22120,22100,9910,22110,,
+22240,22220,9910,22230,,
+22340,22190,9910,22110,,
+22350,21310,9910,21290,,
+22360,21510,9910,21540,,
+22370,22310,9910,22230,,
+22390,22310,9910,22380,,
+22460,22400,9910,22450,,
+22470,22400,9910,,,Elf land to the east of Ñiziel
+25300,25290,9910,,,Name of large region in querum empire
+25400,25370,9910,,,Ñiziel
+26470,26450,9910,26460,,
+26610,26540,9910,26460,,
+26620,26570,9910,,,Land of the dead
+26740,26720,9910,26730,,
+26880,26840,9910,,Region north to Neitiel,Land of giants
+27100,27070,9910,,North-east to Ñiziel,Land of giants
+27110,22630,9910,22110,,
+27120,22660,9910,,to far east of Ñiziel,Elf land
+27130,19920,9910,20190,name of Querum goddess,
+27140,26690,9910,,Far south lands to vortex,Land of the dead
+27160,27150,9910,,,Noun suffix denoting instrument
+27190,27170,9910,27180,,
+27330,27290,9910,,,blasing altar
+27380,27340,9910,,Region south to Neitiel,Blazing land
+27580,27510,9910,27570,,
+27590,27540,9910,,to south of Ñiziel,Hot land
+27730,27690,9910,27720,,
+27740,27260,9910,27180,,
+27880,27840,9910,,in Saroja,Black mountains
+27900,27890,9910,21020,,
+28000,27940,9910,21020,,
+28010,27970,9910,21020,,
+28040,28020,9910,28030,,
+28180,28140,9910,,,Name of the river
+28190,28140,9910,,,Cuezoña river
+28400,28380,9910,28390,,
+28420,28380,9910,28410,,
+28470,28430,9910,28460,,
+28510,28480,9910,28460,,
+28550,28520,9910,28460,,
+28590,28560,9910,28460,,
+28690,28600,9910,28460,,
+28700,28630,9910,28460,,
+28710,28660,9910,28460,,
+28750,28730,9910,28740,,
+28790,22250,9910,22230,,
+29050,29020,9910,,,God mother of the Marzuer
+37260,37250,9910,,,"Of or pertaining to holidays; festive, festal, joyful, merry"
+37290,37270,9910,37280,,
+37450,37420,9910,37280,,
+37610,37580,9910,37280,,
+37630,37550,9910,37620,,
+37660,37640,9910,37650,,
+37770,37760,9910,,,used to form a masculine agent noun
+37800,37780,9910,37790,,
+37810,37780,9910,,,"usually prefixed to verbs, in which cases it often has the effect of intensifying the verbal action"
+37910,37860,9910,37900,,
+37930,37860,9910,37920,,
+37940,37820,9910,,,"One who cuts or cuts off, cutter"
+45350,45140,9910,26730,,
+45360,45020,9910,22230,,
+45510,45470,9910,45500,,
+45530,45370,9910,45520,,
+45550,45380,9910,45540,,
+45710,45620,9910,45500,,
+45740,45720,9910,45730,,
+45880,45840,9910,45870,,
+45890,45810,9910,45730,,
+46080,46050,9910,45870,,
+46090,46020,9910,45730,,
+49330,49320,9910,,,Name of large north region in querum empire
+49350,49340,9910,,,That of the Giants
+49700,49680,9910,49690,,
+49720,49680,9910,49710,,
+49930,49910,9910,49920,,
+50040,50000,9910,50030,,
+50090,50050,9910,,,Wet region to the east of mountains
+50210,50190,9910,50200,,
+50230,50190,9910,50220,,
+50370,50330,9910,,,Lizardfolk land
+50570,50560,9910,,,Land to the north of vertex
+50600,50580,9910,50590,,
+50630,50610,9910,50620,,
