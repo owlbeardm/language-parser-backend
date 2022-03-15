@@ -3,7 +3,7 @@ package by.c7d5a6.languageparser.rest.model.base;
 import java.io.Serializable;
 
 public class Base implements Serializable {
-    private Long id;
+    protected Long id;
     private Long version;
 
     public Base() {

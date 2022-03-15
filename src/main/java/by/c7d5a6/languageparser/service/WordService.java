@@ -60,4 +60,9 @@ public class WordService extends BaseService {
     public boolean canDeleteWord(Long wordId) {
         return true;
     }
+
+    public void addWord(Word word) {
+        EWord eWord = mapper.map(word, EWord.class);
+        this.wordsRepository.save(eWord);
+    }
 }

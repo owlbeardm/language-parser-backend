@@ -63,6 +63,12 @@ public class WordsController {
         return wordService.canDeleteWord(wordId);
     }
 
+    @Operation(summary = "Add new word")
+    @PostMapping("/add")
+    public void addWord(@RequestBody Word word) {
+        wordService.addWord(word);
+    }
+
 //    @Operation(summary = "Get all words from language by text")
 //    @GetMapping("/all/{from}/{text}")
 //    public List<Word> getAllWords(@PathVariable("from") String fromId, @PathVariable("text") String text) {
