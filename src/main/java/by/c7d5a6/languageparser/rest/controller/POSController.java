@@ -33,6 +33,13 @@ public class POSController {
         return posService.getAllPartsOfSpeech();
     }
 
+    @Operation(summary = "Get all parts of speech by language")
+    @GetMapping("/language/{languageId}")
+    public List<POS> getAllPOSByLanguage(@PathVariable Long languageId) {
+        logger.info("Getting all parts of speech by language");
+        return posService.getAllPartsOfSpeechByLanguage(languageId);
+    }
+
     @Operation(summary = "Add new part of speech")
     @PostMapping
     public Long savePOS(@RequestBody POS pos) {

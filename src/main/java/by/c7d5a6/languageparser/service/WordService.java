@@ -61,9 +61,10 @@ public class WordService extends BaseService {
         return true;
     }
 
-    public void addWord(Word word) {
+    public Word addWord(Word word) {
         EWord eWord = mapper.map(word, EWord.class);
-        this.wordsRepository.save(eWord);
+        eWord = this.wordsRepository.save(eWord);
+        return mapper.map(eWord, Word.class);
     }
 
     public long countWordsByLanguageId(Long languageId) {

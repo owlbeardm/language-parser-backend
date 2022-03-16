@@ -53,6 +53,10 @@ public class POSService extends BaseService {
         return this.posRepository.findAll().stream().map(this::convertToRestModel).collect(Collectors.toList());
     }
 
+    public List<POS> getAllPartsOfSpeechByLanguage(Long languageId) {
+        return this.posRepository.findByLanguage_Id(languageId).stream().map(this::convertToRestModel).collect(Collectors.toList());
+    }
+
     public Long saveLanguagePOS(LanguagePOS languagePOS) {
         ELanguage elanguage = this.languageRepository.findById(languagePOS.getLanguageId()).orElseThrow(() -> new IllegalArgumentException("Language " + languagePOS.getLanguageId() + " not found"));
         EPOS epos = this.posRepository.findById(languagePOS.getPosId()).orElseThrow(() -> new IllegalArgumentException("POS " + languagePOS.getPosId() + " not found"));
@@ -63,8 +67,10 @@ public class POSService extends BaseService {
     public void deleteLanguagePOS(Long id) {
         this.languagePOSRepository.deleteById(id);
     }
+
     private POS convertToRestModel(EPOS epos) {
         return mapper.map(epos, POS.class);
     }
+
 
 }

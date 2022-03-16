@@ -65,8 +65,8 @@ public class WordsController {
 
     @Operation(summary = "Add new word")
     @PostMapping("/add")
-    public void addWord(@RequestBody Word word) {
-        wordService.addWord(word);
+    public Word addWord(@RequestBody Word word) {
+        return wordService.addWord(word);
     }
 
 //    @Operation(summary = "Get all words from language by text")
