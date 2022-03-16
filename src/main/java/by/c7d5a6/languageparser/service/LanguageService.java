@@ -3,9 +3,11 @@ package by.c7d5a6.languageparser.service;
 import by.c7d5a6.languageparser.entity.ELanguage;
 import by.c7d5a6.languageparser.entity.ELanguageConnection;
 import by.c7d5a6.languageparser.entity.ELanguagePhoneme;
-import by.c7d5a6.languageparser.entity.EPOS;
 import by.c7d5a6.languageparser.entity.enums.LanguageConnectionType;
-import by.c7d5a6.languageparser.repository.*;
+import by.c7d5a6.languageparser.repository.LanguageConnectionRepository;
+import by.c7d5a6.languageparser.repository.LanguagePhonemeRepository;
+import by.c7d5a6.languageparser.repository.LanguageRepository;
+import by.c7d5a6.languageparser.repository.POSRepository;
 import by.c7d5a6.languageparser.rest.model.*;
 import com.google.common.collect.Lists;
 import org.slf4j.Logger;
@@ -23,7 +25,6 @@ public class LanguageService extends BaseService {
     private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     private final LanguageRepository languageRepository;
-    private final POSRepository posRepository;
     private final LanguageConnectionRepository languageConnectionRepository;
     private final LanguagePhonemeRepository languagePhonemeRepository;
     private final WordService wordService;
@@ -31,10 +32,9 @@ public class LanguageService extends BaseService {
 
 
     @Autowired
-    public LanguageService(LanguageRepository languageRepository, LanguageConnectionRepository languageConnectionRepository, POSRepository posRepository, WordService wordService, IPAService ipaService, LanguagePhonemeRepository languagePhonemeRepository) {
+    public LanguageService(LanguageRepository languageRepository, LanguageConnectionRepository languageConnectionRepository, WordService wordService, IPAService ipaService, LanguagePhonemeRepository languagePhonemeRepository) {
         this.languageRepository = languageRepository;
         this.languageConnectionRepository = languageConnectionRepository;
-        this.posRepository = posRepository;
         this.wordService = wordService;
         this.ipaService = ipaService;
         this.languagePhonemeRepository = languagePhonemeRepository;
@@ -127,10 +127,6 @@ public class LanguageService extends BaseService {
     private void createLanguagesGraph() {
     }
 
-    private POS convertToRestModel(EPOS epos) {
-        return mapper.map(epos, POS.class);
-    }
-
     public Language convertToRestModel(ELanguage language) {
         return mapper.map(language, Language.class);
     }
@@ -160,10 +156,6 @@ public class LanguageService extends BaseService {
 //            lang.setFrequency(language.getFrequency());
         lang = languageRepository.save(lang);
         return convertToRestModel(lang);
-    }
-
-    public List<POS> getAllPartsOfSpeech() {
-        return this.posRepository.findAll().stream().map(this::convertToRestModel).collect(Collectors.toList());
     }
 
     public List<POS> getAllPartsOfSpeechByLanguage(Long languageId) {
@@ -232,10 +224,14 @@ public class LanguageService extends BaseService {
 
     public void deleteLanguage(Long languageId) {
         ELanguage eLanguage = languageRepository.findById(languageId).orElseThrow(() -> new IllegalArgumentException("Language with id " + languageId + " not found"));
+        languageConnectionRepository.deleteAll(languageConnectionRepository.findByLangTo_Id(languageId));
+        languagePhonemeRepository.deleteAll(languagePhonemeRepository.findByLanguage_Id(languageId));
         languageRepository.delete(eLanguage);
     }
 
     public boolean canDeleteLanguage(Long languageId) {
-        return true;
+        long lc = languageConnectionRepository.countByLangFrom_Id(languageId);
+        long w = wordService.countWordsByLanguageId(languageId);
+        return lc + w == 0;
     }
 }

@@ -8,4 +8,5 @@ import java.util.List;
 
 public interface WordsRepository extends IdLongVerRepository<EWord> {
     List<EWord> findByLanguage_Id(Long languageId);
+    long countByLanguage_Id(Long languageId);
 }

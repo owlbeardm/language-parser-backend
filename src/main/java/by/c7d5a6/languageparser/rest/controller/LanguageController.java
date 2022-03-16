@@ -59,13 +59,6 @@ public class LanguageController {
         return languageService.canDeleteLanguage(languageId);
     }
 
-    @Operation(summary = "Get all parts of speech")
-    @GetMapping("/pos")
-    public List<POS> getAllPartsOfSpeech() {
-        logger.info("Getting all parts of speech");
-        return languageService.getAllPartsOfSpeech();
-    }
-
     @Operation(summary = "Get all parts of speech by language")
     @GetMapping("/pos/{languageId}")
     public List<POS> getAllPartsOfSpeechByLanguage(@PathVariable Long languageId) {

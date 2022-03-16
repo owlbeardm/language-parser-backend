@@ -30,7 +30,7 @@ public class POSController {
     @GetMapping
     public List<POS> getAllPOS() {
         logger.info("Getting all parts of speech");
-        return posService.getAllPOS();
+        return posService.getAllPartsOfSpeech();
     }
 
     @Operation(summary = "Add new part of speech")
