@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 
 import java.lang.invoke.MethodHandles;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -73,4 +74,7 @@ public class POSService extends BaseService {
     }
 
 
+    public Optional<EPOS> getPOSById(Long id) {
+        return posRepository.findById(id);
+    }
 }

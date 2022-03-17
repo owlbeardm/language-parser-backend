@@ -3,6 +3,7 @@ package by.c7d5a6.languageparser.rest.controller;
 import by.c7d5a6.languageparser.entity.EWord;
 import by.c7d5a6.languageparser.rest.model.PaginationFilter;
 import by.c7d5a6.languageparser.rest.model.Word;
+import by.c7d5a6.languageparser.rest.model.WordListFilter;
 import by.c7d5a6.languageparser.rest.model.WordWithTranslations;
 import by.c7d5a6.languageparser.rest.model.base.PageResult;
 import by.c7d5a6.languageparser.service.WordService;
@@ -46,7 +47,7 @@ public class WordsController {
 
     @Operation(summary = "Get all words")
     @GetMapping("/all")
-    public PageResult<Word> getAllWords(@Valid PaginationFilter filter) {
+    public PageResult<Word> getAllWords(@Valid WordListFilter filter) {
         return wordService.getAllWords(filter);
     }
 
