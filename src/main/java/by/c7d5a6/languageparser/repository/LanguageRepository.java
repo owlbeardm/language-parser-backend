@@ -1,9 +1,7 @@
 package by.c7d5a6.languageparser.repository;
 
-import by.c7d5a6.languageparser.entity.ELanguage;
-import by.c7d5a6.languageparser.repository.helper.IdLongVerRepository;
-
-import java.util.List;
+import com.owlbeardm.languageparser.entity.ELanguage;
+import com.owlbeardm.languageparser.repository.helper.IdLongVerRepository;
 
 public interface LanguageRepository extends IdLongVerRepository<ELanguage> {
 }
