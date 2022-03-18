@@ -30,6 +30,8 @@ openApi {
     forkProperties.set("-Dspring.profiles.active=test")
 }
 
+
+
 dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa:2.6.3'
     implementation 'org.springframework.boot:spring-boot-starter-web:2.6.3'
@@ -49,10 +51,21 @@ dependencies {
     testImplementation 'org.springframework.boot:spring-boot-starter-test:2.6.3'
     implementation 'com.h2database:h2:2.1.210'
     testImplementation 'org.junit.platform:junit-platform-runner:1.8.2'
-
-
+    annotationProcessor('org.hibernate:hibernate-jpamodelgen:5.6.7.Final')
 }
 
 test {
     useJUnitPlatform()
+}
+
+tasks.withType(JavaCompile) {
+    options.annotationProcessorGeneratedSourcesDirectory(new File("build/generated-sources/annotations"))
+}
+
+sourceSets {
+    generated {
+        java {
+            srcDirs = ['build/generated-sources/annotations']
+        }
+    }
 }
