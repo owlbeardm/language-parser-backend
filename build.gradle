@@ -62,10 +62,4 @@ tasks.withType(JavaCompile) {
     options.annotationProcessorGeneratedSourcesDirectory(new File("build/generated-sources/annotations"))
 }
 
-sourceSets {
-    generated {
-        java {
-            srcDirs = ['build/generated-sources/annotations']
-        }
-    }
-}
+//sourceSets.main.java.srcDir(['src/main/java'])
