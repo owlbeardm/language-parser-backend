@@ -1,6 +1,7 @@
 package by.c7d5a6.languageparser.rest.controller;
 
 import by.c7d5a6.languageparser.rest.model.*;
+import by.c7d5a6.languageparser.rest.model.base.PageResult;
 import by.c7d5a6.languageparser.service.EvolutionService;
 import by.c7d5a6.languageparser.service.LanguageService;
 import by.c7d5a6.languageparser.service.SoundChangesService;
@@ -11,6 +12,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.List;
 
 @RestController
@@ -121,6 +123,13 @@ public class EvolveController {
     public String getSoundChangesRawLinesByLangs(@PathVariable long fromLangId, @PathVariable long toLangId) {
         logger.info("Get all sound changes in text form from {} to {}", fromLangId, toLangId);
         return soundChangesService.getSoundChangesRawLinesByLangs(fromLangId, toLangId);
+    }
+
+    @Operation(summary = "Get all words with evolutions")
+    @GetMapping("/words")
+    public PageResult<WordWithEvolution> getAllWordsWithEvolutions(@Valid WordWithEvolutionsListFilter filter) {
+        logger.info("Get all words with evolutions");
+        return evolutionService.getAllWordsWithEvolutions(filter);
     }
 
 

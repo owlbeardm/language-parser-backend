@@ -132,9 +132,7 @@ public class LanguageService extends BaseService {
         return mapper.map(language, Language.class);
     }
 
-    public LanguageConnection convertToRestModel(ELanguageConnection language) {
-        return mapper.map(language, LanguageConnection.class);
-    }
+
 
     public LanguagePhoneme convertToRestModel(ELanguagePhoneme eLanguagePhoneme) {
         return mapper.map(eLanguagePhoneme, LanguagePhoneme.class);

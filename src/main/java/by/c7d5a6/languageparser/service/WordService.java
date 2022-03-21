@@ -8,7 +8,6 @@ import by.c7d5a6.languageparser.entity.specification.SearchCriteria;
 import by.c7d5a6.languageparser.repository.WordsRepository;
 import by.c7d5a6.languageparser.rest.model.Word;
 import by.c7d5a6.languageparser.rest.model.WordListFilter;
-import by.c7d5a6.languageparser.rest.model.base.Base;
 import by.c7d5a6.languageparser.rest.model.base.PageResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -42,9 +41,7 @@ public class WordService extends BaseService {
         return all.stream().map(this::convertToRestModel).collect(Collectors.toList());
     }
 
-    private Word convertToRestModel(EWord eWord) {
-        return mapper.map(eWord, Word.class);
-    }
+
 
     public PageResult<Word> getAllWords(WordListFilter filter) {
         ELanguage eLanguage = Optional.ofNullable(filter.getLanguageId()).flatMap(languageService::getLangById).orElse(null);

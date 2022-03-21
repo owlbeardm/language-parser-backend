@@ -1,8 +1,8 @@
 package by.c7d5a6.languageparser.entity;
 
-import com.owlbeardm.languageparser.entity.base.BaseEntity;
-import com.owlbeardm.languageparser.entity.enums.LanguageConnectionType;
-import com.owlbeardm.languageparser.entity.possessors.IdLongVerPossessor;
+import by.c7d5a6.languageparser.entity.base.BaseEntity;
+import by.c7d5a6.languageparser.entity.enums.LanguageConnectionType;
+import by.c7d5a6.languageparser.entity.possessors.IdLongVerPossessor;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
