@@ -1,7 +1,5 @@
 package by.c7d5a6.languageparser.rest.controller;
 
-import by.c7d5a6.languageparser.entity.EWord;
-import by.c7d5a6.languageparser.rest.model.PaginationFilter;
 import by.c7d5a6.languageparser.rest.model.Word;
 import by.c7d5a6.languageparser.rest.model.WordListFilter;
 import by.c7d5a6.languageparser.rest.model.WordWithTranslations;
@@ -12,7 +10,6 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -67,7 +64,7 @@ public class WordsController {
     @Operation(summary = "Add new word")
     @PostMapping("/add")
     public Word addWord(@RequestBody Word word) {
-        return wordService.addWord(word);
+        return wordService.saveWord(word);
     }
 
 //    @Operation(summary = "Get all words from language by text")

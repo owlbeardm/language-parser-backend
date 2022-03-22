@@ -1,8 +1,8 @@
 package by.c7d5a6.languageparser.repository;
 
 import by.c7d5a6.languageparser.entity.EWord;
+import by.c7d5a6.languageparser.entity.EWordSource;
 import by.c7d5a6.languageparser.entity.EWordWithEvolutionConnectionsIds;
-import by.c7d5a6.languageparser.entity.EWordWithSourcesIds;
 import by.c7d5a6.languageparser.repository.helper.IdLongVerRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -28,15 +28,16 @@ public interface WordsRepository extends IdLongVerRepository<EWord>, JpaSpecific
             " ON lc.lang_from_id = l1.id " +
             "WHERE lc.connection_type = 'EVOLVING' " +
             " AND (w1.word LIKE CONCAT('%',cast(:word as TEXT),'%') OR :word IS NULL) " +
-            " AND (lc.lang_from_id = cast(cast(:langFromId as text) as bigint) OR COALESCE(:langFromId, NULL) IS NULL) " +
-            " AND (lc.lang_to_id = cast(cast(:langToId as text) as bigint) OR COALESCE(:langToId, NULL) IS NULL) " +
+            " AND (lc.lang_from_id = cast(cast(:langFromId as TEXT) as bigint) OR COALESCE(:langFromId, NULL) IS NULL) " +
+            " AND (lc.lang_to_id = cast(cast(:langToId as TEXT) as bigint) OR COALESCE(:langToId, NULL) IS NULL) " +
+            " AND (:canBeForgotten IS TRUE OR w1.forgotten IS FALSE ) " +
             "ORDER BY w1.word, w1.id, l1.display_name, lc.id", nativeQuery = true)
-    Page<EWordWithEvolutionConnectionsIds> findWithEvolutions(@Param("word") String word, @Param("langFromId") Long langFromId, @Param("langToId") Long langToId, Pageable pageRequest);
+    Page<EWordWithEvolutionConnectionsIds> findWithEvolutions(@Param("word") String word, @Param("langFromId") Long langFromId, @Param("langToId") Long langToId, @Param("canBeForgotten") boolean canBeForgotten, Pageable pageRequest);
 
-    @Query(value = "SELECT w.id as wordEvolvedId, ws.id as wordSourceEvolvedId " +
-            "FROM word_tbl as w " +
-            "INNER JOIN word_source_tbl as ws " +
-            " ON w.id = ws.word_source_id " +
-            "WHERE ws.source_type = 'EVOLVING' AND ws.word_id IN :wordIds", nativeQuery = true)
-    List<EWordWithSourcesIds> findEvolvedWords(List<Long> wordIds);
+    @Query(value = "SELECT ws " +
+            "FROM WordSource as ws " +
+            "INNER JOIN ws.wordSource as w " +
+            " ON w.id = ws.wordSource.id " +
+            "WHERE ws.wordSource.id IN :evolvedFromIds")
+    List<EWordSource> findEvolvedWordsFrom(List<Long> evolvedFromIds);
 }

@@ -29,6 +29,10 @@ public class WordWithEvolutionsListFilter extends PaginationFilter {
     @Schema(description = "The language to to search for")
     private Long languageToId;
 
+    @Parameter(description = "Can be forgotten", required = true)
+    @Schema(description = "The word from to search for", defaultValue = "true")
+    private boolean canBeForgotten;
+
     public String getWord() {
         return word;
     }
@@ -51,5 +55,13 @@ public class WordWithEvolutionsListFilter extends PaginationFilter {
 
     public void setLanguageToId(Long languageToId) {
         this.languageToId = languageToId;
+    }
+
+    public boolean isCanBeForgotten() {
+        return canBeForgotten;
+    }
+
+    public void setCanBeForgotten(boolean canBeForgotten) {
+        this.canBeForgotten = canBeForgotten;
     }
 }

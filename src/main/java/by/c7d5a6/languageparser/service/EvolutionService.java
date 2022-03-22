@@ -15,10 +15,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 
 import java.lang.invoke.MethodHandles;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -119,32 +116,14 @@ public class EvolutionService extends BaseService {
     }
 
     public PageResult<WordWithEvolution> getAllWordsWithEvolutions(WordWithEvolutionsListFilter filter) {
-        Page<EWordWithEvolutionConnectionsIds> withEvolutions = wordsRepository.findWithEvolutions(filter.getWord(), filter.getLanguageFromId(), filter.getLanguageToId(), filter.toPageable());
+        Page<EWordWithEvolutionConnectionsIds> withEvolutions = wordsRepository.findWithEvolutions(filter.getWord(), filter.getLanguageFromId(), filter.getLanguageToId(), filter.isCanBeForgotten(), filter.toPageable());
         List<Long> wordsIds = withEvolutions.stream().map(EWordWithEvolutionConnectionsIds::getWordId).distinct().collect(Collectors.toList());
         List<EWord> sourceWords = wordsRepository.findAllById(wordsIds);
         Map<Long, EWord> wordsSources = sourceWords.stream().collect(Collectors.toMap(BaseEntity::getId, e -> e));
         List<Long> connectionsIds = withEvolutions.stream().map(EWordWithEvolutionConnectionsIds::getLanguageConnectionId).distinct().collect(Collectors.toList());
         List<ELanguageConnection> languageConnections = languageConnectionRepository.findAllById(connectionsIds);
         Map<Long, ELanguageConnection> languageConnectionsFrom = languageConnections.stream().collect(Collectors.toMap(BaseEntity::getId, e -> e));
-
-        List<EWordWithSourcesIds> wordsWithSourcesIds = wordsRepository.findEvolvedWords(wordsIds);
-        Map<Long, EWord> wordsWithSourcesWords = wordsRepository
-                .findAllById(wordsWithSourcesIds
-                        .stream()
-                        .map(EWordWithSourcesIds::getWordEvolvedId)
-                        .distinct()
-                        .collect(Collectors.toList()))
-                .stream()
-                .collect(Collectors.toMap(BaseEntity::getId, e -> e));
-        Map<Long, EWordSource> wordsWithSourcesSources = wordsSourceRepository
-                .findAllById(wordsWithSourcesIds
-                        .stream()
-                        .map(EWordWithSourcesIds::getWordSourceEvolvedId)
-                        .distinct()
-                        .collect(Collectors.toList()))
-                .stream()
-                .collect(Collectors.toMap(BaseEntity::getId, e -> e));
-
+        List<EWordSource> eWordsSources = wordsRepository.findEvolvedWordsFrom(wordsIds);
         Map<Long, Map<Long, String>> calculatedEvolvedWords = evolveWords(sourceWords, languageConnections);
 
         return PageResult.from(withEvolutions, (wwE) -> {
@@ -153,14 +132,17 @@ public class EvolutionService extends BaseService {
             wordWithEvolution.setWord(convertToRestModel(eWord));
             final ELanguageConnection languageConnection = languageConnectionsFrom.get(wwE.getLanguageConnectionId());
             wordWithEvolution.setLanguageConnection(convertToRestModel(languageConnection));
-            wordsWithSourcesIds.stream().filter(wwS -> {
-                EWordSource ews = wordsWithSourcesSources.get(wwS.getWordSourceEvolvedId());
-                EWord ew = wordsWithSourcesWords.get(wwS.getWordEvolvedId());
-                return ews != null && ews.getWord().getId().equals(wwE.getWordId()) && languageConnection.getLangTo().getId().equals(ew.getLanguage().getId());
-            }).findFirst().ifPresent(wwS -> {
-                wordWithEvolution.setWordEvolved(convertToRestModel(wordsWithSourcesWords.get(wwS.getWordEvolvedId())));
-                wordWithEvolution.setWordEvolvedType(wordsWithSourcesSources.get(wwS.getWordSourceEvolvedId()).getSourceType());
-            });
+            eWordsSources
+                    .stream()
+                    .filter(ews ->
+                            ews.getWordSource().getId().equals(wwE.getWordId())
+                                    && languageConnection.getLangTo().getId().equals(ews.getWord().getLanguage().getId())
+                    )
+                    .findFirst()
+                    .ifPresent(eWordSource -> {
+                        wordWithEvolution.setWordEvolved(convertToRestModel(eWordSource.getWord()));
+                        wordWithEvolution.setWordEvolvedType(eWordSource.getSourceType());
+                    });
             wordWithEvolution.setCalculatedEvolution(calculatedEvolvedWords.get(wwE.getLanguageConnectionId()).get(wwE.getWordId()));
             return wordWithEvolution;
         });
@@ -194,13 +176,21 @@ public class EvolutionService extends BaseService {
     }
 
     private WordWithEvolution addEvolvedWord(EWord word, ELanguageConnection eLanguageConnection, List<ESoundChange> soundChanges) {
+        EWord newWord;
+        EWordSource newWordSource;
+        Optional<EWordSource> optionalEWordSource = wordsSourceRepository.findByWordSource_IdAndWord_Language_Id(word.getId(), eLanguageConnection.getLangTo().getId());
+        if (optionalEWordSource.isPresent()) {
+            newWordSource = optionalEWordSource.get();
+            newWord = optionalEWordSource.get().getWord();
+        } else {
+            newWord = new EWord();
+            newWordSource = new EWordSource();
+        }
         String newWordText = evolveWord(word.getWord(), soundChanges);
-        EWord newWord = new EWord();
         newWord.setWord(newWordText);
         newWord.setLanguage(eLanguageConnection.getLangTo());
         newWord.setPartOfSpeech(word.getPartOfSpeech());
         newWord = wordsRepository.save(newWord);
-        EWordSource newWordSource = new EWordSource();
         newWordSource.setWordSource(word);
         newWordSource.setSourceType(eLanguageConnection.getConnectionType());
         newWordSource.setWord(newWord);

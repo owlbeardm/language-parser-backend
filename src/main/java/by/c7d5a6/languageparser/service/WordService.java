@@ -42,7 +42,6 @@ public class WordService extends BaseService {
     }
 
 
-
     public PageResult<Word> getAllWords(WordListFilter filter) {
         ELanguage eLanguage = Optional.ofNullable(filter.getLanguageId()).flatMap(languageService::getLangById).orElse(null);
         EPOS epos = Optional.ofNullable(filter.getPosId()).flatMap(posService::getPOSById).orElse(null);
@@ -65,8 +64,19 @@ public class WordService extends BaseService {
         return true;
     }
 
-    public Word addWord(Word word) {
-        EWord eWord = mapper.map(word, EWord.class);
+    public Word saveWord(Word word) {
+        EWord eWord;
+        if (word.getId() != null) {
+            eWord = wordsRepository.findById(word.getId()).orElseThrow(() -> new IllegalArgumentException("Word " + word.getId() + " not found"));
+            eWord.setWord(word.getWord());
+            eWord.setForgotten(word.getForgotten());
+            EPOS epos = posService.getPOSById(word.getPartOfSpeech().getId()).orElseThrow(() -> new IllegalArgumentException("Pos " + word.getPartOfSpeech().getId() + " not found"));
+            eWord.setPartOfSpeech(epos);
+            ELanguage eLanguage = languageService.getLangById(word.getLanguage().getId()).orElseThrow(() -> new IllegalArgumentException("Language " + word.getLanguage().getId() + " not found"));
+            eWord.setLanguage(eLanguage);
+        } else {
+            eWord = mapper.map(word, EWord.class);
+        }
         eWord = this.wordsRepository.save(eWord);
         return mapper.map(eWord, Word.class);
     }
