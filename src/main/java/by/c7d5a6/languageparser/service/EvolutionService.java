@@ -6,10 +6,7 @@ import by.c7d5a6.languageparser.repository.LanguageConnectionRepository;
 import by.c7d5a6.languageparser.repository.SoundChangeRepository;
 import by.c7d5a6.languageparser.repository.WordsRepository;
 import by.c7d5a6.languageparser.repository.WordsSourceRepository;
-import by.c7d5a6.languageparser.rest.model.Language;
-import by.c7d5a6.languageparser.rest.model.WordTraceResult;
-import by.c7d5a6.languageparser.rest.model.WordWithEvolution;
-import by.c7d5a6.languageparser.rest.model.WordWithEvolutionsListFilter;
+import by.c7d5a6.languageparser.rest.model.*;
 import by.c7d5a6.languageparser.rest.model.base.PageResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -105,7 +102,7 @@ public class EvolutionService extends BaseService {
         String regexp = getRegexpFromSoundChange(soundChange);
         Pattern pattern = Pattern.compile(regexp);
         Matcher matcher = pattern.matcher(result);
-        final String soundTo = soundChange.getSoundTo().replaceAll("ø","");
+        final String soundTo = soundChange.getSoundTo().replaceAll("ø", "");
         switch (soundChange.getType()) {
             case REPLACE_ALL -> result = matcher.replaceAll(soundTo);
             case REPLACE_FIRST -> result = matcher.replaceFirst(soundTo);
@@ -169,4 +166,52 @@ public class EvolutionService extends BaseService {
         });
     }
 
+    public List<WordWithEvolution> addEvolvedWords(List<WordToEvolve> wordsToEvolve) {
+        List<LanguageConnection> connections = wordsToEvolve.stream().map(WordToEvolve::getLanguageConnection).distinct().collect(Collectors.toList());
+        Map<Long, List<Word>> wordsToEvolveMap = wordsToEvolve.stream().map(WordToEvolve::getWord).collect(Collectors.groupingBy(w -> w.getLanguage().getId()));
+        List<WordWithEvolution> result = new ArrayList<>();
+        connections.forEach(languageConnection -> {
+            List<Word> words = wordsToEvolveMap.get(languageConnection.getLangFrom().getId()).stream().distinct().collect(Collectors.toList());
+            result.addAll(addEvolvedWords(words, languageConnection));
+        });
+        return result;
+    }
+
+    public List<WordWithEvolution> addEvolvedWord(Word wordToEvolve, LanguageConnection languageConnection) {
+        return addEvolvedWords(List.of(wordToEvolve), languageConnection);
+    }
+
+    public List<WordWithEvolution> addEvolvedWords(List<Word> wordToEvolve, LanguageConnection languageConnection) {
+        List<EWord> words = wordToEvolve.stream().map(word -> wordsRepository.findById(word.getId()).orElseThrow(() -> new IllegalArgumentException("Word not found"))).collect(Collectors.toList());
+        ELanguageConnection eLanguageConnection = languageConnectionRepository.findById(languageConnection.getId()).orElseThrow(() -> new IllegalArgumentException("Language connection not found"));
+        words.forEach(word -> {
+            if (!word.getLanguage().getId().equals(eLanguageConnection.getLangFrom().getId())) {
+                throw new IllegalArgumentException("Language connection is not valid");
+            }
+        });
+        List<ESoundChange> soundChanges = getSoundChanges(languageConnection.getLangFrom(), languageConnection.getLangTo());
+        return words.stream().map(word -> addEvolvedWord(word, eLanguageConnection, soundChanges)).collect(Collectors.toList());
+    }
+
+    private WordWithEvolution addEvolvedWord(EWord word, ELanguageConnection eLanguageConnection, List<ESoundChange> soundChanges) {
+        String newWordText = evolveWord(word.getWord(), soundChanges);
+        EWord newWord = new EWord();
+        newWord.setWord(newWordText);
+        newWord.setLanguage(eLanguageConnection.getLangTo());
+        newWord.setPartOfSpeech(word.getPartOfSpeech());
+        newWord = wordsRepository.save(newWord);
+        EWordSource newWordSource = new EWordSource();
+        newWordSource.setWordSource(word);
+        newWordSource.setSourceType(eLanguageConnection.getConnectionType());
+        newWordSource.setWord(newWord);
+        wordsSourceRepository.save(newWordSource);
+
+        WordWithEvolution wordWithEvolution = new WordWithEvolution();
+        wordWithEvolution.setCalculatedEvolution(newWordText);
+        wordWithEvolution.setWordEvolved(convertToRestModel(newWord));
+        wordWithEvolution.setWord(convertToRestModel(word));
+        wordWithEvolution.setWordEvolvedType(eLanguageConnection.getConnectionType());
+        wordWithEvolution.setLanguageConnection(convertToRestModel(eLanguageConnection));
+        return wordWithEvolution;
+    }
 }

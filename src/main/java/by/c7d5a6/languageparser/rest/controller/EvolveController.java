@@ -132,5 +132,16 @@ public class EvolveController {
         return evolutionService.getAllWordsWithEvolutions(filter);
     }
 
+    @Operation(summary = "Evolve word")
+    @PostMapping("/words/evolve")
+    public WordWithEvolution addEvolvedWord(@RequestBody WordToEvolve wordToEvolve) {
+        return evolutionService.addEvolvedWord(wordToEvolve.getWord(), wordToEvolve.getLanguageConnection()).stream().findFirst().orElseThrow(() -> new RuntimeException("No result"));
+    }
+
+    @Operation(summary = "Evolve all words")
+    @PostMapping("/words/evolve/all")
+    public List<WordWithEvolution> addEvolvedWord(@RequestBody List<WordToEvolve> wordToEvolve) {
+        return evolutionService.addEvolvedWords(wordToEvolve);
+    }
 
 }
