@@ -35,7 +35,7 @@ public class PaginationFilter implements Serializable {
     private SortDirection dir = SortDirection.asc;
 
     @Parameter(description = "sort column")
-    @Schema(defaultValue = "id")
+    @Schema(defaultValue = "word")
     private String sort;
 
     public PaginationFilter() {
@@ -96,7 +96,7 @@ public class PaginationFilter implements Serializable {
         logger.info("PaginationFilter.toPageable: page={}, size={}, dir={}, sort={}", page, size, dir, sort);
         PageRequest result = PageRequest.of(getPage(), getSize());
         if (sorter == null) {
-            result = result.withSort(Sort.by(Sort.Order.by("id").with(calcSortDirection())));
+            result = result.withSort(Sort.by(Sort.Order.by("word").with(calcSortDirection())));
         } else {
             Sort sortList = sorter.apply(getSort());
             if (calcSortDirection() == Sort.Direction.ASC) {
