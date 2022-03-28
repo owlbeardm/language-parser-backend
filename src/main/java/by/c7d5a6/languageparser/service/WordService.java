@@ -6,8 +6,7 @@ import by.c7d5a6.languageparser.entity.EWord;
 import by.c7d5a6.languageparser.entity.specification.EWordSpecification;
 import by.c7d5a6.languageparser.entity.specification.SearchCriteria;
 import by.c7d5a6.languageparser.repository.WordsRepository;
-import by.c7d5a6.languageparser.rest.model.Word;
-import by.c7d5a6.languageparser.rest.model.WordListFilter;
+import by.c7d5a6.languageparser.rest.model.*;
 import by.c7d5a6.languageparser.rest.model.base.PageResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,6 +15,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import java.lang.invoke.MethodHandles;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -83,5 +83,35 @@ public class WordService extends BaseService {
 
     public long countWordsByLanguageId(Long languageId) {
         return wordsRepository.countByLanguage_Id(languageId);
+    }
+
+    public List<DetailedWord> getDetailedWordsByPhonetics(String word) {
+        return wordsRepository.findByWord(word).stream().map(this::convertToRestModel).map(this::getWordWithDetails).collect(Collectors.toList());
+    }
+
+    private DetailedWord getWordWithDetails(Word word) {
+        DetailedWord detailedWord = new DetailedWord();
+        WordWithWritten wordWithWritten = new WordWithWritten(word);
+        wordWithWritten.setWrittenWord(word.getWord());
+        detailedWord.setWord(wordWithWritten);
+        Etymology etymology = new Etymology();
+        ArrayList<WordWithTranslations> from = new ArrayList<>();
+        WordWithTranslations wordFrom = new WordWithTranslations();
+        wordFrom.setWord("wordFrom");
+        ArrayList<String> translations = new ArrayList<>();
+        translations.add("translation");
+        translations.add("translation");
+        wordFrom.setTranslations(translations);
+        from.add(wordFrom);
+        from.add(wordFrom);
+        etymology.setFrom(from);
+        ArrayList<WordWithTranslations> cognate = new ArrayList<>();
+        WordWithTranslations wordCognate = new WordWithTranslations();
+        wordCognate.setWord("wordCognate");
+        wordCognate.setTranslations(translations);
+        cognate.add(wordCognate);
+        etymology.setCognate(cognate);
+        detailedWord.setEtymology(etymology);
+        return detailedWord;
     }
 }

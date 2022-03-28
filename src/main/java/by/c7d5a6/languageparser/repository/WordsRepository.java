@@ -16,6 +16,7 @@ import java.util.List;
 //https://www.baeldung.com/hibernate-criteria-queries
 public interface WordsRepository extends IdLongVerRepository<EWord>, JpaSpecificationExecutor<EWord> {
     List<EWord> findByLanguage_Id(Long languageId);
+    List<EWord> findByWord(String word);
 
     long countByLanguage_Id(Long languageId);
 

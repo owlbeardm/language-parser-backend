@@ -1,8 +1,6 @@
 package by.c7d5a6.languageparser.rest.controller;
 
-import by.c7d5a6.languageparser.rest.model.Word;
-import by.c7d5a6.languageparser.rest.model.WordListFilter;
-import by.c7d5a6.languageparser.rest.model.WordWithTranslations;
+import by.c7d5a6.languageparser.rest.model.*;
 import by.c7d5a6.languageparser.rest.model.base.PageResult;
 import by.c7d5a6.languageparser.service.WordService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -65,6 +63,12 @@ public class WordsController {
     @PostMapping("/add")
     public Word addWord(@RequestBody Word word) {
         return wordService.saveWord(word);
+    }
+
+    @Operation(summary = "Get detailed words by phonetics")
+    @PostMapping("/{word}")
+    public List<DetailedWord> getDetailedWordsByPhonetics(@PathVariable String word) {
+        return wordService.getDetailedWordsByPhonetics(word);
     }
 
 //    @Operation(summary = "Get all words from language by text")

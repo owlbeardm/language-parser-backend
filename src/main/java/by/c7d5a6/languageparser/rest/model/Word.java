@@ -10,6 +10,16 @@ public class Word extends Base {
     private POS partOfSpeech;
     private String word;
 
+    public Word() {
+    }
+
+    public Word(String word, Language language, POS partOfSpeech, Boolean isForgotten) {
+        this.word = word;
+        this.language = language;
+        this.partOfSpeech = partOfSpeech;
+        this.isForgotten = isForgotten;
+    }
+
     public Language getLanguage() {
         return language;
     }
