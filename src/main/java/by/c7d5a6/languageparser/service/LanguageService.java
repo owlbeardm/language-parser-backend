@@ -5,10 +5,7 @@ import by.c7d5a6.languageparser.entity.ELanguageConnection;
 import by.c7d5a6.languageparser.entity.ELanguagePhoneme;
 import by.c7d5a6.languageparser.entity.EWord;
 import by.c7d5a6.languageparser.entity.enums.LanguageConnectionType;
-import by.c7d5a6.languageparser.repository.LanguageConnectionRepository;
-import by.c7d5a6.languageparser.repository.LanguagePhonemeRepository;
-import by.c7d5a6.languageparser.repository.LanguageRepository;
-import by.c7d5a6.languageparser.repository.WordsRepository;
+import by.c7d5a6.languageparser.repository.*;
 import by.c7d5a6.languageparser.rest.model.*;
 import com.google.common.collect.Lists;
 import org.slf4j.Logger;
@@ -28,17 +25,19 @@ public class LanguageService extends BaseService {
     private final LanguageRepository languageRepository;
     private final LanguageConnectionRepository languageConnectionRepository;
     private final LanguagePhonemeRepository languagePhonemeRepository;
+    private final LanguagePOSRepository languagePOSRepository;
     private final WordsRepository wordsRepository;
     private final IPAService ipaService;
 
 
     @Autowired
-    public LanguageService(LanguageRepository languageRepository, LanguageConnectionRepository languageConnectionRepository, WordsRepository wordsRepository, IPAService ipaService, LanguagePhonemeRepository languagePhonemeRepository) {
+    public LanguageService(LanguageRepository languageRepository, LanguageConnectionRepository languageConnectionRepository, WordsRepository wordsRepository, IPAService ipaService, LanguagePhonemeRepository languagePhonemeRepository, LanguagePOSRepository languagePOSRepository) {
         this.languageRepository = languageRepository;
         this.languageConnectionRepository = languageConnectionRepository;
         this.wordsRepository = wordsRepository;
         this.ipaService = ipaService;
         this.languagePhonemeRepository = languagePhonemeRepository;
+        this.languagePOSRepository = languagePOSRepository;
     }
 
     public List<Language> getAllLanguages() {
@@ -225,6 +224,7 @@ public class LanguageService extends BaseService {
         ELanguage eLanguage = languageRepository.findById(languageId).orElseThrow(() -> new IllegalArgumentException("Language with id " + languageId + " not found"));
         languageConnectionRepository.deleteAll(languageConnectionRepository.findByLangTo_Id(languageId));
         languagePhonemeRepository.deleteAll(languagePhonemeRepository.findByLanguage_Id(languageId));
+        languagePOSRepository.deleteAll(languagePOSRepository.findByLanguage_Id(languageId));
         languageRepository.delete(eLanguage);
     }
 
