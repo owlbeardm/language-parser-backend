@@ -112,6 +112,11 @@ public class WordService extends BaseService {
         cognate.add(wordCognate);
         etymology.setCognate(cognate);
         detailedWord.setEtymology(etymology);
+        ArrayList<WordWithWritten> wwwr = new ArrayList<>();
+        wwwr.add(wordWithWritten);
+        detailedWord.setDescendants(wwwr);
+        detailedWord.setDirived(wwwr);
+        detailedWord.setTranslations(translations);
         return detailedWord;
     }
 }
