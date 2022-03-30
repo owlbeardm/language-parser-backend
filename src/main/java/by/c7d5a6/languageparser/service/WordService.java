@@ -3,9 +3,11 @@ package by.c7d5a6.languageparser.service;
 import by.c7d5a6.languageparser.entity.ELanguage;
 import by.c7d5a6.languageparser.entity.EPOS;
 import by.c7d5a6.languageparser.entity.EWord;
+import by.c7d5a6.languageparser.entity.EWordSource;
 import by.c7d5a6.languageparser.entity.specification.EWordSpecification;
 import by.c7d5a6.languageparser.entity.specification.SearchCriteria;
 import by.c7d5a6.languageparser.repository.WordsRepository;
+import by.c7d5a6.languageparser.repository.WordsSourceRepository;
 import by.c7d5a6.languageparser.rest.model.*;
 import by.c7d5a6.languageparser.rest.model.base.PageResult;
 import org.slf4j.Logger;
@@ -19,6 +21,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Service
 public class WordService extends BaseService {
@@ -26,12 +29,14 @@ public class WordService extends BaseService {
     private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     private final WordsRepository wordsRepository;
+    private final WordsSourceRepository wordsSourceRepository;
     private final LanguageService languageService;
     private final POSService posService;
 
     @Autowired
-    public WordService(WordsRepository wordsRepository, LanguageService languageService, POSService posService) {
+    public WordService(WordsRepository wordsRepository, WordsSourceRepository wordsSourceRepository, LanguageService languageService, POSService posService) {
         this.wordsRepository = wordsRepository;
+        this.wordsSourceRepository = wordsSourceRepository;
         this.languageService = languageService;
         this.posService = posService;
     }
@@ -91,32 +96,72 @@ public class WordService extends BaseService {
 
     private DetailedWord getWordWithDetails(Word word) {
         DetailedWord detailedWord = new DetailedWord();
-        WordWithWritten wordWithWritten = new WordWithWritten(word);
-        wordWithWritten.setWrittenWord(word.getWord());
-        detailedWord.setWord(wordWithWritten);
-        Etymology etymology = new Etymology();
-        ArrayList<WordWithTranslations> from = new ArrayList<>();
-        WordWithTranslations wordFrom = new WordWithTranslations();
-        wordFrom.setWord("wordFrom");
-        ArrayList<String> translations = new ArrayList<>();
-        translations.add("translation");
-        translations.add("translation");
-        wordFrom.setTranslations(translations);
-        from.add(wordFrom);
-        from.add(wordFrom);
-        etymology.setFrom(from);
-        ArrayList<WordWithTranslations> cognate = new ArrayList<>();
-        WordWithTranslations wordCognate = new WordWithTranslations();
-        wordCognate.setWord("wordCognate");
-        wordCognate.setTranslations(translations);
-        cognate.add(wordCognate);
-        etymology.setCognate(cognate);
-        detailedWord.setEtymology(etymology);
+        detailedWord.setWord(getWordWithWritten(word));
+        detailedWord.setEtymology(getEtymology(word));
         ArrayList<WordWithWritten> wwwr = new ArrayList<>();
-        wwwr.add(wordWithWritten);
+//        wwwr.add(wordWithWritten);
         detailedWord.setDescendants(wwwr);
         detailedWord.setDirived(wwwr);
-        detailedWord.setTranslations(translations);
+//        ArrayList<String> translations = new ArrayList<>();
+//        translations.add("translation");
+//        translations.add("translation");
+//        detailedWord.setTranslations(translations);
         return detailedWord;
+    }
+
+    private Etymology getEtymology(Word word) {
+        Etymology etymology = new Etymology();
+        etymology.setFrom(getEtymologyFrom(word));
+        etymology.setCognate(getEtymologyCognate(word, etymology.getFrom()));
+        return etymology;
+    }
+
+    private List<WordWithTranslations> getEtymologyFrom(Word word) {
+        final List<WordWithTranslations> etymologyFrom = new ArrayList<>();
+        Long nextWordId = word.getId();
+        while (nextWordId != null) {
+            Optional<EWordSource> wordSource = wordsSourceRepository.findByWord_Id(nextWordId);
+            wordSource.ifPresent(ws -> {
+                etymologyFrom.add(getWordWithTranslations(ws.getWordSource()));
+            });
+            nextWordId = wordSource.map(EWordSource::getWordSource).map(EWord::getId).orElse(null);
+        }
+        return etymologyFrom;
+    }
+
+    private List<WordWithTranslations> getEtymologyCognate(Word word, List<WordWithTranslations> etymologyFrom) {
+        final List<WordWithTranslations> etymologyCognate = new ArrayList<>();
+        List<Long> langIds = etymologyFrom.stream().map(wfrom -> wfrom.getLanguage().getId()).distinct().collect(Collectors.toList());
+        if (!langIds.contains(word.getLanguage().getId())) {
+            langIds.add(word.getLanguage().getId());
+        }
+        List<Word> toCheck = new ArrayList<>(etymologyFrom);
+        int i = 0;
+        while (i < toCheck.size()) {
+            List<EWordSource> wordSources = wordsSourceRepository.findByWordSource_Id(toCheck.get(i).getId());
+            wordSources.stream().map(EWordSource::getWord).forEach((w) -> {
+                if (!langIds.contains(w.getLanguage().getId())) {
+                    etymologyCognate.add(getWordWithTranslations(w));
+                    toCheck.add(convertToRestModel(w));
+                }
+            });
+            i++;
+        }
+        return etymologyCognate;
+    }
+
+    private WordWithTranslations getWordWithTranslations(EWord eWord) {
+        WordWithTranslations wordWithTranslations = mapper.map(eWord, WordWithTranslations.class);
+//        ArrayList<String> translations = new ArrayList<>();
+//        translations.add("translation");
+//        translations.add("translation");
+//        wordWithTranslations.setTranslations(translations);
+        return wordWithTranslations;
+    }
+
+    private WordWithWritten getWordWithWritten(Word word) {
+        WordWithWritten wordWithWritten = mapper.map(word, WordWithWritten.class);
+        wordWithWritten.setWrittenWord(word.getWord());
+        return wordWithWritten;
     }
 }
