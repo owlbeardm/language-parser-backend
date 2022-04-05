@@ -2,6 +2,7 @@ package by.c7d5a6.languageparser.service;
 
 import by.c7d5a6.languageparser.entity.ELanguage;
 import by.c7d5a6.languageparser.entity.ESoundChange;
+import by.c7d5a6.languageparser.entity.enums.SoundChangePurpose;
 import by.c7d5a6.languageparser.entity.enums.SoundChangeType;
 import by.c7d5a6.languageparser.repository.SoundChangeRepository;
 import by.c7d5a6.languageparser.rest.model.SoundChange;
@@ -71,26 +72,50 @@ public class SoundChangesService extends BaseService {
         return soundChange;
     }
 
-    public List<SoundChange> getSoundChangesByLangs(long fromLangId, long toLangId) {
-        List<ESoundChange> byLangFrom_idAndLangTo_idOrderByPriority = soundChangeRepository.findByLangFrom_IdAndLangTo_IdOrderByPriority(fromLangId, toLangId);
+    public List<SoundChange> getSoundChanges(long fromLangId, long toLangId, SoundChangePurpose soundChangePurpose) {
+        if (soundChangePurpose == SoundChangePurpose.SOUND_CHANGE) {
+            return getSoundChangesByLangs(fromLangId, toLangId, soundChangePurpose);
+        } else {
+            return getSoundChangesByLang(fromLangId, soundChangePurpose);
+        }
+    }
+
+    public List<SoundChange> getSoundChangesByLang(long fromLangId, SoundChangePurpose soundChangePurpose) {
+        List<ESoundChange> byLangFrom_idAndLangTo_idOrderByPriority = soundChangeRepository.findByLangFrom_IdAndSoundChangePurposeOrderByPriority(fromLangId, soundChangePurpose);
         return byLangFrom_idAndLangTo_idOrderByPriority.stream().map(this::convertToSoundChange).collect(Collectors.toList());
     }
 
-    public String getSoundChangesRawLinesByLangs(long fromLangId, long toLangId) {
-        List<ESoundChange> byLangFrom_idAndLangTo_idOrderByPriority = soundChangeRepository.findByLangFrom_IdAndLangTo_IdOrderByPriority(fromLangId, toLangId);
-        return byLangFrom_idAndLangTo_idOrderByPriority.stream().map(this::soundChangeToRawLine).collect(Collectors.joining(System.lineSeparator()));
+    public List<ESoundChange> getESoundChangesByLang(long fromLangId, SoundChangePurpose soundChangePurpose) {
+        List<ESoundChange> byLangFrom_idAndLangTo_idOrderByPriority = soundChangeRepository.findByLangFrom_IdAndSoundChangePurposeOrderByPriority(fromLangId, soundChangePurpose);
+        return byLangFrom_idAndLangTo_idOrderByPriority;
     }
 
-    public void saveSoundChangesRawLinesByLangs(long fromLangId, long toLangId, String rawLines) {
+    public List<SoundChange> getSoundChangesByLangs(long fromLangId, long toLangId, SoundChangePurpose soundChangePurpose) {
+        List<ESoundChange> byLangFrom_idAndLangTo_idOrderByPriority = soundChangeRepository.findByLangFrom_IdAndLangTo_IdAndAndSoundChangePurposeOrderByPriority(fromLangId, toLangId, soundChangePurpose);
+        return byLangFrom_idAndLangTo_idOrderByPriority.stream().map(this::convertToSoundChange).collect(Collectors.toList());
+    }
+
+    public String getSoundChangesRawLinesByLangs(long fromLangId, Long toLangId, SoundChangePurpose soundChangePurpose) {
+        List<ESoundChange> soundChanges;
+        if (soundChangePurpose == SoundChangePurpose.SOUND_CHANGE) {
+            soundChanges = soundChangeRepository.findByLangFrom_IdAndLangTo_IdAndAndSoundChangePurposeOrderByPriority(fromLangId, toLangId, soundChangePurpose);
+        } else {
+            soundChanges = soundChangeRepository.findByLangFrom_IdAndSoundChangePurposeOrderByPriority(fromLangId, soundChangePurpose);
+        }
+        return soundChanges.stream().map(this::soundChangeToRawLine).collect(Collectors.joining(System.lineSeparator()));
+    }
+
+    public void saveSoundChangesRawLinesByLangs(long fromLangId, Long toLangId, String rawLines, SoundChangePurpose soundChangePurpose) {
         ELanguage langFrom = languageService.getLangById(fromLangId).orElseThrow(() -> new IllegalArgumentException("Language from with id " + fromLangId + " doesn't exist"));
-        ELanguage langTo = languageService.getLangById(toLangId).orElseThrow(() -> new IllegalArgumentException("Language to with id " + fromLangId + " doesn't exist"));
+        ELanguage langTo = toLangId == null ? null : languageService.getLangById(toLangId).orElseThrow(() -> new IllegalArgumentException("Language to with id " + fromLangId + " doesn't exist"));
         List<ESoundChange> soundChanges = getSoundChangesFromLines(rawLines);
-        soundChangeRepository.deleteByLangFrom_IdAndLangTo_Id(fromLangId, toLangId);
+        soundChangeRepository.deleteByLangFrom_IdAndLangTo_IdAndSoundChangePurpose(fromLangId, toLangId, soundChangePurpose);
         for (long i = 0; i < soundChanges.size(); i++) {
             ESoundChange soundChange = soundChanges.get((int) i);
             soundChange.setPriority(i);
             soundChange.setLangFrom(langFrom);
             soundChange.setLangTo(langTo);
+            soundChange.setSoundChangePurpose(soundChangePurpose);
             soundChangeRepository.save(soundChange);
         }
     }
@@ -150,7 +175,6 @@ public class SoundChangesService extends BaseService {
     private SoundChange convertToSoundChange(ESoundChange soundChange) {
         return mapper.map(soundChange, SoundChange.class);
     }
-
 
 
 }

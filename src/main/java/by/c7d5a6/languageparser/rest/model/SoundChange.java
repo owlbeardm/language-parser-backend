@@ -1,14 +1,16 @@
 package by.c7d5a6.languageparser.rest.model;
 
+import by.c7d5a6.languageparser.entity.enums.SoundChangePurpose;
 import by.c7d5a6.languageparser.entity.enums.SoundChangeType;
 
 public class SoundChange {
 
     private long id;
-//    private Language langFrom;
+    //    private Language langFrom;
 //    private Language langTo;
     private Long priority;
     private SoundChangeType type;
+    private SoundChangePurpose soundChangePurpose;
     private String soundFrom;
     private String soundTo;
     private String environmentBefore;
@@ -68,5 +70,13 @@ public class SoundChange {
 
     public void setEnvironmentAfter(String environmentAfter) {
         this.environmentAfter = environmentAfter;
+    }
+
+    public SoundChangePurpose getSoundChangePurpose() {
+        return soundChangePurpose;
+    }
+
+    public void setSoundChangePurpose(SoundChangePurpose soundChangePurpose) {
+        this.soundChangePurpose = soundChangePurpose;
     }
 }

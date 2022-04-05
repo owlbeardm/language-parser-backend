@@ -2,6 +2,7 @@ package by.c7d5a6.languageparser.service;
 
 import by.c7d5a6.languageparser.entity.*;
 import by.c7d5a6.languageparser.entity.base.BaseEntity;
+import by.c7d5a6.languageparser.entity.enums.SoundChangePurpose;
 import by.c7d5a6.languageparser.repository.LanguageConnectionRepository;
 import by.c7d5a6.languageparser.repository.SoundChangeRepository;
 import by.c7d5a6.languageparser.repository.WordsRepository;
@@ -65,7 +66,7 @@ public class EvolutionService extends BaseService {
     }
 
     private List<ESoundChange> getSoundChanges(Long languageFromId, Long languageToId) {
-        return soundChangeRepository.findByLangFrom_IdAndLangTo_IdOrderByPriority(languageFromId, languageToId);
+        return soundChangeRepository.findByLangFrom_IdAndLangTo_IdAndAndSoundChangePurposeOrderByPriority(languageFromId, languageToId, SoundChangePurpose.SOUND_CHANGE);
     }
 
     private Map<Long, Map<Long, String>> evolveWords(List<EWord> words, List<ELanguageConnection> languageConnections) {
@@ -87,7 +88,6 @@ public class EvolutionService extends BaseService {
     }
 
     public String evolveWord(String word, List<ESoundChange> soundChanges) {
-
         String result = word;
         for (ESoundChange soundChange : soundChanges) {
             result = evolveWordBySingleSoundChange(result, soundChange);

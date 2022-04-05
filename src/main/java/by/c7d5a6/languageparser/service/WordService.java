@@ -1,9 +1,7 @@
 package by.c7d5a6.languageparser.service;
 
-import by.c7d5a6.languageparser.entity.ELanguage;
-import by.c7d5a6.languageparser.entity.EPOS;
-import by.c7d5a6.languageparser.entity.EWord;
-import by.c7d5a6.languageparser.entity.EWordSource;
+import by.c7d5a6.languageparser.entity.*;
+import by.c7d5a6.languageparser.entity.enums.SoundChangePurpose;
 import by.c7d5a6.languageparser.entity.specification.EWordSpecification;
 import by.c7d5a6.languageparser.entity.specification.SearchCriteria;
 import by.c7d5a6.languageparser.repository.WordsRepository;
@@ -31,14 +29,18 @@ public class WordService extends BaseService {
     private final WordsRepository wordsRepository;
     private final WordsSourceRepository wordsSourceRepository;
     private final LanguageService languageService;
+    private final EvolutionService evolutionService;
+    private final SoundChangesService soundChangesService;
     private final POSService posService;
 
     @Autowired
-    public WordService(WordsRepository wordsRepository, WordsSourceRepository wordsSourceRepository, LanguageService languageService, POSService posService) {
+    public WordService(WordsRepository wordsRepository, WordsSourceRepository wordsSourceRepository, LanguageService languageService, EvolutionService evolutionService, SoundChangesService soundChangesService, POSService posService) {
         this.wordsRepository = wordsRepository;
         this.wordsSourceRepository = wordsSourceRepository;
         this.languageService = languageService;
         this.posService = posService;
+        this.evolutionService = evolutionService;
+        this.soundChangesService = soundChangesService;
     }
 
     public List<Word> getAllWordsFromLang(Long langId) {
@@ -47,7 +49,7 @@ public class WordService extends BaseService {
     }
 
 
-    public PageResult<Word> getAllWords(WordListFilter filter) {
+    public PageResult<WordWithWritten> getAllWords(WordListFilter filter) {
         ELanguage eLanguage = Optional.ofNullable(filter.getLanguageId()).flatMap(languageService::getLangById).orElse(null);
         EPOS epos = Optional.ofNullable(filter.getPosId()).flatMap(posService::getPOSById).orElse(null);
         EWordSpecification spec1 = new EWordSpecification(new SearchCriteria("word", ":", filter.getWord()));
@@ -55,7 +57,7 @@ public class WordService extends BaseService {
         EWordSpecification spec3 = new EWordSpecification(new SearchCriteria("partOfSpeech", ":", epos));
         return PageResult.from(
                 wordsRepository.findAll(Specification.where(spec1).and(spec2).and(spec3), filter.toPageable()),
-                this::convertToRestModel
+                this::getWordWithWritten
         );
     }
 
@@ -159,9 +161,15 @@ public class WordService extends BaseService {
         return wordWithTranslations;
     }
 
+    private WordWithWritten getWordWithWritten(EWord word) {
+        return getWordWithWritten(convertToRestModel(word));
+    }
+
     private WordWithWritten getWordWithWritten(Word word) {
         WordWithWritten wordWithWritten = mapper.map(word, WordWithWritten.class);
-        wordWithWritten.setWrittenWord(word.getWord());
+        List<ESoundChange> soundChangesByLang = soundChangesService.getESoundChangesByLang(word.getLanguage().getId(), SoundChangePurpose.WRITING_SYSTEM);
+        String written = evolutionService.evolveWord(word.getWord(), soundChangesByLang);
+        wordWithWritten.setWrittenWord(written);
         return wordWithWritten;
     }
 }

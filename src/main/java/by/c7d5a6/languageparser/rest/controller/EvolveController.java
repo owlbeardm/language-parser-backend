@@ -1,5 +1,6 @@
 package by.c7d5a6.languageparser.rest.controller;
 
+import by.c7d5a6.languageparser.entity.enums.SoundChangePurpose;
 import by.c7d5a6.languageparser.rest.model.*;
 import by.c7d5a6.languageparser.rest.model.base.PageResult;
 import by.c7d5a6.languageparser.service.EvolutionService;
@@ -105,24 +106,45 @@ public class EvolveController {
     }
 
     @Operation(summary = "Get all sound changes")
-    @GetMapping("/sc/lang/{fromLangId}/{toLangId}")
-    public List<SoundChange> getSoundChangesByLangs(@PathVariable long fromLangId, @PathVariable long toLangId) {
-        logger.info("Get all sound changes from {} to {}", fromLangId, toLangId);
-        return soundChangesService.getSoundChangesByLangs(fromLangId, toLangId);
+    @GetMapping("/sc/lang/{soundChangePurpose}/{fromLangId}/{toLangId}")
+    public List<SoundChange> getSoundChangesByLangs(@PathVariable SoundChangePurpose soundChangePurpose, @PathVariable long fromLangId, @PathVariable long toLangId) {
+        logger.info("Get all sound changes from {} to {}, {}", fromLangId, toLangId, soundChangePurpose);
+        return soundChangesService.getSoundChangesByLangs(fromLangId, toLangId, soundChangePurpose);
+    }
+
+    @Operation(summary = "Get all sound changes")
+    @GetMapping("/sc/lang/{soundChangePurpose}/{fromLangId}")
+    public List<SoundChange> getSoundChangesByLang(@PathVariable SoundChangePurpose soundChangePurpose, @PathVariable long fromLangId) {
+        logger.info("Get all sound changes from {}, {}", fromLangId, soundChangePurpose);
+        return soundChangesService.getSoundChangesByLang(fromLangId, soundChangePurpose);
     }
 
     @Operation(summary = "Save all sound changes from text form")
-    @PostMapping("/sc/raw/lang/{fromLangId}/{toLangId}")
-    public void saveSoundChangesRawLinesByLangs(@PathVariable long fromLangId, @PathVariable long toLangId, @RequestBody String rawLines) {
-        logger.info("Save all sound changes from text form from {} to {}", fromLangId, toLangId);
-        soundChangesService.saveSoundChangesRawLinesByLangs(fromLangId, toLangId, rawLines);
+    @PostMapping("/sc/raw/lang/{soundChangePurpose}/{fromLangId}/{toLangId}")
+    public void saveSoundChangesRawLinesByLangs(@PathVariable SoundChangePurpose soundChangePurpose, @PathVariable long fromLangId, @PathVariable long toLangId, @RequestBody String rawLines) {
+        logger.info("Save all sound changes from text form from {}, {}", fromLangId, toLangId, soundChangePurpose);
+        soundChangesService.saveSoundChangesRawLinesByLangs(fromLangId, toLangId, rawLines, soundChangePurpose);
+    }
+
+    @Operation(summary = "Save all sound changes from text form")
+    @PostMapping("/sc/raw/lang/{soundChangePurpose}/{fromLangId}")
+    public void saveSoundChangesRawLinesByLang(@PathVariable SoundChangePurpose soundChangePurpose, @PathVariable long fromLangId, @RequestBody String rawLines) {
+        logger.info("Save all sound changes from text form from {}, {}", fromLangId, soundChangePurpose);
+        soundChangesService.saveSoundChangesRawLinesByLangs(fromLangId, null, rawLines, soundChangePurpose);
     }
 
     @Operation(summary = "Get all sound changes in text form")
-    @GetMapping(value = "/sc/raw/lang/{fromLangId}/{toLangId}", produces = "text/plain")
-    public String getSoundChangesRawLinesByLangs(@PathVariable long fromLangId, @PathVariable long toLangId) {
-        logger.info("Get all sound changes in text form from {} to {}", fromLangId, toLangId);
-        return soundChangesService.getSoundChangesRawLinesByLangs(fromLangId, toLangId);
+    @GetMapping(value = "/sc/raw/lang/{soundChangePurpose}/{fromLangId}/{toLangId}", produces = "text/plain")
+    public String getSoundChangesRawLinesByLangs(@PathVariable SoundChangePurpose soundChangePurpose, @PathVariable long fromLangId, @PathVariable long toLangId) {
+        logger.info("Get all sound changes in text form from {} to {}, {}", fromLangId, toLangId, soundChangePurpose);
+        return soundChangesService.getSoundChangesRawLinesByLangs(fromLangId, toLangId, soundChangePurpose);
+    }
+
+    @Operation(summary = "Get all sound changes in text form")
+    @GetMapping(value = "/sc/raw/lang/{soundChangePurpose}/{fromLangId}", produces = "text/plain")
+    public String getSoundChangesRawLinesByLang(@PathVariable SoundChangePurpose soundChangePurpose, @PathVariable long fromLangId) {
+        logger.info("Get all sound changes in text form from {}, {}", fromLangId, soundChangePurpose);
+        return soundChangesService.getSoundChangesRawLinesByLangs(fromLangId, null, soundChangePurpose);
     }
 
     @Operation(summary = "Get all words with evolutions")

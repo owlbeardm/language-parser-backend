@@ -1,6 +1,7 @@
 package by.c7d5a6.languageparser.entity;
 
 import by.c7d5a6.languageparser.entity.base.BaseEntity;
+import by.c7d5a6.languageparser.entity.enums.SoundChangePurpose;
 import by.c7d5a6.languageparser.entity.enums.SoundChangeType;
 import by.c7d5a6.languageparser.entity.possessors.IdLongVerPossessor;
 
@@ -21,7 +22,6 @@ public class ESoundChange extends BaseEntity implements Serializable, IdLongVerP
     @JoinColumn(name = "lang_from_id")
     private ELanguage langFrom;
 
-    @NotNull
     @ManyToOne
     @JoinColumn(name = "lang_to_id")
     private ELanguage langTo;
@@ -34,6 +34,11 @@ public class ESoundChange extends BaseEntity implements Serializable, IdLongVerP
     @Enumerated(EnumType.STRING)
     @Column(name = "type")
     private SoundChangeType type;
+
+    @NotNull
+    @Enumerated(EnumType.STRING)
+    @Column(name = "change_type")
+    private SoundChangePurpose soundChangePurpose;
 
     @NotNull
     @Column(name = "sound_from")
@@ -111,6 +116,14 @@ public class ESoundChange extends BaseEntity implements Serializable, IdLongVerP
 
     public void setType(SoundChangeType type) {
         this.type = type;
+    }
+
+    public SoundChangePurpose getSoundChangePurpose() {
+        return soundChangePurpose;
+    }
+
+    public void setSoundChangePurpose(SoundChangePurpose soundChangePurpose) {
+        this.soundChangePurpose = soundChangePurpose;
     }
 
     @Override
