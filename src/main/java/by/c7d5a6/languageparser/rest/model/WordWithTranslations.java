@@ -2,7 +2,7 @@ package by.c7d5a6.languageparser.rest.model;
 
 import java.util.List;
 
-public class WordWithTranslations extends Word {
+public class WordWithTranslations extends WordWithWritten {
     private List<String> translations;
 
     public List<String> getTranslations() {

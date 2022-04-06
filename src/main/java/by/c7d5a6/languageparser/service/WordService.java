@@ -153,7 +153,7 @@ public class WordService extends BaseService {
     }
 
     private WordWithTranslations getWordWithTranslations(EWord eWord) {
-        WordWithTranslations wordWithTranslations = mapper.map(eWord, WordWithTranslations.class);
+        WordWithTranslations wordWithTranslations = mapper.map(getWordWithWritten(eWord), WordWithTranslations.class);
 //        ArrayList<String> translations = new ArrayList<>();
 //        translations.add("translation");
 //        translations.add("translation");
@@ -162,13 +162,18 @@ public class WordService extends BaseService {
     }
 
     private WordWithWritten getWordWithWritten(EWord word) {
-        return getWordWithWritten(convertToRestModel(word));
+        WordWithWritten ww = mapper.map(word, WordWithWritten.class);
+        return _getWithWritten(ww);
     }
 
     private WordWithWritten getWordWithWritten(Word word) {
-        WordWithWritten wordWithWritten = mapper.map(word, WordWithWritten.class);
-        List<ESoundChange> soundChangesByLang = soundChangesService.getESoundChangesByLang(word.getLanguage().getId(), SoundChangePurpose.WRITING_SYSTEM);
-        String written = evolutionService.evolveWord(word.getWord(), soundChangesByLang);
+        WordWithWritten ww = mapper.map(word, WordWithWritten.class);
+        return _getWithWritten(ww);
+    }
+
+    private WordWithWritten _getWithWritten(WordWithWritten wordWithWritten) {
+        List<ESoundChange> soundChangesByLang = soundChangesService.getESoundChangesByLang(wordWithWritten.getLanguage().getId(), SoundChangePurpose.WRITING_SYSTEM);
+        String written = evolutionService.evolveWord(wordWithWritten.getWord(), soundChangesByLang);
         wordWithWritten.setWrittenWord(written);
         return wordWithWritten;
     }
