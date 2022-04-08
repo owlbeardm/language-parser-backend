@@ -134,6 +134,8 @@ public class IPAService extends BaseService {
         return Stream.of(arrays)
                 .flatMap(Stream::of)        // or, use `Arrays::stream`
                 .distinct()
+                .filter(w -> !w.isBlank())
+                .sorted((o1, o2) -> o2.length() - o1.length())
                 .toArray(String[]::new);
     }
 

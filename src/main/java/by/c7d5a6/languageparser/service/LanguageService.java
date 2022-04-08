@@ -132,7 +132,6 @@ public class LanguageService extends BaseService {
     }
 
 
-
     public LanguagePhoneme convertToRestModel(ELanguagePhoneme eLanguagePhoneme) {
         return mapper.map(eLanguagePhoneme, LanguagePhoneme.class);
     }
@@ -241,5 +240,47 @@ public class LanguageService extends BaseService {
                 .map(EWord::getWord)
                 .reduce((a, b) -> a + " " + b)
                 .orElse("");
+    }
+
+    public LanguageSoundClusters getLanguageSoundClusters(Long languageId) {
+        final Set<String> constClustersStart = new HashSet<>();
+        final Set<String> constClustersEnd = new HashSet<>();
+        final Set<String> constClusters = new HashSet<>();
+        final Set<String> vowelClustersStart = new HashSet<>();
+        final Set<String> vowelClustersEnd = new HashSet<>();
+        final Set<String> vowelClusters = new HashSet<>();
+        String constRegexp = "(" + String.join("|", ipaService.getAllConstanantVariants()) + ")";
+        logger.info(constRegexp);
+        String vowelRegexp = "(" + String.join("|", ipaService.getAllVowelVariants()) + ")";
+        logger.info(vowelRegexp);
+        this.wordsRepository.findByLanguage_Id(languageId).stream()
+                .map(EWord::getWord)
+                .forEach(w -> {
+                    w = ipaService.cleanIPA(w);
+                    String[] vowelClustersArr = w.split(constRegexp);
+                    String[] constClustersArr = w.split(vowelRegexp);
+                    getClusters(constClustersStart, constClustersEnd, constClusters, w, constClustersArr);
+                    getClusters(vowelClustersStart, vowelClustersEnd, vowelClusters, w, vowelClustersArr);
+                });
+        LanguageSoundClusters languageSoundClusters = new LanguageSoundClusters();
+        languageSoundClusters.setConstClusters(constClusters.stream().sorted().toList());
+        languageSoundClusters.setConstClustersStart(constClustersStart.stream().sorted().toList());
+        languageSoundClusters.setConstClustersEnd(constClustersEnd.stream().sorted().toList());
+        languageSoundClusters.setVowelClusters(vowelClusters.stream().sorted().toList());
+        languageSoundClusters.setVowelClustersStart(vowelClustersStart.stream().sorted().toList());
+        languageSoundClusters.setVowelClustersEnd(vowelClustersEnd.stream().sorted().toList());
+        return languageSoundClusters;
+    }
+
+    private void getClusters(Set<String> constClustersStart, Set<String> constClustersEnd, Set<String> constClusters, String w, String[] constClustersArr) {
+        if (constClustersArr.length > 0) {
+            String start = constClustersArr[0];
+            if (w.startsWith(start) && !start.isBlank())
+                constClustersStart.add(start);
+            String end = constClustersArr[constClustersArr.length - 1];
+            if (w.endsWith(end) && !start.isBlank())
+                constClustersEnd.add(end);
+            constClusters.addAll(Arrays.stream(constClustersArr).filter(s -> !s.isBlank()).toList());
+        }
     }
 }

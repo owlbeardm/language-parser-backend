@@ -1,9 +1,6 @@
 package by.c7d5a6.languageparser.rest.controller;
 
-import by.c7d5a6.languageparser.rest.model.Language;
-import by.c7d5a6.languageparser.rest.model.LanguagePhoneme;
-import by.c7d5a6.languageparser.rest.model.ListOfLanguagePhonemes;
-import by.c7d5a6.languageparser.rest.model.POS;
+import by.c7d5a6.languageparser.rest.model.*;
 import by.c7d5a6.languageparser.rest.security.IsVerifiedUser;
 import by.c7d5a6.languageparser.service.LanguageService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -85,5 +82,12 @@ public class LanguageController {
     public void deleteLanguagePhoneme(@PathVariable Long phonemeId) {
         logger.info("Deleting language phoneme");
         languageService.deleteLanguagePhoneme(phonemeId);
+    }
+
+    @Operation(summary = "Get language clusters by id")
+    @GetMapping("/clusters/{languageId}")
+    public LanguageSoundClusters getLanguageSoundClusters(@PathVariable Long languageId) {
+        logger.info("Getting language phonemes by id");
+        return languageService.getLanguageSoundClusters(languageId);
     }
 }

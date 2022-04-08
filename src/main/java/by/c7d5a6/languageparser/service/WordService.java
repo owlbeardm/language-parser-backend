@@ -152,6 +152,8 @@ public class WordService extends BaseService {
         return etymologyCognate;
     }
 
+
+
     private WordWithTranslations getWordWithTranslations(EWord eWord) {
         WordWithTranslations wordWithTranslations = mapper.map(getWordWithWritten(eWord), WordWithTranslations.class);
 //        ArrayList<String> translations = new ArrayList<>();
