@@ -1,6 +1,7 @@
-package by.c7d5a6.languageparser.rest.model;
+package by.c7d5a6.languageparser.rest.model.filter;
 
 
+import by.c7d5a6.languageparser.rest.model.SortDirection;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Schema;
 import org.slf4j.Logger;
@@ -35,7 +36,7 @@ public class PaginationFilter implements Serializable {
     private SortDirection dir = SortDirection.asc;
 
     @Parameter(description = "sort column")
-    @Schema(defaultValue = "word")
+    @Schema(defaultValue = "id")
     private String sort;
 
     public PaginationFilter() {
@@ -96,7 +97,7 @@ public class PaginationFilter implements Serializable {
         logger.info("PaginationFilter.toPageable: page={}, size={}, dir={}, sort={}", page, size, dir, sort);
         PageRequest result = PageRequest.of(getPage(), getSize());
         if (sorter == null) {
-            result = result.withSort(Sort.by(Sort.Order.by("word").with(calcSortDirection())));
+            result = result.withSort(Sort.by(Sort.Order.by("id").with(calcSortDirection())));
         } else {
             Sort sortList = sorter.apply(getSort());
             if (calcSortDirection() == Sort.Direction.ASC) {

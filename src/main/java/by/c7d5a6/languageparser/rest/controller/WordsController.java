@@ -2,6 +2,7 @@ package by.c7d5a6.languageparser.rest.controller;
 
 import by.c7d5a6.languageparser.rest.model.*;
 import by.c7d5a6.languageparser.rest.model.base.PageResult;
+import by.c7d5a6.languageparser.rest.model.filter.WordListFilter;
 import by.c7d5a6.languageparser.service.WordService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;

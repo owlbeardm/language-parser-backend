@@ -1,4 +1,4 @@
-package by.c7d5a6.languageparser.entity;
+package by.c7d5a6.languageparser.entity.models;
 
 public interface EWordWithSourcesIds {
 

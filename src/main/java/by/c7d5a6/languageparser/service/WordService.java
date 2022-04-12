@@ -8,6 +8,7 @@ import by.c7d5a6.languageparser.repository.WordsRepository;
 import by.c7d5a6.languageparser.repository.WordsSourceRepository;
 import by.c7d5a6.languageparser.rest.model.*;
 import by.c7d5a6.languageparser.rest.model.base.PageResult;
+import by.c7d5a6.languageparser.rest.model.filter.WordListFilter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,7 +20,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @Service
 public class WordService extends BaseService {
@@ -174,9 +174,14 @@ public class WordService extends BaseService {
     }
 
     private WordWithWritten _getWithWritten(WordWithWritten wordWithWritten) {
-        List<ESoundChange> soundChangesByLang = soundChangesService.getESoundChangesByLang(wordWithWritten.getLanguage().getId(), SoundChangePurpose.WRITING_SYSTEM);
-        String written = evolutionService.evolveWord(wordWithWritten.getWord(), soundChangesByLang);
+        String written = getWrittenForm(wordWithWritten);
         wordWithWritten.setWrittenWord(written);
         return wordWithWritten;
+    }
+
+    public String getWrittenForm(Word word) {
+        List<ESoundChange> soundChangesByLang = soundChangesService.getESoundChangesByLang(word.getLanguage().getId(), SoundChangePurpose.WRITING_SYSTEM);
+        String written = evolutionService.evolveWord(word.getWord(), soundChangesByLang);
+        return written;
     }
 }

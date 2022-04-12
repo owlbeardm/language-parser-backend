@@ -3,6 +3,7 @@ package by.c7d5a6.languageparser.rest.controller;
 import by.c7d5a6.languageparser.entity.enums.SoundChangePurpose;
 import by.c7d5a6.languageparser.rest.model.*;
 import by.c7d5a6.languageparser.rest.model.base.PageResult;
+import by.c7d5a6.languageparser.rest.model.filter.WordWithEvolutionsListFilter;
 import by.c7d5a6.languageparser.service.EvolutionService;
 import by.c7d5a6.languageparser.service.LanguageService;
 import by.c7d5a6.languageparser.service.SoundChangesService;

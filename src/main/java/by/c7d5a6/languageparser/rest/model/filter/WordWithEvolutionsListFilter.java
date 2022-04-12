@@ -1,5 +1,6 @@
-package by.c7d5a6.languageparser.rest.model;
+package by.c7d5a6.languageparser.rest.model.filter;
 
+import by.c7d5a6.languageparser.rest.model.filter.PaginationFilter;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -7,7 +8,6 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.annotation.Nullable;
 import java.lang.invoke.MethodHandles;
 
 @SuppressWarnings("unused")
