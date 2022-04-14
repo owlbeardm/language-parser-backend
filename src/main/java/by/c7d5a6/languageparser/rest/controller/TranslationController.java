@@ -1,9 +1,6 @@
 package by.c7d5a6.languageparser.rest.controller;
 
-import by.c7d5a6.languageparser.rest.model.DetailedWord;
-import by.c7d5a6.languageparser.rest.model.Word;
-import by.c7d5a6.languageparser.rest.model.WordWithTranslations;
-import by.c7d5a6.languageparser.rest.model.WordWithWritten;
+import by.c7d5a6.languageparser.rest.model.*;
 import by.c7d5a6.languageparser.rest.model.base.PageResult;
 import by.c7d5a6.languageparser.rest.model.filter.TranslationListFilter;
 import by.c7d5a6.languageparser.rest.model.filter.WordListFilter;
@@ -39,5 +36,24 @@ public class TranslationController {
     public PageResult<WordWithTranslations> getAllWordsWithTranslationsFromLang(@Valid TranslationListFilter filter) {
         return translationService.getAllWords(filter);
     }
+
+    @Operation(summary = "Get translations for word")
+    @GetMapping("/tranlationsfor/{id}")
+    public List<Translation> getTranslationsForWord(@PathVariable Long id) {
+        return translationService.getTranslationsForWord(id);
+    }
+
+    @Operation(summary = "Delete translation by id")
+    @DeleteMapping("{id}")
+    public void deleteTranslation(@PathVariable Long id){
+        translationService.deleteTranslation(id);
+    }
+
+    @Operation(summary = "Add translation")
+    @PostMapping("/")
+    public Long addTranslation(@RequestBody Translation translation){
+        return translationService.addTranlation(translation);
+    }
+
 
 }
