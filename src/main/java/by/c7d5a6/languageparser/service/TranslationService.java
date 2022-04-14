@@ -21,6 +21,7 @@ import org.springframework.stereotype.Service;
 import java.lang.invoke.MethodHandles;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Service
@@ -44,15 +45,39 @@ public class TranslationService extends BaseService {
         Page<WordWithTranslations> map = words.map((eid) -> {
             WordWithTranslations word = mapper.map(eid, WordWithTranslations.class);
             word.setWrittenWord(wordService.getWrittenForm(word));
-            List<Translation> translations = translationRepository.findByWordFrom_Id(word.getId()).stream().map((et) -> {
-                Translation t = mapper.map(et, Translation.class);
-                if (t.getWordTo() != null)
-                    t.getWordTo().setWrittenWord(wordService.getWrittenForm(t.getWordTo()));
-                return t;
-            }).collect(Collectors.toList());
+            List<Translation> translations = translationRepository.findByWordFrom_Id(word.getId()).stream().map(this::convertToRestModelWithWord).collect(Collectors.toList());
             word.setTranslations(translations);
             return word;
         });
         return PageResult.from(map);
+    }
+
+    private Translation convertToRestModelWithWord(ETranslation translation) {
+        Translation t = mapper.map(translation, Translation.class);
+        if (t.getWordTo() != null)
+            t.getWordTo().setWrittenWord(wordService.getWrittenForm(t.getWordTo()));
+        return t;
+    }
+
+    public void deleteTranslation(Long id) {
+        this.translationRepository.deleteById(id);
+    }
+
+    public Long addTranlation(Translation tr) {
+        ETranslation translation = mapper.map(tr, ETranslation.class);
+        if (translation.getId() == null) {
+            if (translation.getWordTo() != null) {
+                ETranslation newTranslation = new ETranslation();
+                newTranslation.setType(translation.getType());
+                newTranslation.setWordFrom(translation.getWordTo());
+                newTranslation.setWordTo(translation.getWordFrom());
+                this.translationRepository.save(newTranslation);
+            }
+        }
+        return this.translationRepository.save(translation).getId();
+    }
+
+    public List<Translation> getTranslationsForWord(Long id) {
+        return translationRepository.findByWordFrom_Id(id).stream().map(this::convertToRestModelWithWord).collect(Collectors.toList());
     }
 }
