@@ -5,7 +5,7 @@ import by.c7d5a6.languageparser.rest.model.*;
 import by.c7d5a6.languageparser.rest.model.base.PageResult;
 import by.c7d5a6.languageparser.rest.model.filter.WordWithEvolutionsListFilter;
 import by.c7d5a6.languageparser.service.EvolutionService;
-import by.c7d5a6.languageparser.service.LanguageService;
+import by.c7d5a6.languageparser.service.LanguageConnectionService;
 import by.c7d5a6.languageparser.service.SoundChangesService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -25,13 +25,13 @@ public class EvolveController {
     private static final Logger logger = LoggerFactory.getLogger(LanguageController.class);
 
     private final EvolutionService evolutionService;
-    private final LanguageService languageService;
+    private final LanguageConnectionService languageConnectionService;
     private final SoundChangesService soundChangesService;
 
     @Autowired
-    public EvolveController(EvolutionService evolutionService, LanguageService languageService, SoundChangesService soundChangesService) {
+    public EvolveController(EvolutionService evolutionService, LanguageConnectionService languageConnectionService, SoundChangesService soundChangesService) {
         this.evolutionService = evolutionService;
-        this.languageService = languageService;
+        this.languageConnectionService = languageConnectionService;
         this.soundChangesService = soundChangesService;
     }
 
@@ -39,21 +39,21 @@ public class EvolveController {
     @GetMapping("/connection/{fromLangId}/{toLangId}")
     public LanguageConnection getConnectionByLangs(@PathVariable long fromLangId, @PathVariable long toLangId) {
         logger.info("Get connection between {} and {}", fromLangId, toLangId);
-        return languageService.getConnection(fromLangId, toLangId);
+        return languageConnectionService.getConnection(fromLangId, toLangId);
     }
 
     @Operation(summary = "Update connection between two languages")
     @PostMapping(value = "/connection/{fromLangId}/{toLangId}")
     public void updateConnectionByLangs(@PathVariable long fromLangId, @PathVariable long toLangId, @RequestBody LanguageConnectionTypeModel connectionType) {
         logger.info("Update connection between {} and {}", fromLangId, toLangId);
-        languageService.updateConnection(fromLangId, toLangId, connectionType.getLanguageConnectionType());
+        languageConnectionService.updateConnection(fromLangId, toLangId, connectionType.getLanguageConnectionType());
     }
 
     @Operation(summary = "Delete connection between two languages")
     @DeleteMapping("/connection/{fromLangId}/{toLangId}")
     public void deleteConnectionByLangs(@PathVariable long fromLangId, @PathVariable long toLangId) {
         logger.info("Delete connection between {} and {}", fromLangId, toLangId);
-        languageService.deleteConnection(fromLangId, toLangId);
+        languageConnectionService.deleteConnection(fromLangId, toLangId);
     }
 
 
@@ -61,14 +61,14 @@ public class EvolveController {
     @GetMapping("/allfrom/{fromId}")
     public List<Language> getAllLanguagesFrom(@PathVariable long fromId) {
         logger.info("Getting all languages from {}", fromId);
-        return languageService.getAllLanguagesFrom(fromId);
+        return languageConnectionService.getAllLanguagesFrom(fromId);
     }
 
     @Operation(summary = "Get all routes from language to other given language")
     @GetMapping("/routes/{fromId}/{toId}")
     public List<List<Language>> getAllRoutes(@PathVariable long fromId, @PathVariable long toId) {
         logger.info("Getting all paths from {} to {}", fromId, toId);
-        return languageService.getAllRoutes(fromId, toId);
+        return languageConnectionService.getAllRoutes(fromId, toId);
     }
 
     @Operation(summary = "Trace word changes by list of languages")

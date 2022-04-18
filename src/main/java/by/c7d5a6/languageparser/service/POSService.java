@@ -4,7 +4,6 @@ import by.c7d5a6.languageparser.entity.ELanguage;
 import by.c7d5a6.languageparser.entity.ELanguagePOS;
 import by.c7d5a6.languageparser.entity.EPOS;
 import by.c7d5a6.languageparser.repository.LanguagePOSRepository;
-import by.c7d5a6.languageparser.repository.LanguageRepository;
 import by.c7d5a6.languageparser.repository.POSRepository;
 import by.c7d5a6.languageparser.rest.model.LanguagePOS;
 import by.c7d5a6.languageparser.rest.model.POS;
@@ -23,13 +22,13 @@ public class POSService extends BaseService {
 
     private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
-    private final LanguageRepository languageRepository;
+    private final LanguageService languageService;
     private final POSRepository posRepository;
     private final LanguagePOSRepository languagePOSRepository;
 
     @Autowired
-    public POSService(LanguageRepository languageRepository, POSRepository posRepository, LanguagePOSRepository languagePOSRepository) {
-        this.languageRepository = languageRepository;
+    public POSService(LanguageService languageService, POSRepository posRepository, LanguagePOSRepository languagePOSRepository) {
+        this.languageService = languageService;
         this.posRepository = posRepository;
         this.languagePOSRepository = languagePOSRepository;
     }
@@ -59,7 +58,7 @@ public class POSService extends BaseService {
     }
 
     public Long saveLanguagePOS(LanguagePOS languagePOS) {
-        ELanguage elanguage = this.languageRepository.findById(languagePOS.getLanguageId()).orElseThrow(() -> new IllegalArgumentException("Language " + languagePOS.getLanguageId() + " not found"));
+        ELanguage elanguage = this.languageService.getLangById(languagePOS.getLanguageId());
         EPOS epos = this.posRepository.findById(languagePOS.getPosId()).orElseThrow(() -> new IllegalArgumentException("POS " + languagePOS.getPosId() + " not found"));
         ELanguagePOS eLanguagePOS = new ELanguagePOS(elanguage, epos);
         return this.languagePOSRepository.save(eLanguagePOS).getId();

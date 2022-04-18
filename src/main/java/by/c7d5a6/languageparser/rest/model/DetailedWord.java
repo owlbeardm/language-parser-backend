@@ -3,17 +3,17 @@ package by.c7d5a6.languageparser.rest.model;
 import java.util.List;
 
 public class DetailedWord {
-    private WordWithWritten word;
+    private WordWithTranslations word;
     private Etymology etymology;
     private List<String> translations;
     private List<WordWithWritten> dirived;
     private List<WordWithWritten> descendants;
 
-    public WordWithWritten getWord() {
+    public WordWithTranslations getWord() {
         return word;
     }
 
-    public void setWord(WordWithWritten word) {
+    public void setWord(WordWithTranslations word) {
         this.word = word;
     }
 
