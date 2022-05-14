@@ -9,6 +9,7 @@ public class Word extends Base {
     private Boolean isForgotten;
     private POS partOfSpeech;
     private String word;
+    private String comment;
 
     public Word() {
     }
@@ -50,5 +51,13 @@ public class Word extends Base {
 
     public void setPartOfSpeech(POS partOfSpeech) {
         this.partOfSpeech = partOfSpeech;
+    }
+
+    public String getComment() {
+        return comment;
+    }
+
+    public void setComment(String comment) {
+        this.comment = comment;
     }
 }

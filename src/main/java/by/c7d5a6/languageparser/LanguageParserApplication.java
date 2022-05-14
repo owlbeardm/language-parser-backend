@@ -39,8 +39,8 @@ public class LanguageParserApplication {
 		return mapper;
 	}
 
-	@Bean(initMethod = "start", destroyMethod = "stop")
-	public Server inMemoryH2DatabaseServer() throws SQLException {
-		return Server.createTcpServer("-tcp", "-tcpAllowOthers", "-tcpPort", "9091");
-	}
+//	@Bean(initMethod = "start", destroyMethod = "stop")
+//	public Server inMemoryH2DatabaseServer() throws SQLException {
+//		return Server.createTcpServer("-tcp", "-tcpAllowOthers", "-tcpPort", "9091");
+//	}
 }

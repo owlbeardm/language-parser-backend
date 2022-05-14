@@ -19,6 +19,9 @@ public class EWord extends BaseEntity implements Serializable, IdLongVerPossesso
     @Column(name = "word")
     private String word;
 
+    @Column(name = "comment")
+    private String comment;
+
     @ManyToOne
     @JoinColumn(name = "lang_id")
     private ELanguage language;
@@ -61,5 +64,13 @@ public class EWord extends BaseEntity implements Serializable, IdLongVerPossesso
 
     public void setPartOfSpeech(EPOS partOfSpeech) {
         this.partOfSpeech = partOfSpeech;
+    }
+
+    public String getComment() {
+        return comment;
+    }
+
+    public void setComment(String comment) {
+        this.comment = comment;
     }
 }
