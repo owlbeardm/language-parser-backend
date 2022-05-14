@@ -2,9 +2,10 @@ package by.c7d5a6.languageparser.rest.controller;
 
 import by.c7d5a6.languageparser.rest.model.*;
 import by.c7d5a6.languageparser.rest.security.IsVerifiedUser;
+import by.c7d5a6.languageparser.service.LanguagePhonemeService;
 import by.c7d5a6.languageparser.service.LanguageService;
+import by.c7d5a6.languageparser.service.POSService;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,10 +22,14 @@ public class LanguageController {
     private static final Logger logger = LoggerFactory.getLogger(LanguageController.class);
 
     private final LanguageService languageService;
+    private final LanguagePhonemeService languagePhonemeService;
+    private final POSService posService;
 
     @Autowired
-    public LanguageController(LanguageService languageService) {
+    public LanguageController(LanguageService languageService, LanguagePhonemeService languagePhonemeService, POSService posService) {
         this.languageService = languageService;
+        this.languagePhonemeService = languagePhonemeService;
+        this.posService = posService;
     }
 
     @IsVerifiedUser
@@ -60,34 +65,34 @@ public class LanguageController {
     @GetMapping("/pos/{languageId}")
     public List<POS> getAllPartsOfSpeechByLanguage(@PathVariable Long languageId) {
         logger.info("Getting all parts of speech by language");
-        return languageService.getAllPartsOfSpeechByLanguage(languageId);
+        return posService.getAllPartsOfSpeechByLanguage(languageId);
     }
 
     @Operation(summary = "Get language phonemes by id")
     @GetMapping("/phoneme/{languageId}")
     public ListOfLanguagePhonemes getLanguagePhonemes(@PathVariable Long languageId) {
         logger.info("Getting language phonemes by id");
-        return languageService.getLanguagePhonemes(languageId);
+        return languagePhonemeService.getLanguagePhonemes(languageId);
     }
 
     @Operation(summary = "Save language phoneme")
     @PostMapping("/phoneme/{languageId}")
     public LanguagePhoneme saveLanguagePhoneme(@PathVariable Long languageId, @RequestBody String phoneme) {
         logger.info("Saving language phoneme");
-        return languageService.saveLanguagePhoneme(languageId, phoneme);
+        return languagePhonemeService.saveLanguagePhoneme(languageId, phoneme);
     }
 
     @Operation(summary = "Delete language phoneme")
     @DeleteMapping("/phoneme/{phonemeId}")
     public void deleteLanguagePhoneme(@PathVariable Long phonemeId) {
         logger.info("Deleting language phoneme");
-        languageService.deleteLanguagePhoneme(phonemeId);
+        languagePhonemeService.deleteLanguagePhoneme(phonemeId);
     }
 
     @Operation(summary = "Get language clusters by id")
     @GetMapping("/clusters/{languageId}")
     public LanguageSoundClusters getLanguageSoundClusters(@PathVariable Long languageId) {
         logger.info("Getting language phonemes by id");
-        return languageService.getLanguageSoundClusters(languageId);
+        return languagePhonemeService.getLanguageSoundClusters(languageId);
     }
 }

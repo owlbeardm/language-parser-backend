@@ -29,19 +29,17 @@ public class TranslationService extends BaseService {
 
     private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
-    private final WordsRepository wordsRepository;
     private final TranslationRepository translationRepository;
     private final WordService wordService;
 
     @Autowired
-    public TranslationService(WordsRepository wordsRepository, TranslationRepository translationRepository, WordService wordService) {
-        this.wordsRepository = wordsRepository;
+    public TranslationService(TranslationRepository translationRepository, WordService wordService) {
         this.translationRepository = translationRepository;
         this.wordService = wordService;
     }
 
     public PageResult<WordWithTranslations> getAllWords(TranslationListFilter filter) {
-        Page<EWord> words = wordsRepository.findWordsWithTranslations(filter.getWord(), filter.getLanguageFromId(), filter.getTranslation(), filter.getLanguageToId(), filter.toPageable());
+        Page<EWord> words = wordService.findWordsWithTranslations(filter);
         Page<WordWithTranslations> map = words.map((eid) -> {
             WordWithTranslations word = mapper.map(eid, WordWithTranslations.class);
             word.setWrittenWord(wordService.getWrittenForm(word));

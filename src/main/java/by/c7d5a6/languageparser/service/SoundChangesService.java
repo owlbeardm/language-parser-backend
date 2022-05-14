@@ -86,8 +86,11 @@ public class SoundChangesService extends BaseService {
     }
 
     public List<ESoundChange> getESoundChangesByLang(long fromLangId, SoundChangePurpose soundChangePurpose) {
-        List<ESoundChange> byLangFrom_idAndLangTo_idOrderByPriority = soundChangeRepository.findByLangFrom_IdAndSoundChangePurposeOrderByPriority(fromLangId, soundChangePurpose);
-        return byLangFrom_idAndLangTo_idOrderByPriority;
+        return soundChangeRepository.findByLangFrom_IdAndSoundChangePurposeOrderByPriority(fromLangId, soundChangePurpose);
+    }
+
+    public List<ESoundChange> getESoundChangesByLangs(long fromLangId, long toLangId, SoundChangePurpose soundChangePurpose) {
+        return soundChangeRepository.findByLangFrom_IdAndLangTo_IdAndAndSoundChangePurposeOrderByPriority(fromLangId, toLangId, soundChangePurpose);
     }
 
     public List<SoundChange> getSoundChangesByLangs(long fromLangId, long toLangId, SoundChangePurpose soundChangePurpose) {
@@ -106,8 +109,8 @@ public class SoundChangesService extends BaseService {
     }
 
     public void saveSoundChangesRawLinesByLangs(long fromLangId, Long toLangId, String rawLines, SoundChangePurpose soundChangePurpose) {
-        ELanguage langFrom = languageService.getLangById(fromLangId).orElseThrow(() -> new IllegalArgumentException("Language from with id " + fromLangId + " doesn't exist"));
-        ELanguage langTo = toLangId == null ? null : languageService.getLangById(toLangId).orElseThrow(() -> new IllegalArgumentException("Language to with id " + fromLangId + " doesn't exist"));
+        ELanguage langFrom = languageService.getLangById(fromLangId);
+        ELanguage langTo = toLangId == null ? null : languageService.getLangById(toLangId);
         List<ESoundChange> soundChanges = getSoundChangesFromLines(rawLines);
         soundChangeRepository.deleteByLangFrom_IdAndLangTo_IdAndSoundChangePurpose(fromLangId, toLangId, soundChangePurpose);
         for (long i = 0; i < soundChanges.size(); i++) {

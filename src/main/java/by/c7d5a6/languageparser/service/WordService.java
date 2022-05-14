@@ -2,16 +2,21 @@ package by.c7d5a6.languageparser.service;
 
 import by.c7d5a6.languageparser.entity.*;
 import by.c7d5a6.languageparser.entity.enums.SoundChangePurpose;
+import by.c7d5a6.languageparser.entity.models.EWordWithEvolutionConnectionsIds;
 import by.c7d5a6.languageparser.entity.specification.EWordSpecification;
 import by.c7d5a6.languageparser.entity.specification.SearchCriteria;
+import by.c7d5a6.languageparser.repository.TranslationRepository;
 import by.c7d5a6.languageparser.repository.WordsRepository;
 import by.c7d5a6.languageparser.repository.WordsSourceRepository;
 import by.c7d5a6.languageparser.rest.model.*;
 import by.c7d5a6.languageparser.rest.model.base.PageResult;
+import by.c7d5a6.languageparser.rest.model.filter.TranslationListFilter;
 import by.c7d5a6.languageparser.rest.model.filter.WordListFilter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
@@ -27,30 +32,38 @@ public class WordService extends BaseService {
     private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     private final WordsRepository wordsRepository;
-    private final WordsSourceRepository wordsSourceRepository;
+//    private final WordsSourceRepository wordsSourceRepository;
+//    private final TranslationRepository translationRepository;
+//    private final TranslationService translationService;
     private final LanguageService languageService;
-    private final EvolutionService evolutionService;
-    private final SoundChangesService soundChangesService;
+//    private final EvolutionService evolutionService;
+//    private final SoundChangesService soundChangesService;
     private final POSService posService;
 
     @Autowired
-    public WordService(WordsRepository wordsRepository, WordsSourceRepository wordsSourceRepository, LanguageService languageService, EvolutionService evolutionService, SoundChangesService soundChangesService, POSService posService) {
+    public WordService(WordsRepository wordsRepository, WordsSourceRepository wordsSourceRepository, TranslationRepository translationRepository, TranslationService translationService, LanguageService languageService, EvolutionService evolutionService, SoundChangesService soundChangesService, POSService posService) {
         this.wordsRepository = wordsRepository;
         this.wordsSourceRepository = wordsSourceRepository;
         this.languageService = languageService;
+        this.translationService = translationService;
         this.posService = posService;
         this.evolutionService = evolutionService;
         this.soundChangesService = soundChangesService;
+        this.translationRepository = translationRepository;
     }
 
-    public List<Word> getAllWordsFromLang(Long langId) {
+    public List<EWord> getAllWordsFromLang(ELanguage lang) {
+        return wordsRepository.findByLanguage_Id(lang.getId());
+    }
+
+    public List<Word> getAllWordsFromLangId(Long langId) {
         List<EWord> all = wordsRepository.findByLanguage_Id(langId);
-        return all.stream().map(this::convertToRestModel).collect(Collectors.toList());
+        return all.stream().map(eWord -> mapper.map(eWord, Word.class)).collect(Collectors.toList());
     }
 
 
     public PageResult<WordWithWritten> getAllWords(WordListFilter filter) {
-        ELanguage eLanguage = Optional.ofNullable(filter.getLanguageId()).flatMap(languageService::getLangById).orElse(null);
+        ELanguage eLanguage = Optional.ofNullable(filter.getLanguageId()).flatMap(languageService::getOLangById).orElse(null);
         EPOS epos = Optional.ofNullable(filter.getPosId()).flatMap(posService::getPOSById).orElse(null);
         EWordSpecification spec1 = new EWordSpecification(new SearchCriteria("word", ":", filter.getWord()));
         EWordSpecification spec2 = new EWordSpecification(new SearchCriteria("language", ":", eLanguage));
@@ -68,7 +81,10 @@ public class WordService extends BaseService {
     }
 
     public boolean canDeleteWord(Long wordId) {
-        return true;
+        Long translations = this.translationRepository.countByWordFrom_Id(wordId);
+        Long wordSources = this.wordsSourceRepository.countByWordSource_Id(wordId);
+        logger.info("Can delete word: Translations {}, Word Sources {}", translations, wordSources);
+        return translations + wordSources > 0;
     }
 
     public Word saveWord(Word word) {
@@ -79,7 +95,7 @@ public class WordService extends BaseService {
             eWord.setForgotten(word.getForgotten());
             EPOS epos = posService.getPOSById(word.getPartOfSpeech().getId()).orElseThrow(() -> new IllegalArgumentException("Pos " + word.getPartOfSpeech().getId() + " not found"));
             eWord.setPartOfSpeech(epos);
-            ELanguage eLanguage = languageService.getLangById(word.getLanguage().getId()).orElseThrow(() -> new IllegalArgumentException("Language " + word.getLanguage().getId() + " not found"));
+            ELanguage eLanguage = languageService.getLangById(word.getLanguage().getId());
             eWord.setLanguage(eLanguage);
         } else {
             eWord = mapper.map(word, EWord.class);
@@ -93,7 +109,7 @@ public class WordService extends BaseService {
     }
 
     public List<DetailedWord> getDetailedWordsByPhonetics(String word) {
-        return wordsRepository.findByWord(word).stream().map(this::convertToRestModel).map(this::getWordWithDetails).collect(Collectors.toList());
+        return wordsRepository.findByWord(word).stream().map(eWord -> mapper.map(eWord, Word.class)).map(this::getWordWithDetails).collect(Collectors.toList());
     }
 
     private DetailedWord getWordWithDetails(Word word) {
@@ -153,7 +169,6 @@ public class WordService extends BaseService {
     }
 
 
-
     private WordWithTranslations getWordWithTranslations(EWord eWord) {
         WordWithTranslations wordWithTranslations = mapper.map(getWordWithWritten(eWord), WordWithTranslations.class);
 //        ArrayList<String> translations = new ArrayList<>();
@@ -164,16 +179,16 @@ public class WordService extends BaseService {
     }
 
     private WordWithWritten getWordWithWritten(EWord word) {
-        WordWithWritten ww = mapper.map(word, WordWithWritten.class);
+        WordWithTranslations ww = mapper.map(word, WordWithTranslations.class);
         return _getWithWritten(ww);
     }
 
-    private WordWithWritten getWordWithWritten(Word word) {
-        WordWithWritten ww = mapper.map(word, WordWithWritten.class);
+    private WordWithTranslations getWordWithWritten(Word word) {
+        WordWithTranslations ww = mapper.map(word, WordWithTranslations.class);
         return _getWithWritten(ww);
     }
 
-    private WordWithWritten _getWithWritten(WordWithWritten wordWithWritten) {
+    private WordWithTranslations _getWithWritten(WordWithTranslations wordWithWritten) {
         String written = getWrittenForm(wordWithWritten);
         wordWithWritten.setWrittenWord(written);
         return wordWithWritten;
@@ -183,5 +198,29 @@ public class WordService extends BaseService {
         List<ESoundChange> soundChangesByLang = soundChangesService.getESoundChangesByLang(word.getLanguage().getId(), SoundChangePurpose.WRITING_SYSTEM);
         String written = evolutionService.evolveWord(word.getWord(), soundChangesByLang);
         return written;
+    }
+
+    public EWord save(EWord newWord) {
+        return wordsRepository.save(newWord);
+    }
+
+    public EWord getById(Long id) {
+        return wordsRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Word not found"));
+    }
+
+    public List<EWord> findAllById(List<Long> wordsIds) {
+        return wordsRepository.findAllById(wordsIds);
+    }
+
+    public Page<EWordWithEvolutionConnectionsIds> findWithEvolutions(String word, Long languageFromId, Long languageToId, boolean canBeForgotten, PageRequest toPageable) {
+        return wordsRepository.findWithEvolutions(word, languageFromId, languageToId, canBeForgotten, toPageable);
+    }
+
+    public List<EWordSource> findEvolvedWordsFrom(List<Long> wordsIds) {
+        return wordsRepository.findEvolvedWordsFrom(wordsIds);
+    }
+
+    public Page<EWord> findWordsWithTranslations(TranslationListFilter filter) {
+        return this.wordsRepository.findWordsWithTranslations(filter.getWord(), filter.getLanguageFromId(), filter.getTranslation(), filter.getLanguageToId(), filter.toPageable());
     }
 }
