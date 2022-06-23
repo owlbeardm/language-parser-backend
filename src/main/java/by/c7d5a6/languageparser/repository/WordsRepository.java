@@ -37,7 +37,7 @@ public interface WordsRepository extends IdLongVerRepository<EWord>, JpaSpecific
             "ORDER BY w1.word, w1.id, l1.display_name, lc.id", nativeQuery = true)
     Page<EWordWithEvolutionConnectionsIds> findWithEvolutions(@Param("word") String word, @Param("langFromId") Long langFromId, @Param("langToId") Long langToId, @Param("canBeForgotten") boolean canBeForgotten, Pageable pageRequest);
 
-    @Query(value = "SELECT w1.id, w1.version, w1.createdwhen, w1.modiwhen, w1.word, w1.lang_id, w1.pos_id, w1.forgotten " +
+    @Query(value = "SELECT w1.id, w1.version, w1.createdwhen, w1.modiwhen, w1.word, w1.lang_id, w1.pos_id, w1.forgotten, w1.comment " +
             "FROM word_tbl AS w1 " +
             "LEFT JOIN translation_tbl AS t " +
             " ON t.word_from_id = w1.id " +
