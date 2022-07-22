@@ -11,8 +11,8 @@ import java.io.Serializable;
 @Table(name = EWordOriginSource.TABLE_NAME)
 public class EWordOriginSource extends BaseEntity implements Serializable, IdLongVerPossessor {
 
-    protected static final String ENTITY_NAME = "WordSource";
-    protected static final String TABLE_NAME = "word_source_tbl";
+    protected static final String ENTITY_NAME = "WordOriginSource";
+    protected static final String TABLE_NAME = "word_origin_source_tbl";
     private static final long serialVersionUID = 1L;
 
     @ManyToOne
