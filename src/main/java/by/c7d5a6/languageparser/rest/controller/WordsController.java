@@ -62,7 +62,7 @@ public class WordsController {
 
     @Operation(summary = "Add new word")
     @PostMapping("/add")
-    public Word addWord(@RequestBody Word word) {
+    public Word addWord(@RequestBody WordToAdd word) {
         return wordService.saveWord(word);
     }
 
