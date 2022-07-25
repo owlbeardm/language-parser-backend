@@ -2,6 +2,7 @@ package by.c7d5a6.languageparser.service;
 
 import by.c7d5a6.languageparser.entity.*;
 import by.c7d5a6.languageparser.entity.enums.SoundChangePurpose;
+import by.c7d5a6.languageparser.entity.enums.WordOriginType;
 import by.c7d5a6.languageparser.entity.specification.EWordSpecification;
 import by.c7d5a6.languageparser.entity.specification.SearchCriteria;
 import by.c7d5a6.languageparser.repository.WordsRepository;
@@ -71,7 +72,7 @@ public class WordService extends BaseService {
         return true;
     }
 
-    public Word saveWord(Word word) {
+    public Word saveWord(WordToAdd word) {
         EWord eWord;
         if (word.getId() != null) {
             eWord = wordsRepository.findById(word.getId()).orElseThrow(() -> new IllegalArgumentException("Word " + word.getId() + " not found"));
@@ -82,7 +83,11 @@ public class WordService extends BaseService {
             ELanguage eLanguage = languageService.getLangById(word.getLanguage().getId()).orElseThrow(() -> new IllegalArgumentException("Language " + word.getLanguage().getId() + " not found"));
             eWord.setLanguage(eLanguage);
         } else {
+            if (word.getWordOriginType() != WordOriginType.NEW) {
+                throw new IllegalArgumentException("Only new word allowed");
+            }
             eWord = mapper.map(word, EWord.class);
+            eWord.setSourceType(word.getWordOriginType());
         }
         eWord = this.wordsRepository.save(eWord);
         return mapper.map(eWord, Word.class);
@@ -151,7 +156,6 @@ public class WordService extends BaseService {
         }
         return etymologyCognate;
     }
-
 
 
     private WordWithTranslations getWordWithTranslations(EWord eWord) {

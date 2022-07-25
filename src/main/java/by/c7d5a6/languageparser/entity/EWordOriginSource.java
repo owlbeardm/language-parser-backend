@@ -17,25 +17,25 @@ public class EWordOriginSource extends BaseEntity implements Serializable, IdLon
 
     @ManyToOne
     @JoinColumn(name = "word_origin_id")
-    private EWordOrigin wordOrigin;
+    private EWord word;
 
     @OneToOne
     @JoinColumn(name = "word_source_id")
     private EWord wordSource;
 
     @NotNull
-    @Column(name = "source_initial_version")
+    @Column(name = "source_initial_version_text")
     private String sourceInitialVersion;
 
     @Column(name = "comment")
     private String comment;
 
-    public EWordOrigin getWordOrigin() {
-        return wordOrigin;
+    public EWord getWord() {
+        return word;
     }
 
-    public void setWordOrigin(EWordOrigin wordOrigin) {
-        this.wordOrigin = wordOrigin;
+    public void setWord(EWord word) {
+        this.word = word;
     }
 
     public EWord getWordSource() {

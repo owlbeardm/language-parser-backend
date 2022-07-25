@@ -1,6 +1,7 @@
 package by.c7d5a6.languageparser.entity;
 
 import by.c7d5a6.languageparser.entity.base.BaseEntity;
+import by.c7d5a6.languageparser.entity.enums.WordOriginType;
 import by.c7d5a6.languageparser.entity.possessors.IdLongVerPossessor;
 
 import javax.persistence.*;
@@ -33,6 +34,11 @@ public class EWord extends BaseEntity implements Serializable, IdLongVerPossesso
     @JoinColumn(name = "pos_id")
     private EPOS partOfSpeech;
 
+    @NotNull
+    @Enumerated(EnumType.STRING)
+    @Column(name = "source_type")
+    private WordOriginType sourceType;
+
 
     public String getWord() {
         return word;
@@ -64,6 +70,14 @@ public class EWord extends BaseEntity implements Serializable, IdLongVerPossesso
 
     public void setPartOfSpeech(EPOS partOfSpeech) {
         this.partOfSpeech = partOfSpeech;
+    }
+
+    public WordOriginType getSourceType() {
+        return sourceType;
+    }
+
+    public void setSourceType(WordOriginType sourceType) {
+        this.sourceType = sourceType;
     }
 
     public String getComment() {

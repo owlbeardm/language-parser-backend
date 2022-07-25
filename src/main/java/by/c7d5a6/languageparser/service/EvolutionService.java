@@ -3,11 +3,9 @@ package by.c7d5a6.languageparser.service;
 import by.c7d5a6.languageparser.entity.*;
 import by.c7d5a6.languageparser.entity.base.BaseEntity;
 import by.c7d5a6.languageparser.entity.enums.SoundChangePurpose;
+import by.c7d5a6.languageparser.entity.enums.WordOriginType;
 import by.c7d5a6.languageparser.entity.models.EWordWithEvolutionConnectionsIds;
-import by.c7d5a6.languageparser.repository.LanguageConnectionRepository;
-import by.c7d5a6.languageparser.repository.SoundChangeRepository;
-import by.c7d5a6.languageparser.repository.WordsRepository;
-import by.c7d5a6.languageparser.repository.WordsSourceRepository;
+import by.c7d5a6.languageparser.repository.*;
 import by.c7d5a6.languageparser.rest.model.*;
 import by.c7d5a6.languageparser.rest.model.base.PageResult;
 import by.c7d5a6.languageparser.rest.model.filter.WordWithEvolutionsListFilter;
@@ -30,15 +28,15 @@ public class EvolutionService extends BaseService {
 
     private final SoundChangeRepository soundChangeRepository;
     private final WordsRepository wordsRepository;
-    private final WordsSourceRepository wordsSourceRepository;
+    private final WordsOriginSourceRepository wordsOriginSourceRepository;
     private final LanguageConnectionRepository languageConnectionRepository;
 
     @Autowired
-    public EvolutionService(SoundChangeRepository soundChangeRepository, WordsRepository wordsRepository, LanguageConnectionRepository languageConnectionRepository, WordsSourceRepository wordsSourceRepository) {
+    public EvolutionService(SoundChangeRepository soundChangeRepository, WordsRepository wordsRepository, LanguageConnectionRepository languageConnectionRepository, WordsOriginSourceRepository wordsOriginSourceRepository) {
         this.soundChangeRepository = soundChangeRepository;
         this.wordsRepository = wordsRepository;
         this.languageConnectionRepository = languageConnectionRepository;
-        this.wordsSourceRepository = wordsSourceRepository;
+        this.wordsOriginSourceRepository = wordsOriginSourceRepository;
     }
 
     public List<WordTraceResult> trace(String word, List<Language> languages) {
@@ -177,31 +175,36 @@ public class EvolutionService extends BaseService {
         return words.stream().map(word -> addEvolvedWord(word, eLanguageConnection, soundChanges)).collect(Collectors.toList());
     }
 
-    private WordWithEvolution addEvolvedWord(EWord word, ELanguageConnection eLanguageConnection, List<ESoundChange> soundChanges) {
+    private WordWithEvolution addEvolvedWord(EWord wordSource, ELanguageConnection eLanguageConnection, List<ESoundChange> soundChanges) {
         EWord newWord;
-        EWordSource newWordSource;
-        Optional<EWordSource> optionalEWordSource = wordsSourceRepository.findByWordSource_IdAndWord_Language_Id(word.getId(), eLanguageConnection.getLangTo().getId());
-        if (optionalEWordSource.isPresent()) {
-            newWordSource = optionalEWordSource.get();
-            newWord = optionalEWordSource.get().getWord();
+        EWordOriginSource newWordOriginSource;
+        Optional<EWordOriginSource> oWordOriginSource = wordsOriginSourceRepository.findByWordSource_IdAndWord_Language_Id(wordSource.getId(), eLanguageConnection.getLangTo().getId());
+        if (oWordOriginSource.isPresent()) {
+            newWordOriginSource = oWordOriginSource.get();
+            newWord = oWordOriginSource.get().getWord();
         } else {
             newWord = new EWord();
-            newWordSource = new EWordSource();
+            newWordOriginSource = new EWordOriginSource();
+            newWordOriginSource.setWordSource(wordSource);
         }
-        String newWordText = evolveWord(word.getWord(), soundChanges);
+        String newWordText = evolveWord(wordSource.getWord(), soundChanges);
         newWord.setWord(newWordText);
         newWord.setLanguage(eLanguageConnection.getLangTo());
-        newWord.setPartOfSpeech(word.getPartOfSpeech());
+        newWord.setPartOfSpeech(wordSource.getPartOfSpeech());
+        switch (eLanguageConnection.getConnectionType()){
+            case BORROWING -> newWord.setSourceType(WordOriginType.BORROWED);
+            case EVOLVING -> newWord.setSourceType(WordOriginType.EVOLVED);
+            default -> throw new IllegalArgumentException("Can't evolve word for language connection type " + eLanguageConnection.getConnectionType());
+        }
         newWord = wordsRepository.save(newWord);
-        newWordSource.setWordSource(word);
-        newWordSource.setSourceType(eLanguageConnection.getConnectionType());
-        newWordSource.setWord(newWord);
-        wordsSourceRepository.save(newWordSource);
+        newWordOriginSource.setSourceInitialVersion(wordSource.getWord());
+        newWordOriginSource.setWord(newWord);
+        wordsOriginSourceRepository.save(newWordOriginSource);
 
         WordWithEvolution wordWithEvolution = new WordWithEvolution();
         wordWithEvolution.setCalculatedEvolution(newWordText);
         wordWithEvolution.setWordEvolved(convertToRestModel(newWord));
-        wordWithEvolution.setWord(convertToRestModel(word));
+        wordWithEvolution.setWord(convertToRestModel(wordSource));
         wordWithEvolution.setWordEvolvedType(eLanguageConnection.getConnectionType());
         wordWithEvolution.setLanguageConnection(convertToRestModel(eLanguageConnection));
         return wordWithEvolution;

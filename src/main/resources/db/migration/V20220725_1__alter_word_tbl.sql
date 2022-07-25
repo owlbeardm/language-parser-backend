@@ -1,0 +1,2 @@
+ALTER TABLE word_tbl
+    ADD COLUMN source_type TEXT NOT NULL DEFAULT 'NEW';
