@@ -66,6 +66,12 @@ public class WordsController {
         return wordService.saveWord(word);
     }
 
+    @Operation(summary = "Add derived word")
+    @PostMapping("/derive")
+    public Word addDerivedWord(@RequestBody DerivedWordToAdd word) {
+        return wordService.saveDerivedWord(word);
+    }
+
     @Operation(summary = "Get detailed words by phonetics")
     @PostMapping("/{word}")
     public List<DetailedWord> getDetailedWordsByPhonetics(@PathVariable String word) {

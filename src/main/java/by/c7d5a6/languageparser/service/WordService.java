@@ -5,6 +5,7 @@ import by.c7d5a6.languageparser.entity.enums.SoundChangePurpose;
 import by.c7d5a6.languageparser.entity.enums.WordOriginType;
 import by.c7d5a6.languageparser.entity.specification.EWordSpecification;
 import by.c7d5a6.languageparser.entity.specification.SearchCriteria;
+import by.c7d5a6.languageparser.repository.WordsOriginSourceRepository;
 import by.c7d5a6.languageparser.repository.WordsRepository;
 import by.c7d5a6.languageparser.repository.WordsSourceRepository;
 import by.c7d5a6.languageparser.rest.model.*;
@@ -29,15 +30,17 @@ public class WordService extends BaseService {
 
     private final WordsRepository wordsRepository;
     private final WordsSourceRepository wordsSourceRepository;
+    private final WordsOriginSourceRepository wordsOriginSourceRepository;
     private final LanguageService languageService;
     private final EvolutionService evolutionService;
     private final SoundChangesService soundChangesService;
     private final POSService posService;
 
     @Autowired
-    public WordService(WordsRepository wordsRepository, WordsSourceRepository wordsSourceRepository, LanguageService languageService, EvolutionService evolutionService, SoundChangesService soundChangesService, POSService posService) {
+    public WordService(WordsRepository wordsRepository, WordsOriginSourceRepository wordsOriginSourceRepository, WordsSourceRepository wordsSourceRepository, LanguageService languageService, EvolutionService evolutionService, SoundChangesService soundChangesService, POSService posService) {
         this.wordsRepository = wordsRepository;
         this.wordsSourceRepository = wordsSourceRepository;
+        this.wordsOriginSourceRepository = wordsOriginSourceRepository;
         this.languageService = languageService;
         this.posService = posService;
         this.evolutionService = evolutionService;
@@ -73,6 +76,9 @@ public class WordService extends BaseService {
     }
 
     public Word saveWord(WordToAdd word) {
+        if (word.getWordOriginType() != WordOriginType.NEW) {
+            throw new IllegalArgumentException("Only new word allowed");
+        }
         EWord eWord;
         if (word.getId() != null) {
             eWord = wordsRepository.findById(word.getId()).orElseThrow(() -> new IllegalArgumentException("Word " + word.getId() + " not found"));
@@ -83,9 +89,6 @@ public class WordService extends BaseService {
             ELanguage eLanguage = languageService.getLangById(word.getLanguage().getId()).orElseThrow(() -> new IllegalArgumentException("Language " + word.getLanguage().getId() + " not found"));
             eWord.setLanguage(eLanguage);
         } else {
-            if (word.getWordOriginType() != WordOriginType.NEW) {
-                throw new IllegalArgumentException("Only new word allowed");
-            }
             eWord = mapper.map(word, EWord.class);
             eWord.setSourceType(word.getWordOriginType());
         }
@@ -187,5 +190,39 @@ public class WordService extends BaseService {
         List<ESoundChange> soundChangesByLang = soundChangesService.getESoundChangesByLang(word.getLanguage().getId(), SoundChangePurpose.WRITING_SYSTEM);
         String written = evolutionService.evolveWord(word.getWord(), soundChangesByLang);
         return written;
+    }
+
+    public Word saveDerivedWord(DerivedWordToAdd word) {
+        List<Word> derivedFrom = word.getDerivedFrom();
+        if (derivedFrom == null || derivedFrom.isEmpty())
+            throw new IllegalArgumentException("Should be at least one word derived from");
+        if (word.getWordOriginType() != WordOriginType.DERIVED) {
+            throw new IllegalArgumentException("Only derived word allowed");
+        }
+        EWord eWord;
+        if (word.getId() != null) {
+            eWord = wordsRepository.findById(word.getId()).orElseThrow(() -> new IllegalArgumentException("Word " + word.getId() + " not found"));
+            eWord.setWord(word.getWord());
+            eWord.setForgotten(word.getForgotten());
+            EPOS epos = posService.getPOSById(word.getPartOfSpeech().getId()).orElseThrow(() -> new IllegalArgumentException("Pos " + word.getPartOfSpeech().getId() + " not found"));
+            eWord.setPartOfSpeech(epos);
+            ELanguage eLanguage = languageService.getLangById(word.getLanguage().getId()).orElseThrow(() -> new IllegalArgumentException("Language " + word.getLanguage().getId() + " not found"));
+            eWord.setLanguage(eLanguage);
+        } else {
+            eWord = mapper.map(word, EWord.class);
+            eWord.setSourceType(word.getWordOriginType());
+        }
+        eWord = this.wordsRepository.save(eWord);
+        for (Word derivedFromWord : derivedFrom) {
+            EWord eWordSource = wordsRepository.findById(derivedFromWord.getId()).orElseThrow(() -> new IllegalArgumentException("Word " + derivedFromWord.getId() + " not found"));
+            EWordOriginSource eWordOriginSource = new EWordOriginSource();
+            eWordOriginSource.setWord(eWord);
+            eWordOriginSource.setWordSource(eWordSource);
+            eWordOriginSource.setSourceInitialVersion(eWordSource.getWord());
+//            TODO: comment
+//            eWordOriginSource.setComment();
+            wordsOriginSourceRepository.save(eWordOriginSource);
+        }
+        return mapper.map(eWord, Word.class);
     }
 }
