@@ -1,6 +1,7 @@
 package by.c7d5a6.languageparser.repository;
 
 import by.c7d5a6.languageparser.entity.EWord;
+import by.c7d5a6.languageparser.entity.EWordOriginSource;
 import by.c7d5a6.languageparser.entity.EWordSource;
 import by.c7d5a6.languageparser.entity.models.EWordId;
 import by.c7d5a6.languageparser.entity.models.EWordWithEvolutionConnectionsIds;
@@ -53,10 +54,10 @@ public interface WordsRepository extends IdLongVerRepository<EWord>, JpaSpecific
             "ORDER BY w1.word", nativeQuery = true)
     Page<EWord> findWordsWithTranslations(@Param("wordFrom") String wordFrom, @Param("langFromId") Long langFromId, @Param("wordTo") String wordTo, @Param("langToId") Long langToId, Pageable pageRequest);
 
-    @Query(value = "SELECT ws " +
-            "FROM WordSource as ws " +
-            "INNER JOIN ws.wordSource as w " +
-            " ON w.id = ws.wordSource.id " +
-            "WHERE ws.wordSource.id IN :evolvedFromIds")
-    List<EWordSource> findEvolvedWordsFrom(List<Long> evolvedFromIds);
+    @Query(value = "SELECT wo " +
+            "FROM WordOriginSource as wo " +
+            "INNER JOIN wo.wordSource as w " +
+            " ON w.id = wo.wordSource.id " +
+            "WHERE wo.wordSource.id IN :evolvedFromIds")
+    List<EWordOriginSource> findEvolvedWordsFrom(List<Long> evolvedFromIds);
 }

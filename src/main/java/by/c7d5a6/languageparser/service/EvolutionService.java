@@ -2,6 +2,7 @@ package by.c7d5a6.languageparser.service;
 
 import by.c7d5a6.languageparser.entity.*;
 import by.c7d5a6.languageparser.entity.base.BaseEntity;
+import by.c7d5a6.languageparser.entity.enums.LanguageConnectionType;
 import by.c7d5a6.languageparser.entity.enums.SoundChangePurpose;
 import by.c7d5a6.languageparser.entity.enums.WordOriginType;
 import by.c7d5a6.languageparser.entity.models.EWordWithEvolutionConnectionsIds;
@@ -130,7 +131,7 @@ public class EvolutionService extends BaseService {
         List<Long> connectionsIds = withEvolutions.stream().map(EWordWithEvolutionConnectionsIds::getLanguageConnectionId).distinct().collect(Collectors.toList());
         List<ELanguageConnection> languageConnections = languageConnectionRepository.findAllById(connectionsIds);
         Map<Long, ELanguageConnection> languageConnectionsFrom = languageConnections.stream().collect(Collectors.toMap(BaseEntity::getId, e -> e));
-        List<EWordSource> eWordsSources = wordsRepository.findEvolvedWordsFrom(wordsIds);
+        List<EWordOriginSource> eWordsSources = wordsRepository.findEvolvedWordsFrom(wordsIds);
         Map<Long, Map<Long, String>> calculatedEvolvedWords = evolveWords(sourceWords, languageConnections);
 
         return PageResult.from(withEvolutions, (wwE) -> {
@@ -148,7 +149,13 @@ public class EvolutionService extends BaseService {
                     .findFirst()
                     .ifPresent(eWordSource -> {
                         wordWithEvolution.setWordEvolved(convertToRestModel(eWordSource.getWord()));
-                        wordWithEvolution.setWordEvolvedType(eWordSource.getSourceType());
+                        WordOriginType sourceType = eWordSource.getWord().getSourceType();
+                        switch(eWordSource.getWord().getSourceType()){
+                            case EVOLVED -> wordWithEvolution.setWordEvolvedType(LanguageConnectionType.EVOLVING);
+                            case BORROWED -> wordWithEvolution.setWordEvolvedType(LanguageConnectionType.BORROWING);
+                            default -> throw new RuntimeException("Word origin type wrong in evolutioin" + eWordSource.getWord().getSourceType());
+                        }
+
                     });
             wordWithEvolution.setCalculatedEvolution(calculatedEvolvedWords.get(wwE.getLanguageConnectionId()).get(wwE.getWordId()));
             return wordWithEvolution;
