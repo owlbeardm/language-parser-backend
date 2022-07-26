@@ -105,6 +105,10 @@ public class LanguageService extends BaseService {
         return this.languageConnectionRepository.findByLangFrom_IdAndLangTo_Id(fromLangId, toLangId).map(this::convertToRestModel).orElse(null);
     }
 
+    public List<LanguageConnection> getConnectionsFrom(long fromLangId) {
+        return this.languageConnectionRepository.findByLangFrom_Id(fromLangId).stream().map(this::convertToRestModel).collect(Collectors.toList());
+    }
+
     public void updateConnection(long fromLangId, long toLangId, LanguageConnectionType connectionType) {
         this.languageConnectionRepository.findByLangFrom_IdAndLangTo_Id(fromLangId, toLangId).ifPresentOrElse(connection -> {
             connection.setConnectionType(connectionType);

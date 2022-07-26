@@ -42,6 +42,13 @@ public class EvolveController {
         return languageService.getConnection(fromLangId, toLangId);
     }
 
+    @Operation(summary = "Get connections from language")
+    @GetMapping("/connection/{fromLangId}")
+    public List<LanguageConnection> getConnectionFromLang(@PathVariable long fromLangId) {
+        logger.info("Get connections from {}", fromLangId);
+        return languageService.getConnectionsFrom(fromLangId);
+    }
+
     @Operation(summary = "Update connection between two languages")
     @PostMapping(value = "/connection/{fromLangId}/{toLangId}")
     public void updateConnectionByLangs(@PathVariable long fromLangId, @PathVariable long toLangId, @RequestBody LanguageConnectionTypeModel connectionType) {
@@ -169,7 +176,7 @@ public class EvolveController {
 
     @Operation(summary = "Get language connection graph")
     @GetMapping("/graph")
-    public String getLanguageGraph(){
+    public String getLanguageGraph() {
         return evolutionService.getGraph();
     }
 
