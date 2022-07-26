@@ -5,10 +5,15 @@ import by.c7d5a6.languageparser.entity.base.BaseEntity;
 import by.c7d5a6.languageparser.entity.enums.SoundChangePurpose;
 import by.c7d5a6.languageparser.entity.enums.WordOriginType;
 import by.c7d5a6.languageparser.entity.models.EWordWithEvolutionConnectionsIds;
-import by.c7d5a6.languageparser.repository.*;
+import by.c7d5a6.languageparser.repository.LanguageConnectionRepository;
+import by.c7d5a6.languageparser.repository.SoundChangeRepository;
+import by.c7d5a6.languageparser.repository.WordsOriginSourceRepository;
+import by.c7d5a6.languageparser.repository.WordsRepository;
 import by.c7d5a6.languageparser.rest.model.*;
 import by.c7d5a6.languageparser.rest.model.base.PageResult;
 import by.c7d5a6.languageparser.rest.model.filter.WordWithEvolutionsListFilter;
+import org.apache.commons.lang3.tuple.ImmutablePair;
+import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,13 +35,15 @@ public class EvolutionService extends BaseService {
     private final WordsRepository wordsRepository;
     private final WordsOriginSourceRepository wordsOriginSourceRepository;
     private final LanguageConnectionRepository languageConnectionRepository;
+    private final LanguageService languageService;
 
     @Autowired
-    public EvolutionService(SoundChangeRepository soundChangeRepository, WordsRepository wordsRepository, LanguageConnectionRepository languageConnectionRepository, WordsOriginSourceRepository wordsOriginSourceRepository) {
+    public EvolutionService(LanguageService languageService, SoundChangeRepository soundChangeRepository, WordsRepository wordsRepository, LanguageConnectionRepository languageConnectionRepository, WordsOriginSourceRepository wordsOriginSourceRepository) {
         this.soundChangeRepository = soundChangeRepository;
         this.wordsRepository = wordsRepository;
         this.languageConnectionRepository = languageConnectionRepository;
         this.wordsOriginSourceRepository = wordsOriginSourceRepository;
+        this.languageService = languageService;
     }
 
     public List<WordTraceResult> trace(String word, List<Language> languages) {
@@ -191,7 +198,7 @@ public class EvolutionService extends BaseService {
         newWord.setWord(newWordText);
         newWord.setLanguage(eLanguageConnection.getLangTo());
         newWord.setPartOfSpeech(wordSource.getPartOfSpeech());
-        switch (eLanguageConnection.getConnectionType()){
+        switch (eLanguageConnection.getConnectionType()) {
             case BORROWING -> newWord.setSourceType(WordOriginType.BORROWED);
             case EVOLVING -> newWord.setSourceType(WordOriginType.EVOLVED);
             default -> throw new IllegalArgumentException("Can't evolve word for language connection type " + eLanguageConnection.getConnectionType());
@@ -208,5 +215,72 @@ public class EvolutionService extends BaseService {
         wordWithEvolution.setWordEvolvedType(eLanguageConnection.getConnectionType());
         wordWithEvolution.setLanguageConnection(convertToRestModel(eLanguageConnection));
         return wordWithEvolution;
+    }
+
+    public String getGraph() {
+        Map<Long, Language> nodes = new HashMap<>();
+        Map<Pair<Long, Long>, Set<EDGE_INFO>> edges = new HashMap<>();
+        List<Language> allLanguages = languageService.getAllLanguages();
+        for (Language lang : allLanguages) {
+            nodes.put(lang.getId(), lang);
+            for (Language langTo : allLanguages) {
+                if (Objects.equals(lang.getId(), langTo.getId()))
+                    continue;
+                ImmutablePair<Long, Long> key = new ImmutablePair<>(lang.getId(), langTo.getId());
+                Set<EDGE_INFO> edge_infos = edges.computeIfAbsent(key, k -> new HashSet<>());
+                LanguageConnection connection = languageService.getConnection(lang.getId(), langTo.getId());
+                if (connection != null) {
+                    switch (connection.getConnectionType()) {
+                        case EVOLVING -> edge_infos.add(EDGE_INFO.EVOLVE_CONNECTION);
+                        case BORROWING -> edge_infos.add(EDGE_INFO.BORROW_CONNECTION);
+                        default -> edge_infos.add(EDGE_INFO.OTHER_CONNECTION);
+                    }
+                }
+                long countWord = wordsOriginSourceRepository.countByWordSource_Language_IdAndWord_Language_Id(lang.getId(), langTo.getId());
+                if (countWord > 0) {
+                    edge_infos.add(EDGE_INFO.HAS_WORDS_FROM);
+                }
+            }
+        }
+        String nodesStr = nodes.keySet().stream().map((node) -> {
+            Language language = nodes.get(node);
+            return "\tnode\n" +
+                    "\t[\n" +
+                    "\t\t id " + node + "\n" +
+                    "\t\t label \"" + language.getDisplayName() + "\"\n" +
+                    "\t]\n";
+
+        }).collect(Collectors.joining("\n"));
+        String edgesStr = edges.keySet().stream().map((pair) -> {
+            Set<EDGE_INFO> edge_infos = edges.get(pair);
+            if (edge_infos.isEmpty()) {
+                return "";
+            }
+            String color = edge_infos.contains(EDGE_INFO.HAS_WORDS_FROM) ? (edge_infos.contains(EDGE_INFO.BORROW_CONNECTION) || edge_infos.contains(EDGE_INFO.EVOLVE_CONNECTION) ? "000000" : "880000") : "888888";
+            String graphics = "\t\tgraphics\n" +
+                    "\t\t[\n" +
+                    "style \"" + (edge_infos.contains(EDGE_INFO.BORROW_CONNECTION) ? "dashed" : "standard") + "\"\n" +
+                    "\t\t\tfill \"#" + color + "\"\n" +
+                    "\t\t\ttargetArrow \"standard\"\n" +
+                    "\t\t]\n";
+            return "\tedge" +
+                    "\t[\n" +
+                    "\t\t source " + pair.getLeft() + "\n" +
+                    "\t\t target " + pair.getRight() + "\n" +
+                    graphics +
+                    "\t]\n";
+        }).collect(Collectors.joining("\n"));
+        return "graph\n" +
+                "[\n" +
+                nodesStr +
+                edgesStr +
+                "]";
+    }
+
+    enum EDGE_INFO {
+        EVOLVE_CONNECTION,
+        BORROW_CONNECTION,
+        OTHER_CONNECTION,
+        HAS_WORDS_FROM
     }
 }

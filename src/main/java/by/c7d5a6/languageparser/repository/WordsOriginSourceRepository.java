@@ -12,4 +12,5 @@ import java.util.Optional;
 public interface WordsOriginSourceRepository extends IdLongVerRepository<EWordOriginSource>, JpaSpecificationExecutor<EWordOriginSource> {
 
     Optional<EWordOriginSource> findByWordSource_IdAndWord_Language_Id(@Param("wordSourceId") Long wordSourceId, @Param("languageId") Long languageId);
+    long countByWordSource_Language_IdAndWord_Language_Id(Long langFromId, Long langToId);
 }

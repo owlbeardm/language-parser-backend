@@ -167,4 +167,10 @@ public class EvolveController {
         return evolutionService.addEvolvedWords(wordToEvolve);
     }
 
+    @Operation(summary = "Get language connection graph")
+    @GetMapping("/graph")
+    public String getLanguageGraph(){
+        return evolutionService.getGraph();
+    }
+
 }
