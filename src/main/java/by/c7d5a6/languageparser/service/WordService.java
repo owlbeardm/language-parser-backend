@@ -21,6 +21,7 @@ import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.Stack;
 import java.util.stream.Collectors;
 
 @Service
@@ -109,13 +110,18 @@ public class WordService extends BaseService {
         detailedWord.setWord(getWordWithWritten(word));
         detailedWord.setEtymology(getEtymology(word));
         ArrayList<WordWithWritten> wwwr = new ArrayList<>();
-//        wwwr.add(wordWithWritten);
+        WordWithWritten wordWithWritten = new WordWithWritten();
+        wordWithWritten.setWrittenWord("222");
+        wordWithWritten.setWord("111");
+        wwwr.add(wordWithWritten);
         detailedWord.setDescendants(wwwr);
         detailedWord.setDirived(wwwr);
-//        ArrayList<String> translations = new ArrayList<>();
-//        translations.add("translation");
-//        translations.add("translation");
-//        detailedWord.setTranslations(translations);
+
+        ArrayList<String> translations = new ArrayList<>();
+        translations.add("translation");
+        translations.add("translation");
+        getWordWithTranslations();
+        detailedWord.setTranslations();
         return detailedWord;
     }
 
@@ -128,13 +134,15 @@ public class WordService extends BaseService {
 
     private List<WordWithTranslations> getEtymologyFrom(Word word) {
         final List<WordWithTranslations> etymologyFrom = new ArrayList<>();
-        Long nextWordId = word.getId();
-        while (nextWordId != null) {
-            Optional<EWordSource> wordSource = wordsSourceRepository.findByWord_Id(nextWordId);
-            wordSource.ifPresent(ws -> {
-                etymologyFrom.add(getWordWithTranslations(ws.getWordSource()));
+        Stack<Long> newWordIds = new Stack<>();
+        newWordIds.push(word.getId());
+        while (!newWordIds.empty()) {
+            List<EWordOriginSource> wordOriginSource = wordsOriginSourceRepository.findByWord_Id(newWordIds.pop());
+            wordOriginSource.forEach((wos)->{
+                EWord wordSource = wos.getWordSource();
+                etymologyFrom.add(getWordWithTranslations(wordSource));
+                newWordIds.push(wordSource.getId());
             });
-            nextWordId = wordSource.map(EWordSource::getWordSource).map(EWord::getId).orElse(null);
         }
         return etymologyFrom;
     }
@@ -148,8 +156,8 @@ public class WordService extends BaseService {
         List<Word> toCheck = new ArrayList<>(etymologyFrom);
         int i = 0;
         while (i < toCheck.size()) {
-            List<EWordSource> wordSources = wordsSourceRepository.findByWordSource_Id(toCheck.get(i).getId());
-            wordSources.stream().map(EWordSource::getWord).forEach((w) -> {
+            List<EWordOriginSource> wordSources = wordsOriginSourceRepository.findByWordSource_Id(toCheck.get(i).getId());
+            wordSources.stream().map(EWordOriginSource::getWord).forEach((w) -> {
                 if (!langIds.contains(w.getLanguage().getId())) {
                     etymologyCognate.add(getWordWithTranslations(w));
                     toCheck.add(convertToRestModel(w));
