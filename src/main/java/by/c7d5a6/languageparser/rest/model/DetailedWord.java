@@ -5,7 +5,7 @@ import java.util.List;
 public class DetailedWord {
     private WordWithWritten word;
     private Etymology etymology;
-    private List<String> translations;
+    private List<Translation> translations;
     private List<WordWithWritten> dirived;
     private List<WordWithWritten> descendants;
 
@@ -25,11 +25,11 @@ public class DetailedWord {
         this.etymology = etymology;
     }
 
-    public List<String> getTranslations() {
+    public List<Translation> getTranslations() {
         return translations;
     }
 
-    public void setTranslations(List<String> translations) {
+    public void setTranslations(List<Translation> translations) {
         this.translations = translations;
     }
 

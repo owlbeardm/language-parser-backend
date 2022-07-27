@@ -1,13 +1,14 @@
 package by.c7d5a6.languageparser.service;
 
-import by.c7d5a6.languageparser.entity.*;
-import by.c7d5a6.languageparser.entity.enums.SoundChangePurpose;
+import by.c7d5a6.languageparser.entity.ELanguage;
+import by.c7d5a6.languageparser.entity.EPOS;
+import by.c7d5a6.languageparser.entity.EWord;
+import by.c7d5a6.languageparser.entity.EWordOriginSource;
 import by.c7d5a6.languageparser.entity.enums.WordOriginType;
 import by.c7d5a6.languageparser.entity.specification.EWordSpecification;
 import by.c7d5a6.languageparser.entity.specification.SearchCriteria;
 import by.c7d5a6.languageparser.repository.WordsOriginSourceRepository;
 import by.c7d5a6.languageparser.repository.WordsRepository;
-import by.c7d5a6.languageparser.repository.WordsSourceRepository;
 import by.c7d5a6.languageparser.rest.model.*;
 import by.c7d5a6.languageparser.rest.model.base.PageResult;
 import by.c7d5a6.languageparser.rest.model.filter.WordListFilter;
@@ -30,22 +31,20 @@ public class WordService extends BaseService {
     private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     private final WordsRepository wordsRepository;
-    private final WordsSourceRepository wordsSourceRepository;
     private final WordsOriginSourceRepository wordsOriginSourceRepository;
     private final LanguageService languageService;
-    private final EvolutionService evolutionService;
-    private final SoundChangesService soundChangesService;
     private final POSService posService;
+    private final WordWrittenService wordWrittenService;
+    private final TranslationService translationService;
 
     @Autowired
-    public WordService(WordsRepository wordsRepository, WordsOriginSourceRepository wordsOriginSourceRepository, WordsSourceRepository wordsSourceRepository, LanguageService languageService, EvolutionService evolutionService, SoundChangesService soundChangesService, POSService posService) {
+    public WordService(TranslationService translationService, WordWrittenService wordWrittenService, WordsRepository wordsRepository, WordsOriginSourceRepository wordsOriginSourceRepository, LanguageService languageService, POSService posService) {
         this.wordsRepository = wordsRepository;
-        this.wordsSourceRepository = wordsSourceRepository;
         this.wordsOriginSourceRepository = wordsOriginSourceRepository;
         this.languageService = languageService;
         this.posService = posService;
-        this.evolutionService = evolutionService;
-        this.soundChangesService = soundChangesService;
+        this.wordWrittenService = wordWrittenService;
+        this.translationService = translationService;
     }
 
     public List<Word> getAllWordsFromLang(Long langId) {
@@ -117,11 +116,7 @@ public class WordService extends BaseService {
         detailedWord.setDescendants(wwwr);
         detailedWord.setDirived(wwwr);
 
-        ArrayList<String> translations = new ArrayList<>();
-        translations.add("translation");
-        translations.add("translation");
-        getWordWithTranslations();
-        detailedWord.setTranslations();
+        detailedWord.setTranslations(translationService.getTranslationsForWord(word.getId()));
         return detailedWord;
     }
 
@@ -138,7 +133,7 @@ public class WordService extends BaseService {
         newWordIds.push(word.getId());
         while (!newWordIds.empty()) {
             List<EWordOriginSource> wordOriginSource = wordsOriginSourceRepository.findByWord_Id(newWordIds.pop());
-            wordOriginSource.forEach((wos)->{
+            wordOriginSource.forEach((wos) -> {
                 EWord wordSource = wos.getWordSource();
                 etymologyFrom.add(getWordWithTranslations(wordSource));
                 newWordIds.push(wordSource.getId());
@@ -170,12 +165,7 @@ public class WordService extends BaseService {
 
 
     private WordWithTranslations getWordWithTranslations(EWord eWord) {
-        WordWithTranslations wordWithTranslations = mapper.map(getWordWithWritten(eWord), WordWithTranslations.class);
-//        ArrayList<String> translations = new ArrayList<>();
-//        translations.add("translation");
-//        translations.add("translation");
-//        wordWithTranslations.setTranslations(translations);
-        return wordWithTranslations;
+        return translationService.getWordWithTranslations(eWord);
     }
 
     private WordWithWritten getWordWithWritten(EWord word) {
@@ -189,16 +179,11 @@ public class WordService extends BaseService {
     }
 
     private WordWithWritten _getWithWritten(WordWithWritten wordWithWritten) {
-        String written = getWrittenForm(wordWithWritten);
+        String written = wordWrittenService.getWrittenForm(wordWithWritten);
         wordWithWritten.setWrittenWord(written);
         return wordWithWritten;
     }
 
-    public String getWrittenForm(Word word) {
-        List<ESoundChange> soundChangesByLang = soundChangesService.getESoundChangesByLang(word.getLanguage().getId(), SoundChangePurpose.WRITING_SYSTEM);
-        String written = evolutionService.evolveWord(word.getWord(), soundChangesByLang);
-        return written;
-    }
 
     public Word saveDerivedWord(DerivedWordToAdd word) {
         List<Word> derivedFrom = word.getDerivedFrom();

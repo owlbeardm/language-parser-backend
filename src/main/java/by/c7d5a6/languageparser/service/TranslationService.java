@@ -31,31 +31,37 @@ public class TranslationService extends BaseService {
 
     private final WordsRepository wordsRepository;
     private final TranslationRepository translationRepository;
-    private final WordService wordService;
+    private final WordWrittenService wordWrittenService;
 
     @Autowired
-    public TranslationService(WordsRepository wordsRepository, TranslationRepository translationRepository, WordService wordService) {
+    public TranslationService(WordWrittenService wordWrittenService, WordsRepository wordsRepository, TranslationRepository translationRepository, WordService wordService) {
         this.wordsRepository = wordsRepository;
         this.translationRepository = translationRepository;
-        this.wordService = wordService;
+        this.wordWrittenService = wordWrittenService;
     }
 
     public PageResult<WordWithTranslations> getAllWords(TranslationListFilter filter) {
         Page<EWord> words = wordsRepository.findWordsWithTranslations(filter.getWord(), filter.getLanguageFromId(), filter.getTranslation(), filter.getLanguageToId(), filter.toPageable());
-        Page<WordWithTranslations> map = words.map((eid) -> {
-            WordWithTranslations word = mapper.map(eid, WordWithTranslations.class);
-            word.setWrittenWord(wordService.getWrittenForm(word));
-            List<Translation> translations = translationRepository.findByWordFrom_Id(word.getId()).stream().map(this::convertToRestModelWithWord).collect(Collectors.toList());
-            word.setTranslations(translations);
-            return word;
-        });
+        Page<WordWithTranslations> map = words.map(this::getWordWithTranslations);
         return PageResult.from(map);
+    }
+
+    public WordWithTranslations getWordWithTranslations(EWord eid) {
+        WordWithTranslations word = mapper.map(eid, WordWithTranslations.class);
+        word.setWrittenWord(wordWrittenService.getWrittenForm(word));
+        List<Translation> translations = getTranslations(word.getId());
+        word.setTranslations(translations);
+        return word;
+    }
+
+    private List<Translation> getTranslations(Long id) {
+        return translationRepository.findByWordFrom_Id(id).stream().map(this::convertToRestModelWithWord).collect(Collectors.toList());
     }
 
     private Translation convertToRestModelWithWord(ETranslation translation) {
         Translation t = mapper.map(translation, Translation.class);
         if (t.getWordTo() != null)
-            t.getWordTo().setWrittenWord(wordService.getWrittenForm(t.getWordTo()));
+            t.getWordTo().setWrittenWord(wordWrittenService.getWrittenForm(t.getWordTo()));
         return t;
     }
 
@@ -78,6 +84,6 @@ public class TranslationService extends BaseService {
     }
 
     public List<Translation> getTranslationsForWord(Long id) {
-        return translationRepository.findByWordFrom_Id(id).stream().map(this::convertToRestModelWithWord).collect(Collectors.toList());
+        return getTranslations(id);
     }
 }
