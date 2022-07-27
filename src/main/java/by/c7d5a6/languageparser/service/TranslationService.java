@@ -14,6 +14,7 @@ import by.c7d5a6.languageparser.rest.model.filter.WordListFilter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.Page;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
@@ -33,6 +34,7 @@ public class TranslationService extends BaseService {
     private final TranslationRepository translationRepository;
     private final WordWrittenService wordWrittenService;
 
+    @Lazy
     @Autowired
     public TranslationService(WordWrittenService wordWrittenService, WordsRepository wordsRepository, TranslationRepository translationRepository, WordService wordService) {
         this.wordsRepository = wordsRepository;
