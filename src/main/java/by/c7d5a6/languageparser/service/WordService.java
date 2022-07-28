@@ -76,9 +76,7 @@ public class WordService extends BaseService {
     }
 
     public Word saveWord(WordToAdd word) {
-        if (word.getWordOriginType() != WordOriginType.NEW) {
-            throw new IllegalArgumentException("Only new word allowed");
-        }
+
         EWord eWord;
         if (word.getId() != null) {
             eWord = wordsRepository.findById(word.getId()).orElseThrow(() -> new IllegalArgumentException("Word " + word.getId() + " not found"));
@@ -89,6 +87,9 @@ public class WordService extends BaseService {
             ELanguage eLanguage = languageService.getLangById(word.getLanguage().getId()).orElseThrow(() -> new IllegalArgumentException("Language " + word.getLanguage().getId() + " not found"));
             eWord.setLanguage(eLanguage);
         } else {
+            if (word.getWordOriginType() != WordOriginType.NEW) {
+                throw new IllegalArgumentException("Only new word allowed");
+            }
             eWord = mapper.map(word, EWord.class);
             eWord.setSourceType(word.getWordOriginType());
         }
