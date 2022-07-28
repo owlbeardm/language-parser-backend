@@ -6,8 +6,8 @@ public class DetailedWord {
     private WordWithWritten word;
     private Etymology etymology;
     private List<Translation> translations;
-    private List<WordWithWritten> dirived;
-    private List<WordWithWritten> descendants;
+    private List<WordWithTranslations> derived;
+    private List<WordWithTranslations> descendants;
 
     public WordWithWritten getWord() {
         return word;
@@ -33,19 +33,19 @@ public class DetailedWord {
         this.translations = translations;
     }
 
-    public List<WordWithWritten> getDirived() {
-        return dirived;
+    public List<WordWithTranslations> getDerived() {
+        return derived;
     }
 
-    public void setDirived(List<WordWithWritten> dirived) {
-        this.dirived = dirived;
+    public void setDerived(List<WordWithTranslations> derived) {
+        this.derived = derived;
     }
 
-    public List<WordWithWritten> getDescendants() {
+    public List<WordWithTranslations> getDescendants() {
         return descendants;
     }
 
-    public void setDescendants(List<WordWithWritten> descendants) {
+    public void setDescendants(List<WordWithTranslations> descendants) {
         this.descendants = descendants;
     }
 }

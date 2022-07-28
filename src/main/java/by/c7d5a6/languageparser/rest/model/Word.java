@@ -1,6 +1,7 @@
 package by.c7d5a6.languageparser.rest.model;
 
 
+import by.c7d5a6.languageparser.entity.enums.WordOriginType;
 import by.c7d5a6.languageparser.rest.model.base.Base;
 
 public class Word extends Base {
@@ -10,6 +11,7 @@ public class Word extends Base {
     private POS partOfSpeech;
     private String word;
     private String comment;
+    private WordOriginType sourceType;
 
     public Word() {
     }
@@ -51,6 +53,14 @@ public class Word extends Base {
 
     public void setPartOfSpeech(POS partOfSpeech) {
         this.partOfSpeech = partOfSpeech;
+    }
+
+    public WordOriginType getSourceType() {
+        return sourceType;
+    }
+
+    public void setSourceType(WordOriginType sourceType) {
+        this.sourceType = sourceType;
     }
 
     public String getComment() {

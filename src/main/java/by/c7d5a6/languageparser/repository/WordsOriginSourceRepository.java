@@ -15,7 +15,13 @@ public interface WordsOriginSourceRepository extends IdLongVerRepository<EWordOr
 
     Optional<EWordOriginSource> findByWordSource_IdAndWord_Language_Id(@Param("wordSourceId") Long wordSourceId, @Param("languageId") Long languageId);
     List<EWordOriginSource> findByWord_Id(Long wordId);
-    List<EWordOriginSource> findByWordSource_Id(Long wordId);
+    List<EWordOriginSource> findByWordSource_Id(Long wordSourceId);
+
+    @Query(value = "SELECT wo " +
+            "FROM WordOriginSource as wo " +
+            "WHERE wo.wordSource.id = :wordId " +
+            "AND (wo.word.sourceType = 'EVOLVED' OR wo.word.sourceType = 'BORROWED')")
+    List<EWordOriginSource> findEvolvedOrBorrowedByWordSourceId(@Param("wordId") Long wordId);
     long countByWordSource_Language_IdAndWord_Language_Id(Long langFromId, Long langToId);
 
 

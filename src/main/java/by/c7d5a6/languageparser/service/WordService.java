@@ -108,16 +108,21 @@ public class WordService extends BaseService {
         DetailedWord detailedWord = new DetailedWord();
         detailedWord.setWord(getWordWithWritten(word));
         detailedWord.setEtymology(getEtymology(word));
-        ArrayList<WordWithWritten> wwwr = new ArrayList<>();
-        WordWithWritten wordWithWritten = new WordWithWritten();
-        wordWithWritten.setWrittenWord("222");
-        wordWithWritten.setWord("111");
-        wwwr.add(wordWithWritten);
-        detailedWord.setDescendants(wwwr);
-        detailedWord.setDirived(wwwr);
-
+//        detailedWord.setDescendants(wwwr);
+        detailedWord.setDerived(getDerived(word));
         detailedWord.setTranslations(translationService.getTranslationsForWord(word.getId()));
         return detailedWord;
+    }
+
+    private List<WordWithTranslations> getDerived(Word word) {
+        List<EWordOriginSource> byWordSource_id = wordsOriginSourceRepository.findByWordSource_Id(word.getId());
+        byWordSource_id.forEach((ew)-> logger.info("word {} type {}",ew.getWord().getWord(),ew.getWord().getSourceType()));
+        return byWordSource_id
+                .stream()
+                .map(EWordOriginSource::getWord)
+                .filter((w) -> w.getSourceType() == WordOriginType.DERIVED)
+                .map(this::getWordWithTranslations)
+                .collect(Collectors.toList());
     }
 
     private Etymology getEtymology(Word word) {
@@ -148,10 +153,12 @@ public class WordService extends BaseService {
         if (!langIds.contains(word.getLanguage().getId())) {
             langIds.add(word.getLanguage().getId());
         }
-        List<Word> toCheck = new ArrayList<>(etymologyFrom);
+        List<Word> toCheck = etymologyFrom.stream()
+//                .filter((wfrom) -> wfrom.getSourceType() == WordOriginType.EVOLVED || wfrom.getSourceType() == WordOriginType.BORROWED)
+                .collect(Collectors.toList());
         int i = 0;
         while (i < toCheck.size()) {
-            List<EWordOriginSource> wordSources = wordsOriginSourceRepository.findByWordSource_Id(toCheck.get(i).getId());
+            List<EWordOriginSource> wordSources = wordsOriginSourceRepository.findEvolvedOrBorrowedByWordSourceId(toCheck.get(i).getId());
             wordSources.stream().map(EWordOriginSource::getWord).forEach((w) -> {
                 if (!langIds.contains(w.getLanguage().getId())) {
                     etymologyCognate.add(getWordWithTranslations(w));
