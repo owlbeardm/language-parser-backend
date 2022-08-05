@@ -27,7 +27,7 @@ public class LanguageController {
         this.languageService = languageService;
     }
 
-    @IsVerifiedUser
+//    @IsVerifiedUser
     @Operation(summary = "Get all languages")
     @GetMapping("/all")
     public List<Language> getAllLanguages() {
