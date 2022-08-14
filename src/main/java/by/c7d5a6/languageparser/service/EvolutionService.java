@@ -2,10 +2,10 @@ package by.c7d5a6.languageparser.service;
 
 import by.c7d5a6.languageparser.entity.*;
 import by.c7d5a6.languageparser.entity.base.BaseEntity;
-import by.c7d5a6.languageparser.entity.enums.LanguageConnectionType;
-import by.c7d5a6.languageparser.entity.enums.SoundChangePurpose;
-import by.c7d5a6.languageparser.entity.enums.WordOriginType;
 import by.c7d5a6.languageparser.entity.models.EWordWithEvolutionConnectionsIds;
+import by.c7d5a6.languageparser.enums.LanguageConnectionType;
+import by.c7d5a6.languageparser.enums.SoundChangePurpose;
+import by.c7d5a6.languageparser.enums.WordOriginType;
 import by.c7d5a6.languageparser.repository.LanguageConnectionRepository;
 import by.c7d5a6.languageparser.repository.SoundChangeRepository;
 import by.c7d5a6.languageparser.repository.WordsOriginSourceRepository;
@@ -13,6 +13,7 @@ import by.c7d5a6.languageparser.repository.WordsRepository;
 import by.c7d5a6.languageparser.rest.model.*;
 import by.c7d5a6.languageparser.rest.model.base.PageResult;
 import by.c7d5a6.languageparser.rest.model.filter.WordWithEvolutionsListFilter;
+import by.c7d5a6.languageparser.rest.security.IsEditor;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.Logger;
@@ -61,7 +62,7 @@ public class EvolutionService extends BaseService {
         return result;
     }
 
-    public String evolveWord(String word, Language languageFrom, Language languageTo) {
+    private String evolveWord(String word, Language languageFrom, Language languageTo) {
         return evolveWord(word, getSoundChanges(languageFrom, languageTo));
     }
 
@@ -150,7 +151,7 @@ public class EvolutionService extends BaseService {
                     .ifPresent(eWordSource -> {
                         wordWithEvolution.setWordEvolved(convertToRestModel(eWordSource.getWord()));
                         WordOriginType sourceType = eWordSource.getWord().getSourceType();
-                        switch(eWordSource.getWord().getSourceType()){
+                        switch (eWordSource.getWord().getSourceType()) {
                             case EVOLVED -> wordWithEvolution.setWordEvolvedType(LanguageConnectionType.EVOLVING);
                             case BORROWED -> wordWithEvolution.setWordEvolvedType(LanguageConnectionType.BORROWING);
                             default -> throw new RuntimeException("Word origin type wrong in evolutioin" + eWordSource.getWord().getSourceType());
@@ -189,6 +190,7 @@ public class EvolutionService extends BaseService {
         return words.stream().map(word -> addEvolvedWord(word, eLanguageConnection, soundChanges)).collect(Collectors.toList());
     }
 
+    @IsEditor
     private WordWithEvolution addEvolvedWord(EWord wordSource, ELanguageConnection eLanguageConnection, List<ESoundChange> soundChanges) {
         EWord newWord;
         EWordOriginSource newWordOriginSource;

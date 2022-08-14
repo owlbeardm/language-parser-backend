@@ -8,16 +8,22 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import javax.annotation.PostConstruct;
 import java.security.KeyFactory;
+import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 @EnableWebSecurity
 public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
+
     private static final Logger log = LoggerFactory.getLogger(SecurityConfiguration.class);
 
     @Value("${lp.cors_allowed_origin}")
@@ -38,8 +44,8 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-        http
-                .authorizeRequests()
+//        http
+//                .authorizeRequests()
 //                .mvcMatchers("/docs/**").permitAll()
 //                .mvcMatchers("/api/auth/**").permitAll()
 //                .mvcMatchers(HttpMethod.OPTIONS, "/**").permitAll()
@@ -48,14 +54,17 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 //                .mvcMatchers(HttpMethod.DELETE, "/**").permitAll()
 //                .mvcMatchers(HttpMethod.POST, "/api/evolve/trace/**").permitAll()
 //                .mvcMatchers(HttpMethod.POST, "/api/evolve/sc/raw/**").permitAll()
-                .anyRequest().authenticated();
+//                .anyRequest().authenticated();
 //                .and()
 //                .oauth2Login();
 //                .oauth2ResourceServer(oauth2 -> oauth2
 //                        .authenticationManagerResolver(new JwtIssuerAuthenticationManagerResolver(oauthAuthenticationManager))
 //                )
-        http.oauth2ResourceServer().jwt();
-        http.csrf().disable()
+        http.oauth2ResourceServer()
+                .jwt()
+                .jwtAuthenticationConverter(jwtAuthenticationConverter());;
+        http.csrf()
+                .disable()
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()));
 
     }
@@ -69,5 +78,20 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
         return source;
+    }
+
+    private JwtAuthenticationConverter jwtAuthenticationConverter() {
+        JwtAuthenticationConverter converter = new JwtAuthenticationConverter();
+
+        converter.setJwtGrantedAuthoritiesConverter(jwt ->
+                Optional.ofNullable(jwt.getClaimAsStringList("custom_claims"))
+                        .stream()
+                        .flatMap(Collection::stream)
+                        .peek(log::info)
+                        .map(SimpleGrantedAuthority::new)
+                        .collect(Collectors.toList())
+        );
+
+        return converter;
     }
 }

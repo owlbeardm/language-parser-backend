@@ -11,6 +11,7 @@ import by.c7d5a6.languageparser.rest.model.*;
 import by.c7d5a6.languageparser.rest.model.base.PageResult;
 import by.c7d5a6.languageparser.rest.model.filter.TranslationListFilter;
 import by.c7d5a6.languageparser.rest.model.filter.WordListFilter;
+import by.c7d5a6.languageparser.rest.security.IsEditor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -67,10 +68,12 @@ public class TranslationService extends BaseService {
         return t;
     }
 
+    @IsEditor
     public void deleteTranslation(Long id) {
         this.translationRepository.deleteById(id);
     }
 
+    @IsEditor
     public Long addTranlation(Translation tr) {
         ETranslation translation = mapper.map(tr, ETranslation.class);
         if (translation.getId() == null) {

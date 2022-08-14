@@ -4,7 +4,7 @@ import by.c7d5a6.languageparser.entity.ELanguage;
 import by.c7d5a6.languageparser.entity.EPOS;
 import by.c7d5a6.languageparser.entity.EWord;
 import by.c7d5a6.languageparser.entity.EWordOriginSource;
-import by.c7d5a6.languageparser.entity.enums.WordOriginType;
+import by.c7d5a6.languageparser.enums.WordOriginType;
 import by.c7d5a6.languageparser.entity.specification.EWordSpecification;
 import by.c7d5a6.languageparser.entity.specification.SearchCriteria;
 import by.c7d5a6.languageparser.repository.WordsOriginSourceRepository;
@@ -12,6 +12,7 @@ import by.c7d5a6.languageparser.repository.WordsRepository;
 import by.c7d5a6.languageparser.rest.model.*;
 import by.c7d5a6.languageparser.rest.model.base.PageResult;
 import by.c7d5a6.languageparser.rest.model.filter.WordListFilter;
+import by.c7d5a6.languageparser.rest.security.IsEditor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -66,6 +67,7 @@ public class WordService extends BaseService {
     }
 
 
+    @IsEditor
     public void deleteWord(Long id) {
         EWord eWord = this.wordsRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Word " + id + " not found"));
         this.wordsRepository.delete(eWord);
@@ -75,6 +77,7 @@ public class WordService extends BaseService {
         return true;
     }
 
+    @IsEditor
     public Word saveWord(WordToAdd word) {
 
         EWord eWord;
@@ -192,7 +195,7 @@ public class WordService extends BaseService {
         return wordWithWritten;
     }
 
-
+    @IsEditor
     public Word saveDerivedWord(DerivedWordToAdd word) {
         List<Word> derivedFrom = word.getDerivedFrom();
         if (derivedFrom == null || derivedFrom.isEmpty())

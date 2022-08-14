@@ -1,6 +1,6 @@
 package by.c7d5a6.languageparser.rest.model;
 
-import by.c7d5a6.languageparser.entity.enums.LanguageConnectionType;
+import by.c7d5a6.languageparser.enums.LanguageConnectionType;
 
 public class LanguageConnectionTypeModel {
     LanguageConnectionType languageConnectionType;

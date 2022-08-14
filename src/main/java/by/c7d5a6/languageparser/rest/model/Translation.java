@@ -1,6 +1,6 @@
 package by.c7d5a6.languageparser.rest.model;
 
-import by.c7d5a6.languageparser.entity.enums.TranslationType;
+import by.c7d5a6.languageparser.enums.TranslationType;
 import by.c7d5a6.languageparser.rest.model.base.Base;
 
 public class Translation extends Base {

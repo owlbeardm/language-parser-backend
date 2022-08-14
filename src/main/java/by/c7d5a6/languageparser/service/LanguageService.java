@@ -4,9 +4,10 @@ import by.c7d5a6.languageparser.entity.ELanguage;
 import by.c7d5a6.languageparser.entity.ELanguageConnection;
 import by.c7d5a6.languageparser.entity.ELanguagePhoneme;
 import by.c7d5a6.languageparser.entity.EWord;
-import by.c7d5a6.languageparser.entity.enums.LanguageConnectionType;
+import by.c7d5a6.languageparser.enums.LanguageConnectionType;
 import by.c7d5a6.languageparser.repository.*;
 import by.c7d5a6.languageparser.rest.model.*;
+import by.c7d5a6.languageparser.rest.security.IsEditor;
 import com.google.common.collect.Lists;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -109,6 +110,7 @@ public class LanguageService extends BaseService {
         return this.languageConnectionRepository.findByLangFrom_Id(fromLangId).stream().map(this::convertToRestModel).collect(Collectors.toList());
     }
 
+    @IsEditor
     public void updateConnection(long fromLangId, long toLangId, LanguageConnectionType connectionType) {
         this.languageConnectionRepository.findByLangFrom_IdAndLangTo_Id(fromLangId, toLangId).ifPresentOrElse(connection -> {
             connection.setConnectionType(connectionType);
@@ -124,6 +126,7 @@ public class LanguageService extends BaseService {
         });
     }
 
+    @IsEditor
     public void deleteConnection(long fromLangId, long toLangId) {
         this.languageConnectionRepository.findByLangFrom_IdAndLangTo_Id(fromLangId, toLangId).ifPresent(this.languageConnectionRepository::delete);
     }
@@ -144,6 +147,7 @@ public class LanguageService extends BaseService {
         return languageRepository.findById(fromLangId);
     }
 
+    @IsEditor
     public Language saveOrUpdateLanguage(Language language) {
         ELanguage lang;
         if (language.getId() == null) {
@@ -209,6 +213,7 @@ public class LanguageService extends BaseService {
         return resultList;
     }
 
+    @IsEditor
     public LanguagePhoneme saveLanguagePhoneme(Long languageId, String phoneme) {
         ELanguage eLanguage = languageRepository.findById(languageId).orElseThrow(() -> new IllegalArgumentException("Language with id " + languageId + " not found"));
         ELanguagePhoneme eLanguagePhoneme = new ELanguagePhoneme();
@@ -218,11 +223,13 @@ public class LanguageService extends BaseService {
         return convertToRestModel(eLanguagePhoneme);
     }
 
+    @IsEditor
     public void deleteLanguagePhoneme(Long phonemeId) {
         ELanguagePhoneme eLanguagePhoneme = languagePhonemeRepository.findById(phonemeId).orElseThrow(() -> new IllegalArgumentException("Phoneme with id " + phonemeId + " not found"));
         languagePhonemeRepository.delete(eLanguagePhoneme);
     }
 
+    @IsEditor
     public void deleteLanguage(Long languageId) {
         ELanguage eLanguage = languageRepository.findById(languageId).orElseThrow(() -> new IllegalArgumentException("Language with id " + languageId + " not found"));
         languageConnectionRepository.deleteAll(languageConnectionRepository.findByLangTo_Id(languageId));

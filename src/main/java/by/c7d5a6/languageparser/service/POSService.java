@@ -8,6 +8,7 @@ import by.c7d5a6.languageparser.repository.LanguageRepository;
 import by.c7d5a6.languageparser.repository.POSRepository;
 import by.c7d5a6.languageparser.rest.model.LanguagePOS;
 import by.c7d5a6.languageparser.rest.model.POS;
+import by.c7d5a6.languageparser.rest.security.IsEditor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,6 +35,7 @@ public class POSService extends BaseService {
         this.languagePOSRepository = languagePOSRepository;
     }
 
+    @IsEditor
     public Long savePOS(POS pos) {
         if (pos.getId() != null) {
             posRepository.findById(pos.getId()).ifPresent(epos -> {
@@ -58,6 +60,7 @@ public class POSService extends BaseService {
         return this.posRepository.findByLanguage_Id(languageId).stream().map(this::convertToRestModel).collect(Collectors.toList());
     }
 
+    @IsEditor
     public Long saveLanguagePOS(LanguagePOS languagePOS) {
         ELanguage elanguage = this.languageRepository.findById(languagePOS.getLanguageId()).orElseThrow(() -> new IllegalArgumentException("Language " + languagePOS.getLanguageId() + " not found"));
         EPOS epos = this.posRepository.findById(languagePOS.getPosId()).orElseThrow(() -> new IllegalArgumentException("POS " + languagePOS.getPosId() + " not found"));
@@ -65,6 +68,7 @@ public class POSService extends BaseService {
         return this.languagePOSRepository.save(eLanguagePOS).getId();
     }
 
+    @IsEditor
     public void deleteLanguagePOS(Long id) {
         this.languagePOSRepository.deleteById(id);
     }
@@ -72,7 +76,6 @@ public class POSService extends BaseService {
     private POS convertToRestModel(EPOS epos) {
         return mapper.map(epos, POS.class);
     }
-
 
     public Optional<EPOS> getPOSById(Long id) {
         return posRepository.findById(id);

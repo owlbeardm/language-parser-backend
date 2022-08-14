@@ -2,10 +2,11 @@ package by.c7d5a6.languageparser.service;
 
 import by.c7d5a6.languageparser.entity.ELanguage;
 import by.c7d5a6.languageparser.entity.ESoundChange;
-import by.c7d5a6.languageparser.entity.enums.SoundChangePurpose;
-import by.c7d5a6.languageparser.entity.enums.SoundChangeType;
+import by.c7d5a6.languageparser.enums.SoundChangePurpose;
+import by.c7d5a6.languageparser.enums.SoundChangeType;
 import by.c7d5a6.languageparser.repository.SoundChangeRepository;
 import by.c7d5a6.languageparser.rest.model.SoundChange;
+import by.c7d5a6.languageparser.rest.security.IsEditor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -105,6 +106,7 @@ public class SoundChangesService extends BaseService {
         return soundChanges.stream().map(this::soundChangeToRawLine).collect(Collectors.joining(System.lineSeparator()));
     }
 
+    @IsEditor
     public void saveSoundChangesRawLinesByLangs(long fromLangId, Long toLangId, String rawLines, SoundChangePurpose soundChangePurpose) {
         ELanguage langFrom = languageService.getLangById(fromLangId).orElseThrow(() -> new IllegalArgumentException("Language from with id " + fromLangId + " doesn't exist"));
         ELanguage langTo = toLangId == null ? null : languageService.getLangById(toLangId).orElseThrow(() -> new IllegalArgumentException("Language to with id " + fromLangId + " doesn't exist"));
@@ -124,6 +126,7 @@ public class SoundChangesService extends BaseService {
         return soundChangeRepository.findById(id).map(this::soundChangeToRawLine).orElseThrow(() -> new IllegalArgumentException("Sound change with id " + id + " doesn't exist"));
     }
 
+    @IsEditor
     public void updateSoundChange(long id, String rawLine) {
         soundChangeRepository.findById(id).map((sc) -> {
             ESoundChange soundChangesFromLine = this.getSoundChangesFromLine(rawLine);
@@ -136,6 +139,7 @@ public class SoundChangesService extends BaseService {
         }).orElseThrow(() -> new IllegalArgumentException("Sound change with id " + id + " doesn't exist"));
     }
 
+    @IsEditor
     public void deleteSoundChange(long id) {
         soundChangeRepository.delete(soundChangeRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Sound change with id " + id + " doesn't exist")));
     }

@@ -1,8 +1,8 @@
 package by.c7d5a6.languageparser.entity;
 
 import by.c7d5a6.languageparser.entity.base.BaseEntity;
-import by.c7d5a6.languageparser.entity.enums.SoundChangePurpose;
-import by.c7d5a6.languageparser.entity.enums.SoundChangeType;
+import by.c7d5a6.languageparser.enums.SoundChangePurpose;
+import by.c7d5a6.languageparser.enums.SoundChangeType;
 import by.c7d5a6.languageparser.entity.possessors.IdLongVerPossessor;
 
 import javax.persistence.*;

@@ -1,7 +1,7 @@
 package by.c7d5a6.languageparser.service;
 
 import by.c7d5a6.languageparser.entity.ESoundChange;
-import by.c7d5a6.languageparser.entity.enums.SoundChangePurpose;
+import by.c7d5a6.languageparser.enums.SoundChangePurpose;
 import by.c7d5a6.languageparser.rest.model.Word;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
