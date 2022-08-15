@@ -15,23 +15,22 @@ import java.io.IOException;
 @Configuration
 public class FirebaseAuthConfig {
 
-//    @Value("classpath:data/data.json")
-//    Resource serviceAccount;
-
     @Autowired
     ResourceLoader resourceLoader;
 
     @Bean
     FirebaseAuth firebaseAuth() throws IOException {
-
         Resource data = data();
-        if (data == null) {
-            throw new IOException("No firebase auth");
+        FirebaseOptions options;
+        if (data == null || !data.exists()) {
+            options = FirebaseOptions.builder()
+                    .setCredentials(GoogleCredentials.getApplicationDefault())
+                    .build();
+        } else {
+            options = FirebaseOptions.builder()
+                    .setCredentials(GoogleCredentials.fromStream(data.getInputStream()))
+                    .build();
         }
-        FirebaseOptions options = FirebaseOptions.builder()
-                .setCredentials(GoogleCredentials.fromStream(data.getInputStream()))
-                .build();
-
         FirebaseApp firebaseApp = FirebaseApp.initializeApp(options);
 
         return FirebaseAuth.getInstance(firebaseApp);

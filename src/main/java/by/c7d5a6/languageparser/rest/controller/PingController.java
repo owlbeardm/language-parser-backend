@@ -41,6 +41,6 @@ public class PingController {
             @PathVariable String uid,
             @RequestBody List<FirebaseCustomClaims> requestedClaims
     ) throws FirebaseAuthException {
-        firebaseService.setUserClaims(uid, requestedClaims);
+//        firebaseService.setUserClaims(uid, requestedClaims);
     }
 }

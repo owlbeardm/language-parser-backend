@@ -70,11 +70,13 @@ public class WordService extends BaseService {
     @IsEditor
     public void deleteWord(Long id) {
         EWord eWord = this.wordsRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Word " + id + " not found"));
+        List<EWordOriginSource> byWord_id = this.wordsOriginSourceRepository.findByWord_Id(id);
+        this.wordsOriginSourceRepository.deleteAll(byWord_id);
         this.wordsRepository.delete(eWord);
     }
 
     public boolean canDeleteWord(Long wordId) {
-        return true;
+        return this.wordsOriginSourceRepository.findByWordSource_Id(wordId).isEmpty();
     }
 
     @IsEditor
