@@ -43,10 +43,17 @@ public class EvolveController {
     }
 
     @Operation(summary = "Get connections from language")
-    @GetMapping("/connection/{fromLangId}")
+    @GetMapping("/connection/from/{fromLangId}")
     public List<LanguageConnection> getConnectionFromLang(@PathVariable long fromLangId) {
         logger.info("Get connections from {}", fromLangId);
         return languageService.getConnectionsFrom(fromLangId);
+    }
+
+    @Operation(summary = "Get connections from language")
+    @GetMapping("/connection/to/{toLangId}")
+    public List<LanguageConnection> getConnectionToLang(@PathVariable long toLangId) {
+        logger.info("Get connections to {}", toLangId);
+        return languageService.getConnectionsTo(toLangId);
     }
 
     @Operation(summary = "Update connection between two languages")

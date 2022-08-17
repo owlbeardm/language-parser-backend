@@ -294,4 +294,8 @@ public class LanguageService extends BaseService {
             constClusters.addAll(Arrays.stream(constClustersArr).filter(s -> !s.isBlank()).toList());
         }
     }
+
+    public List<LanguageConnection> getConnectionsTo(long toLangId) {
+        return this.languageConnectionRepository.findByLangTo_Id(toLangId).stream().map(this::convertToRestModel).collect(Collectors.toList());
+    }
 }
