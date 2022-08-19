@@ -1,10 +1,11 @@
 package by.c7d5a6.languageparser.rest.model;
 
 
+import by.c7d5a6.languageparser.entity.WordWithIdAndLanguage;
 import by.c7d5a6.languageparser.enums.WordOriginType;
 import by.c7d5a6.languageparser.rest.model.base.Base;
 
-public class Word extends Base {
+public class Word extends Base implements WordWithIdAndLanguage {
 
     private Language language;
     private Boolean isForgotten;

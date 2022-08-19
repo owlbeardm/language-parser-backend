@@ -13,7 +13,7 @@ import java.io.Serializable;
 
 @Entity(name = ELanguage.ENTITY_NAME)
 @Table(name = ELanguage.TABLE_NAME)
-public class ELanguage extends BaseEntity implements Serializable, IdLongVerPossessor {
+public class ELanguage extends BaseEntity implements Serializable, LanguageWithID {
 
     protected static final String ENTITY_NAME = "Language";
     protected static final String TABLE_NAME = "language_tbl";

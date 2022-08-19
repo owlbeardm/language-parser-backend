@@ -3,6 +3,8 @@ package by.c7d5a6.languageparser.rest.controller;
 import by.c7d5a6.languageparser.enums.SoundChangePurpose;
 import by.c7d5a6.languageparser.rest.model.*;
 import by.c7d5a6.languageparser.rest.model.base.PageResult;
+import by.c7d5a6.languageparser.rest.model.filter.WordBorrowedListFilter;
+import by.c7d5a6.languageparser.rest.model.filter.WordListFilter;
 import by.c7d5a6.languageparser.rest.model.filter.WordWithEvolutionsListFilter;
 import by.c7d5a6.languageparser.service.EvolutionService;
 import by.c7d5a6.languageparser.service.LanguageService;
@@ -167,6 +169,12 @@ public class EvolveController {
     public PageResult<WordWithEvolution> getAllWordsWithEvolutions(@Valid WordWithEvolutionsListFilter filter) {
         logger.info("Get all words with evolutions");
         return evolutionService.getAllWordsWithEvolutions(filter);
+    }
+
+    @Operation(summary = "Get all words")
+    @GetMapping("/words/borrowed")
+    public PageResult<WordWithBorrowed> getAllWords(@Valid WordBorrowedListFilter filter) {
+        return evolutionService.getAllBorrowedWords(filter);
     }
 
     @Operation(summary = "Evolve word")

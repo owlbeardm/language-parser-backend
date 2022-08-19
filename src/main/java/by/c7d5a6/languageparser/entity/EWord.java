@@ -2,7 +2,6 @@ package by.c7d5a6.languageparser.entity;
 
 import by.c7d5a6.languageparser.entity.base.BaseEntity;
 import by.c7d5a6.languageparser.enums.WordOriginType;
-import by.c7d5a6.languageparser.entity.possessors.IdLongVerPossessor;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
@@ -10,7 +9,7 @@ import java.io.Serializable;
 
 @Entity(name = EWord.ENTITY_NAME)
 @Table(name = EWord.TABLE_NAME)
-public class EWord extends BaseEntity implements Serializable, IdLongVerPossessor {
+public class EWord extends BaseEntity implements Serializable, WordWithIdAndLanguage {
 
     protected static final String ENTITY_NAME = "Word";
     protected static final String TABLE_NAME = "word_tbl";

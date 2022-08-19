@@ -16,6 +16,7 @@ import by.c7d5a6.languageparser.rest.security.IsEditor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
@@ -61,9 +62,18 @@ public class WordService extends BaseService {
         EWordSpecification spec2 = new EWordSpecification(new SearchCriteria("language", ":", eLanguage));
         EWordSpecification spec3 = new EWordSpecification(new SearchCriteria("partOfSpeech", ":", epos));
         return PageResult.from(
-                wordsRepository.findAll(Specification.where(spec1).and(spec2).and(spec3), filter.toPageable()),
+                getAllWordsPage(filter),
                 this::getWordWithWritten
         );
+    }
+
+    public Page<EWord> getAllWordsPage(WordListFilter filter) {
+        ELanguage eLanguage = Optional.ofNullable(filter.getLanguageId()).flatMap(languageService::getLangById).orElse(null);
+        EPOS epos = Optional.ofNullable(filter.getPosId()).flatMap(posService::getPOSById).orElse(null);
+        EWordSpecification spec1 = new EWordSpecification(new SearchCriteria("word", ":", filter.getWord()));
+        EWordSpecification spec2 = new EWordSpecification(new SearchCriteria("language", ":", eLanguage));
+        EWordSpecification spec3 = new EWordSpecification(new SearchCriteria("partOfSpeech", ":", epos));
+        return wordsRepository.findAll(Specification.where(spec1).and(spec2).and(spec3), filter.toPageable());
     }
 
 
