@@ -1,10 +1,14 @@
 package by.c7d5a6.languageparser.service;
 
 import by.c7d5a6.languageparser.entity.ELanguage;
+import by.c7d5a6.languageparser.entity.ELanguageConnection;
 import by.c7d5a6.languageparser.entity.ESoundChange;
+import by.c7d5a6.languageparser.entity.WordWithIdAndLanguage;
+import by.c7d5a6.languageparser.entity.base.BaseEntity;
 import by.c7d5a6.languageparser.enums.SoundChangePurpose;
 import by.c7d5a6.languageparser.enums.SoundChangeType;
 import by.c7d5a6.languageparser.repository.SoundChangeRepository;
+import by.c7d5a6.languageparser.rest.model.Language;
 import by.c7d5a6.languageparser.rest.model.SoundChange;
 import by.c7d5a6.languageparser.rest.security.IsEditor;
 import org.slf4j.Logger;
@@ -14,7 +18,11 @@ import org.springframework.stereotype.Service;
 
 import java.lang.invoke.MethodHandles;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 @Service
@@ -180,5 +188,70 @@ public class SoundChangesService extends BaseService {
         return mapper.map(soundChange, SoundChange.class);
     }
 
+    public String evolveWord(String word, Language languageFrom, Language languageTo) {
+        return evolveWord(word, getSoundChanges(languageFrom, languageTo));
+    }
+
+    private List<ESoundChange> getSoundChanges(ELanguage languageFrom, ELanguage languageTo) {
+        return getSoundChanges(languageFrom.getId(), languageTo.getId());
+    }
+
+    public List<ESoundChange> getSoundChanges(Language languageFrom, Language languageTo) {
+        return getSoundChanges(languageFrom.getId(), languageTo.getId());
+    }
+
+    private List<ESoundChange> getSoundChanges(Long languageFromId, Long languageToId) {
+        return soundChangeRepository.findByLangFrom_IdAndLangTo_IdAndAndSoundChangePurposeOrderByPriority(languageFromId, languageToId, SoundChangePurpose.SOUND_CHANGE);
+    }
+
+    public Map<Long, Map<Long, String>> evolveWords(List<WordWithIdAndLanguage> words, List<ELanguageConnection> languageConnections) {
+        return languageConnections
+                .stream()
+                .collect(Collectors.toMap(BaseEntity::getId, languageConnection -> evolveWords(words, languageConnection)));
+    }
+
+    private Map<Long, String> evolveWords(List<WordWithIdAndLanguage> words, ELanguageConnection languageConnection) {
+        return getSounChangedWords(words, languageConnection.getLangFrom(), languageConnection.getLangTo());
+    }
+
+    public Map<Long, String> getSounChangedWords(List<WordWithIdAndLanguage> words, ELanguage langFrom, ELanguage langTo) {
+        List<ESoundChange> soundChanges = getSoundChanges(langFrom, langTo);
+        final Map<Long, String> result = new HashMap<>();
+        words
+                .stream()
+                .filter(word -> word.getLanguage().getId().equals(langFrom.getId()))
+                .forEach(word -> {
+                    result.put(word.getId(), evolveWord(word.getWord(), soundChanges));
+                });
+        return result;
+    }
+
+    public String evolveWord(String word, List<ESoundChange> soundChanges) {
+        String result = word;
+        for (ESoundChange soundChange : soundChanges) {
+            result = evolveWordBySingleSoundChange(result, soundChange);
+        }
+        return result;
+    }
+
+    private String evolveWordBySingleSoundChange(String result, ESoundChange soundChange) {
+        String regexp = getRegexpFromSoundChange(soundChange);
+        Pattern pattern = Pattern.compile(regexp);
+        Matcher matcher = pattern.matcher(result);
+        final String soundTo = soundChange.getSoundTo().replaceAll("ø", "");
+        switch (soundChange.getType()) {
+            case REPLACE_ALL -> result = matcher.replaceAll(soundTo);
+            case REPLACE_FIRST -> result = matcher.replaceFirst(soundTo);
+            case REPLACE_LAST -> throw new UnsupportedOperationException("Not implemented yet");
+        }
+        return result.trim();
+    }
+
+    private String getRegexpFromSoundChange(ESoundChange soundChange) {
+        String regexpBefore = (soundChange.getEnvironmentBefore() != null && !soundChange.getEnvironmentBefore().isEmpty()) ? "(?<=" + soundChange.getEnvironmentBefore() + ")" : "";
+        String regexpAfter = (soundChange.getEnvironmentAfter() != null && !soundChange.getEnvironmentAfter().isEmpty()) ? "(?=" + soundChange.getEnvironmentAfter() + ")" : "";
+        String regexp = regexpBefore + soundChange.getSoundFrom() + regexpAfter;
+        return regexp;
+    }
 
 }

@@ -25,8 +25,5 @@ public class WordWrittenService extends BaseService {
         this.soundChangesService = soundChangesService;
     }
 
-    public String getWrittenForm(Word word) {
-        List<ESoundChange> soundChangesByLang = soundChangesService.getESoundChangesByLang(word.getLanguage().getId(), SoundChangePurpose.WRITING_SYSTEM);
-        return evolutionService.evolveWord(word.getWord(), soundChangesByLang);
-    }
+
 }

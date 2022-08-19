@@ -1,9 +1,7 @@
 package by.c7d5a6.languageparser.service;
 
-import by.c7d5a6.languageparser.entity.ELanguage;
-import by.c7d5a6.languageparser.entity.EPOS;
-import by.c7d5a6.languageparser.entity.EWord;
-import by.c7d5a6.languageparser.entity.EWordOriginSource;
+import by.c7d5a6.languageparser.entity.*;
+import by.c7d5a6.languageparser.enums.SoundChangePurpose;
 import by.c7d5a6.languageparser.enums.WordOriginType;
 import by.c7d5a6.languageparser.entity.specification.EWordSpecification;
 import by.c7d5a6.languageparser.entity.specification.SearchCriteria;
@@ -36,16 +34,16 @@ public class WordService extends BaseService {
     private final WordsOriginSourceRepository wordsOriginSourceRepository;
     private final LanguageService languageService;
     private final POSService posService;
-    private final WordWrittenService wordWrittenService;
+    private final SoundChangesService soundChangesService;
     private final TranslationService translationService;
 
     @Autowired
-    public WordService(TranslationService translationService, WordWrittenService wordWrittenService, WordsRepository wordsRepository, WordsOriginSourceRepository wordsOriginSourceRepository, LanguageService languageService, POSService posService) {
+    public WordService(TranslationService translationService, SoundChangesService soundChangesService, WordsRepository wordsRepository, WordsOriginSourceRepository wordsOriginSourceRepository, LanguageService languageService, POSService posService) {
         this.wordsRepository = wordsRepository;
         this.wordsOriginSourceRepository = wordsOriginSourceRepository;
         this.languageService = languageService;
         this.posService = posService;
-        this.wordWrittenService = wordWrittenService;
+        this.soundChangesService = soundChangesService;
         this.translationService = translationService;
     }
 
@@ -202,7 +200,7 @@ public class WordService extends BaseService {
     }
 
     private WordWithWritten _getWithWritten(WordWithWritten wordWithWritten) {
-        String written = wordWrittenService.getWrittenForm(wordWithWritten);
+        String written = getWrittenForm(wordWithWritten);
         wordWithWritten.setWrittenWord(written);
         return wordWithWritten;
     }
@@ -240,5 +238,10 @@ public class WordService extends BaseService {
             wordsOriginSourceRepository.save(eWordOriginSource);
         }
         return mapper.map(eWord, Word.class);
+    }
+
+    public String getWrittenForm(Word word) {
+        List<ESoundChange> soundChangesByLang = soundChangesService.getESoundChangesByLang(word.getLanguage().getId(), SoundChangePurpose.WRITING_SYSTEM);
+        return soundChangesService.evolveWord(word.getWord(), soundChangesByLang);
     }
 }

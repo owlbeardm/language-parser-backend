@@ -6,6 +6,7 @@ import by.c7d5a6.languageparser.rest.model.base.PageResult;
 import by.c7d5a6.languageparser.rest.model.filter.WordBorrowedListFilter;
 import by.c7d5a6.languageparser.rest.model.filter.WordListFilter;
 import by.c7d5a6.languageparser.rest.model.filter.WordWithEvolutionsListFilter;
+import by.c7d5a6.languageparser.rest.security.IsEditor;
 import by.c7d5a6.languageparser.service.EvolutionService;
 import by.c7d5a6.languageparser.service.LanguageService;
 import by.c7d5a6.languageparser.service.SoundChangesService;
@@ -179,8 +180,16 @@ public class EvolveController {
 
     @Operation(summary = "Evolve word")
     @PostMapping("/words/evolve")
+    @IsEditor
     public WordWithEvolution addEvolvedWord(@RequestBody WordToEvolve wordToEvolve) {
         return evolutionService.addEvolvedWord(wordToEvolve.getWord(), wordToEvolve.getLanguageConnection()).stream().findFirst().orElseThrow(() -> new RuntimeException("No result"));
+    }
+
+    @Operation(summary = "Evolve word")
+    @PostMapping("/words/borrow")
+    @IsEditor
+    public WordWithBorrowed addEvolvedWord(@RequestBody WordToBorrow wordToBorrow) {
+        return evolutionService.addBorrowedWord(wordToBorrow);
     }
 
     @Operation(summary = "Evolve all words")

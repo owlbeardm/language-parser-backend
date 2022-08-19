@@ -33,14 +33,14 @@ public class TranslationService extends BaseService {
 
     private final WordsRepository wordsRepository;
     private final TranslationRepository translationRepository;
-    private final WordWrittenService wordWrittenService;
+    private final WordService wordService;
 
     @Lazy
     @Autowired
-    public TranslationService(WordWrittenService wordWrittenService, WordsRepository wordsRepository, TranslationRepository translationRepository, WordService wordService) {
+    public TranslationService(WordService wordService, WordsRepository wordsRepository, TranslationRepository translationRepository) {
         this.wordsRepository = wordsRepository;
         this.translationRepository = translationRepository;
-        this.wordWrittenService = wordWrittenService;
+        this.wordService = wordService;
     }
 
     public PageResult<WordWithTranslations> getAllWords(TranslationListFilter filter) {
@@ -51,7 +51,7 @@ public class TranslationService extends BaseService {
 
     public WordWithTranslations getWordWithTranslations(EWord eid) {
         WordWithTranslations word = mapper.map(eid, WordWithTranslations.class);
-        word.setWrittenWord(wordWrittenService.getWrittenForm(word));
+        word.setWrittenWord(wordService.getWrittenForm(word));
         List<Translation> translations = getTranslations(word.getId());
         word.setTranslations(translations);
         return word;
@@ -64,7 +64,7 @@ public class TranslationService extends BaseService {
     private Translation convertToRestModelWithWord(ETranslation translation) {
         Translation t = mapper.map(translation, Translation.class);
         if (t.getWordTo() != null)
-            t.getWordTo().setWrittenWord(wordWrittenService.getWrittenForm(t.getWordTo()));
+            t.getWordTo().setWrittenWord(wordService.getWrittenForm(t.getWordTo()));
         return t;
     }
 
