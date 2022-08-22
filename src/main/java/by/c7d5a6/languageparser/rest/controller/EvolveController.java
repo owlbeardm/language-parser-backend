@@ -188,7 +188,7 @@ public class EvolveController {
     @Operation(summary = "Evolve word")
     @PostMapping("/words/borrow")
     @IsEditor
-    public WordWithBorrowed addEvolvedWord(@RequestBody WordToBorrow wordToBorrow) {
+    public WordWithBorrowed addBorrowedWord(@RequestBody WordToBorrow wordToBorrow) {
         return evolutionService.addBorrowedWord(wordToBorrow);
     }
 

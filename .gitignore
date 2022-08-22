@@ -40,3 +40,5 @@ gradle/wrapper/caches/
 gradle/
 
 src/main/resources/data/data.json
+
+.idea/
