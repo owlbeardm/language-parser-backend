@@ -1,10 +1,10 @@
 package by.c7d5a6.languageparser.service;
 
 import by.c7d5a6.languageparser.entity.*;
-import by.c7d5a6.languageparser.enums.SoundChangePurpose;
-import by.c7d5a6.languageparser.enums.WordOriginType;
 import by.c7d5a6.languageparser.entity.specification.EWordSpecification;
 import by.c7d5a6.languageparser.entity.specification.SearchCriteria;
+import by.c7d5a6.languageparser.enums.SoundChangePurpose;
+import by.c7d5a6.languageparser.enums.WordOriginType;
 import by.c7d5a6.languageparser.repository.WordsOriginSourceRepository;
 import by.c7d5a6.languageparser.repository.WordsRepository;
 import by.c7d5a6.languageparser.rest.model.*;
@@ -89,7 +89,6 @@ public class WordService extends BaseService {
 
     @IsEditor
     public Word saveWord(WordToAdd word) {
-
         EWord eWord;
         if (word.getId() != null) {
             eWord = wordsRepository.findById(word.getId()).orElseThrow(() -> new IllegalArgumentException("Word " + word.getId() + " not found"));
@@ -122,20 +121,36 @@ public class WordService extends BaseService {
         DetailedWord detailedWord = new DetailedWord();
         detailedWord.setWord(getWordWithWritten(word));
         detailedWord.setEtymology(getEtymology(word));
-//        detailedWord.setDescendants(wwwr);
+        detailedWord.setDescendants(getDescendants(word));
         detailedWord.setDerived(getDerived(word));
         detailedWord.setTranslations(translationService.getTranslationsForWord(word.getId()));
         return detailedWord;
     }
 
+    private DescendantWords getDescendants(WordWithIdAndLanguage w) {
+        WordWithTranslations word = translationService.getWordWithTranslations(w);
+        DescendantWords descendantWords = new DescendantWords();
+        descendantWords.setWord(word);
+        final List<DescendantWords> descendants = new ArrayList<>();
+        descendantWords.setDescendants(descendants);
+
+        List<EWordOriginSource> wordOriginSource = wordsOriginSourceRepository.findByWordSource_Id(word.getId());
+        wordOriginSource
+                .forEach((wos) -> {
+                    EWord eword = wos.getWord();
+                    descendants.add(getDescendants(eword));
+                });
+        return descendantWords;
+    }
+
     private List<WordWithTranslations> getDerived(Word word) {
         List<EWordOriginSource> byWordSource_id = wordsOriginSourceRepository.findByWordSource_Id(word.getId());
-        byWordSource_id.forEach((ew)-> logger.info("word {} type {}",ew.getWord().getWord(),ew.getWord().getSourceType()));
+        byWordSource_id.forEach((ew) -> logger.info("word {} type {}", ew.getWord().getWord(), ew.getWord().getSourceType()));
         return byWordSource_id
                 .stream()
                 .map(EWordOriginSource::getWord)
                 .filter((w) -> w.getSourceType() == WordOriginType.DERIVED)
-                .map(this::getWordWithTranslations)
+                .map(translationService::getWordWithTranslations)
                 .collect(Collectors.toList());
     }
 
@@ -154,7 +169,7 @@ public class WordService extends BaseService {
             List<EWordOriginSource> wordOriginSource = wordsOriginSourceRepository.findByWord_Id(newWordIds.pop());
             wordOriginSource.forEach((wos) -> {
                 EWord wordSource = wos.getWordSource();
-                etymologyFrom.add(getWordWithTranslations(wordSource));
+                etymologyFrom.add(translationService.getWordWithTranslations(wordSource));
                 newWordIds.push(wordSource.getId());
             });
         }
@@ -175,7 +190,7 @@ public class WordService extends BaseService {
             List<EWordOriginSource> wordSources = wordsOriginSourceRepository.findEvolvedOrBorrowedByWordSourceId(toCheck.get(i).getId());
             wordSources.stream().map(EWordOriginSource::getWord).forEach((w) -> {
                 if (!langIds.contains(w.getLanguage().getId())) {
-                    etymologyCognate.add(getWordWithTranslations(w));
+                    etymologyCognate.add(translationService.getWordWithTranslations(w));
                     toCheck.add(convertToRestModel(w));
                 }
             });
@@ -184,10 +199,6 @@ public class WordService extends BaseService {
         return etymologyCognate;
     }
 
-
-    private WordWithTranslations getWordWithTranslations(EWord eWord) {
-        return translationService.getWordWithTranslations(eWord);
-    }
 
     private WordWithWritten getWordWithWritten(EWord word) {
         WordWithWritten ww = mapper.map(word, WordWithWritten.class);

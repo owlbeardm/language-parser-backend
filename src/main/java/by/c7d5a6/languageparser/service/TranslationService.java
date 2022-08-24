@@ -49,7 +49,7 @@ public class TranslationService extends BaseService {
         return PageResult.from(map);
     }
 
-    public WordWithTranslations getWordWithTranslations(EWord eid) {
+    public WordWithTranslations getWordWithTranslations(WordWithIdAndLanguage eid) {
         WordWithTranslations word = mapper.map(eid, WordWithTranslations.class);
         word.setWrittenWord(wordService.getWrittenForm(word));
         List<Translation> translations = getTranslations(word.getId());

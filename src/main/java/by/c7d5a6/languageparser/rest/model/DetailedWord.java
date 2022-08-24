@@ -7,7 +7,7 @@ public class DetailedWord {
     private Etymology etymology;
     private List<Translation> translations;
     private List<WordWithTranslations> derived;
-    private List<WordWithTranslations> descendants;
+    private DescendantWords descendants;
 
     public WordWithWritten getWord() {
         return word;
@@ -41,11 +41,11 @@ public class DetailedWord {
         this.derived = derived;
     }
 
-    public List<WordWithTranslations> getDescendants() {
+    public DescendantWords getDescendants() {
         return descendants;
     }
 
-    public void setDescendants(List<WordWithTranslations> descendants) {
+    public void setDescendants(DescendantWords descendants) {
         this.descendants = descendants;
     }
 }
