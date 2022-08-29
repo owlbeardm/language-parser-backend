@@ -88,7 +88,7 @@ public class WordService extends BaseService {
     }
 
     @IsEditor
-    public Word saveWord(WordToAdd word) {
+    public Word saveWord(Word word) {
         EWord eWord;
         if (word.getId() != null) {
             eWord = wordsRepository.findById(word.getId()).orElseThrow(() -> new IllegalArgumentException("Word " + word.getId() + " not found"));
@@ -98,12 +98,13 @@ public class WordService extends BaseService {
             eWord.setPartOfSpeech(epos);
             ELanguage eLanguage = languageService.getLangById(word.getLanguage().getId()).orElseThrow(() -> new IllegalArgumentException("Language " + word.getLanguage().getId() + " not found"));
             eWord.setLanguage(eLanguage);
+            eWord.setComment(word.getComment());
         } else {
-            if (word.getWordOriginType() != WordOriginType.NEW) {
+            if (word.getSourceType() != WordOriginType.NEW) {
                 throw new IllegalArgumentException("Only new word allowed");
             }
             eWord = mapper.map(word, EWord.class);
-            eWord.setSourceType(word.getWordOriginType());
+            eWord.setSourceType(word.getSourceType());
         }
         eWord = this.wordsRepository.save(eWord);
         return mapper.map(eWord, Word.class);
