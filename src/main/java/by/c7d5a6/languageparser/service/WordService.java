@@ -89,6 +89,7 @@ public class WordService extends BaseService {
 
     @IsEditor
     public Word saveWord(Word word) {
+        word.setWord(IPAService.cleanIPA(word.getWord()));
         EWord eWord;
         if (word.getId() != null) {
             eWord = wordsRepository.findById(word.getId()).orElseThrow(() -> new IllegalArgumentException("Word " + word.getId() + " not found"));
@@ -219,6 +220,7 @@ public class WordService extends BaseService {
 
     @IsEditor
     public Word saveDerivedWord(DerivedWordToAdd word) {
+        word.setWord(IPAService.cleanIPA(word.getWord()));
         List<Word> derivedFrom = word.getDerivedFrom();
         if (derivedFrom == null || derivedFrom.isEmpty())
             throw new IllegalArgumentException("Should be at least one word derived from");
@@ -255,5 +257,17 @@ public class WordService extends BaseService {
     public String getWrittenForm(Word word) {
         List<ESoundChange> soundChangesByLang = soundChangesService.getESoundChangesByLang(word.getLanguage().getId(), SoundChangePurpose.WRITING_SYSTEM);
         return soundChangesService.evolveWord(word.getWord(), soundChangesByLang);
+    }
+
+    public void cleanIPAWords() {
+        List<EWord> all = this.wordsRepository.findAll();
+        List<EWord> collected = all.stream().map(eWord -> {
+            String word = eWord.getWord();
+            String word1 = IPAService.cleanIPA(word);
+            logger.info("Clean word {} to {}", word, word1);
+            eWord.setWord(word1);
+            return eWord;
+        }).collect(Collectors.toList());
+        this.wordsRepository.saveAllAndFlush(collected);
     }
 }

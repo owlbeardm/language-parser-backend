@@ -24,7 +24,7 @@ import java.util.stream.Collectors;
 @EnableWebSecurity
 public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
-    private static final Logger log = LoggerFactory.getLogger(SecurityConfiguration.class);
+//    private static final Logger log = LoggerFactory.getLogger(SecurityConfiguration.class);
 
     @Value("${lp.cors_allowed_origin}")
     private String corsAllowedOrigin;
@@ -35,9 +35,9 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     public void initialize() {
         try {
             KeyFactory keyFactory = KeyFactory.getInstance("RSA");
-            log.info("Initialized private and public key");
+//            log.info("Initialized private and public key");
         } catch (Exception e) {
-            log.warn(e.getMessage(), e);
+//            log.warn(e.getMessage(), e);
             throw new IllegalStateException("Cannot initialize keys: " + e.getMessage(), e);
         }
     }
@@ -87,7 +87,6 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                 Optional.ofNullable(jwt.getClaimAsStringList("custom_claims"))
                         .stream()
                         .flatMap(Collection::stream)
-                        .peek(log::info)
                         .map(SimpleGrantedAuthority::new)
                         .collect(Collectors.toList())
         );

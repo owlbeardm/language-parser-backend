@@ -1,5 +1,7 @@
 package by.c7d5a6.languageparser.entity.possessors;
 
-public interface IdLongPossessor {
+import java.io.Serializable;
+
+public interface IdLongPossessor extends Serializable {
     Long getId();
 }

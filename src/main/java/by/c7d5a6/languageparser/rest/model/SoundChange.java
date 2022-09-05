@@ -2,6 +2,7 @@ package by.c7d5a6.languageparser.rest.model;
 
 import by.c7d5a6.languageparser.enums.SoundChangePurpose;
 import by.c7d5a6.languageparser.enums.SoundChangeType;
+import by.c7d5a6.languageparser.rest.model.format.IPAFormat;
 
 public class SoundChange {
 

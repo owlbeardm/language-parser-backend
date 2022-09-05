@@ -1,5 +1,7 @@
 package by.c7d5a6.languageparser.rest.model;
 
+import by.c7d5a6.languageparser.rest.model.format.IPAFormat;
+
 import java.io.Serializable;
 
 public class WordTraceResult implements Serializable {

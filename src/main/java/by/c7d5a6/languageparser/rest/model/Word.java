@@ -4,12 +4,22 @@ package by.c7d5a6.languageparser.rest.model;
 import by.c7d5a6.languageparser.entity.WordWithIdAndLanguage;
 import by.c7d5a6.languageparser.enums.WordOriginType;
 import by.c7d5a6.languageparser.rest.model.base.Base;
+import by.c7d5a6.languageparser.rest.model.format.IPAFormat;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Schema;
 
+@SuppressWarnings("unused")
+@JsonInclude(JsonInclude.Include.NON_NULL)
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class Word extends Base implements WordWithIdAndLanguage {
 
     private Language language;
     private Boolean isForgotten;
     private POS partOfSpeech;
+    @Parameter(description = "The word sounds", required = true)
+    @Schema(description = "The word sounds")
     private String word;
     private String comment;
     private WordOriginType sourceType;

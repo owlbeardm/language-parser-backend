@@ -56,19 +56,18 @@ public class WordsController {
     @Operation(summary = "Can delete word")
     @GetMapping("/{wordId}/candelete")
     public boolean canDeleteWord(@PathVariable Long wordId) {
-        logger.info("Can delete word");
         return wordService.canDeleteWord(wordId);
     }
 
     @Operation(summary = "Add new word")
     @PostMapping("/add")
-    public Word addWord(@RequestBody Word word) {
+    public Word addWord(@Valid @RequestBody Word word) {
         return wordService.saveWord(word);
     }
 
     @Operation(summary = "Add derived word")
     @PostMapping("/derive")
-    public Word addDerivedWord(@RequestBody DerivedWordToAdd word) {
+    public Word addDerivedWord(@Valid @RequestBody DerivedWordToAdd word) {
         return wordService.saveDerivedWord(word);
     }
 
@@ -76,6 +75,12 @@ public class WordsController {
     @PostMapping("/{word}")
     public List<DetailedWord> getDetailedWordsByPhonetics(@PathVariable String word) {
         return wordService.getDetailedWordsByPhonetics(word);
+    }
+
+    @Operation(summary = "Clean IPA in words")
+    @PostMapping("/clean")
+    public void cleanIPAWords() {
+        wordService.cleanIPAWords();
     }
 
 //    @Operation(summary = "Get all words from language by text")

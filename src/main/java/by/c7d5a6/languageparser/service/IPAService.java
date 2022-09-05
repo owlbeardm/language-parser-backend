@@ -139,7 +139,7 @@ public class IPAService extends BaseService {
                 .toArray(String[]::new);
     }
 
-    public String cleanIPA(String ipaString) {
+    public static String cleanIPA(String ipaString) {
 //        IPA = IPA.normalize('NFD');
         return ipaString
                 .trim()

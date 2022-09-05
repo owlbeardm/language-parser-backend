@@ -1,5 +1,6 @@
 package by.c7d5a6.languageparser.rest.model.filter;
 
+import by.c7d5a6.languageparser.rest.model.format.IPAFormat;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -23,6 +24,7 @@ public class TranslationListFilter extends PaginationFilter {
 
     @Parameter(description = "The word to search for", required = false)
     @Schema(description = "The word to search for")
+    @IPAFormat
     private String word;
 
     @Parameter(description = "The translation language to search for", required = false)
@@ -31,6 +33,7 @@ public class TranslationListFilter extends PaginationFilter {
 
     @Parameter(description = "The translation to search for", required = false)
     @Schema(description = "The translation to search for")
+    @IPAFormat
     private String translation;
 
     public Long getLanguageFromId() {
