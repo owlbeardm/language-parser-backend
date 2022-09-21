@@ -72,7 +72,7 @@ public class WordsController {
     }
 
     @Operation(summary = "Get detailed words by phonetics")
-    @PostMapping("/{word}")
+    @GetMapping("/{word}")
     public List<DetailedWord> getDetailedWordsByPhonetics(@PathVariable String word) {
         return wordService.getDetailedWordsByPhonetics(word);
     }
