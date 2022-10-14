@@ -1,5 +1,6 @@
 package by.c7d5a6.languageparser.repository;
 
+import by.c7d5a6.languageparser.entity.EPOS;
 import by.c7d5a6.languageparser.entity.EWord;
 import by.c7d5a6.languageparser.entity.EWordOriginSource;
 import by.c7d5a6.languageparser.entity.EWordSource;
@@ -60,4 +61,11 @@ public interface WordsRepository extends IdLongVerRepository<EWord>, JpaSpecific
             " ON w.id = wo.wordSource.id " +
             "WHERE wo.wordSource.id IN :evolvedFromIds")
     List<EWordOriginSource> findEvolvedWordsFrom(List<Long> evolvedFromIds);
+
+    @Query(value = "SELECT DISTINCT pos " +
+            "FROM Word as w " +
+            "INNER JOIN w.partOfSpeech as pos " +
+            " ON w.partOfSpeech.id = pos.id " +
+            "WHERE w.language.id = :langId")
+    List<EPOS> findPOSInWordsByLanguage(@Param("langId") Long langId);
 }

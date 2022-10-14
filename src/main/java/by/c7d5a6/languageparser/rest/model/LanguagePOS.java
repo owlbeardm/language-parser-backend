@@ -6,12 +6,18 @@ public class LanguagePOS extends Base {
 
     Long languageId;
     Long posId;
+    boolean usedInLanguage;
+    boolean connectedToLanguage;
 
-    public LanguagePOS(Long id, Long languageId, Long posId) {
+    public LanguagePOS(Long id, Long languageId, Long posId, boolean usedInLanguage, boolean connectedToLanguage) {
         this.id = id;
         this.languageId = languageId;
         this.posId = posId;
+        this.usedInLanguage = usedInLanguage;
+        this.connectedToLanguage = connectedToLanguage;
     }
+
+
 
     public LanguagePOS() {
     }
@@ -30,5 +36,21 @@ public class LanguagePOS extends Base {
 
     public void setPosId(Long posId) {
         this.posId = posId;
+    }
+
+    public boolean isUsedInLanguage() {
+        return usedInLanguage;
+    }
+
+    public void setUsedInLanguage(boolean usedInLanguage) {
+        this.usedInLanguage = usedInLanguage;
+    }
+
+    public boolean isConnectedToLanguage() {
+        return connectedToLanguage;
+    }
+
+    public void setConnectedToLanguage(boolean connectedToLanguage) {
+        this.connectedToLanguage = connectedToLanguage;
     }
 }
