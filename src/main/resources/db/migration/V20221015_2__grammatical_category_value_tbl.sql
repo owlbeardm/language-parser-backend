@@ -11,3 +11,9 @@ CREATE TABLE grammatical_category_value_tbl
     CONSTRAINT grammatical_category_value_tbl_pkey PRIMARY KEY (id),
     CONSTRAINT grammatical_category_value_tbl_gc_id_fkey FOREIGN KEY (gc_id) REFERENCES grammatical_category_tbl (id)
 );
+
+CREATE TRIGGER grammatical_category_value_tbl
+    BEFORE INSERT OR UPDATE
+    ON grammatical_category_value_tbl
+    FOR EACH ROW
+EXECUTE PROCEDURE on_modi_when();

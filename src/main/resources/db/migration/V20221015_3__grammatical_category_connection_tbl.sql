@@ -13,5 +13,11 @@ CREATE TABLE grammatical_category_connection_tbl
     CONSTRAINT grammatical_category_connection_tbl_language_id_fkey FOREIGN KEY (language_id) REFERENCES language_tbl (id),
     CONSTRAINT grammatical_category_connection_tbl_gc_id_fkey FOREIGN KEY (gc_id) REFERENCES grammatical_category_tbl (id),
     CONSTRAINT grammatical_category_connection_tbl_pos_id_fkey FOREIGN KEY (pos_id) REFERENCES pos_tbl (id),
-    CONSTRAINT grammatical_category_connection_tbl_language_id_gc_id_pos_id_fkey UNIQUE (language_id, gc_id, pos_id)
+    CONSTRAINT gr_category_connection_tbl_language_id_gc_id_pos_id_fkey UNIQUE (language_id, gc_id, pos_id)
 );
+
+CREATE TRIGGER grammatical_category_connection_tbl
+    BEFORE INSERT OR UPDATE
+    ON grammatical_category_connection_tbl
+    FOR EACH ROW
+EXECUTE PROCEDURE on_modi_when();

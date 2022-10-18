@@ -10,3 +10,9 @@ CREATE TABLE grammatical_category_tbl
 
     CONSTRAINT grammatical_category_tbl_pkey PRIMARY KEY (id)
 );
+
+CREATE TRIGGER grammatical_category_tbl
+    BEFORE INSERT OR UPDATE
+    ON grammatical_category_tbl
+    FOR EACH ROW
+EXECUTE PROCEDURE on_modi_when();
