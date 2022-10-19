@@ -1,9 +1,6 @@
 package by.c7d5a6.languageparser.rest.controller;
 
-import by.c7d5a6.languageparser.rest.model.GrammaticalCategory;
-import by.c7d5a6.languageparser.rest.model.GrammaticalCategoryValue;
-import by.c7d5a6.languageparser.rest.model.LanguagePOS;
-import by.c7d5a6.languageparser.rest.model.POS;
+import by.c7d5a6.languageparser.rest.model.*;
 import by.c7d5a6.languageparser.service.GrammaticalCategoryService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -54,5 +51,26 @@ public class CategoryController {
     public Long saveGrammaticalCategoryValue(@RequestBody GrammaticalCategoryValue grammaticalCategoryValue) {
         logger.info("Save grammatical category value");
         return grammaticalCategoryService.saveGrammaticalCategoryValue(grammaticalCategoryValue);
+    }
+
+    @Operation(summary = "Get grammatical category connections")
+    @GetMapping("/{categoryId}/{languageId}/connections")
+    public List<GrammaticalCategoryConnection> getGrammaticalCategoryConnectionsForLang(@PathVariable Long categoryId, @PathVariable Long languageId) {
+        logger.info("Get grammatical category connections for category {} and language {}", categoryId, languageId);
+        return grammaticalCategoryService.getGrammaticalCategoryConnectionsForLang(categoryId, languageId);
+    }
+
+    @Operation(summary = "Save grammatical category connection")
+    @PostMapping("/connection")
+    public Long saveGrammaticalCategoryConnection(@RequestBody GrammaticalCategoryConnection grammaticalCategoryConnection) {
+        logger.info("Save grammatical category connection");
+        return grammaticalCategoryService.saveGrammaticalCategoryConnection(grammaticalCategoryConnection);
+    }
+
+    @Operation(summary = "Delete grammatical category connection")
+    @DeleteMapping("/connection/{connectionId}")
+    public void deleteGrammaticalCategoryConnection(@PathVariable Long connectionId) {
+        logger.info("Delete grammatical category connection");
+        grammaticalCategoryService.deleteGrammaticalCategoryConnection(connectionId);
     }
 }

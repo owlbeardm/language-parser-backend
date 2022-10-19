@@ -1,10 +1,13 @@
 package by.c7d5a6.languageparser.service;
 
 import by.c7d5a6.languageparser.entity.EGrammaticalCategory;
+import by.c7d5a6.languageparser.entity.EGrammaticalCategoryConnection;
 import by.c7d5a6.languageparser.entity.EGrammaticalCategoryValue;
+import by.c7d5a6.languageparser.repository.GrammaticalCategoryConnectionRepository;
 import by.c7d5a6.languageparser.repository.GrammaticalCategoryRepository;
 import by.c7d5a6.languageparser.repository.GrammaticalCategoryValueRepository;
 import by.c7d5a6.languageparser.rest.model.GrammaticalCategory;
+import by.c7d5a6.languageparser.rest.model.GrammaticalCategoryConnection;
 import by.c7d5a6.languageparser.rest.model.GrammaticalCategoryValue;
 import by.c7d5a6.languageparser.rest.security.IsEditor;
 import org.slf4j.Logger;
@@ -23,11 +26,13 @@ public class GrammaticalCategoryService extends BaseService {
 
     private final GrammaticalCategoryRepository grammaticalCategoryRepository;
     private final GrammaticalCategoryValueRepository grammaticalCategoryValueRepository;
+    private final GrammaticalCategoryConnectionRepository grammaticalCategoryConnectionRepository;
 
     @Autowired
-    public GrammaticalCategoryService(GrammaticalCategoryRepository grammaticalCategoryRepository, GrammaticalCategoryValueRepository grammaticalCategoryValueRepository) {
+    public GrammaticalCategoryService(GrammaticalCategoryRepository grammaticalCategoryRepository, GrammaticalCategoryValueRepository grammaticalCategoryValueRepository, GrammaticalCategoryConnectionRepository grammaticalCategoryConnectionRepository) {
         this.grammaticalCategoryRepository = grammaticalCategoryRepository;
         this.grammaticalCategoryValueRepository = grammaticalCategoryValueRepository;
+        this.grammaticalCategoryConnectionRepository = grammaticalCategoryConnectionRepository;
     }
 
     public List<GrammaticalCategory> getAllCategories() {
@@ -67,4 +72,17 @@ public class GrammaticalCategoryService extends BaseService {
         return result.getId();
     }
 
+    public List<GrammaticalCategoryConnection> getGrammaticalCategoryConnectionsForLang(Long categoryId, Long languageId) {
+        List<EGrammaticalCategoryConnection> connections = grammaticalCategoryConnectionRepository.findByGrammaticalCategory_IdAndLanguage_Id(categoryId, languageId);
+        return connections.stream().map((con) -> mapper.map(con, GrammaticalCategoryConnection.class)).collect(Collectors.toList());
+    }
+
+    public Long saveGrammaticalCategoryConnection(GrammaticalCategoryConnection grammaticalCategoryConnection) {
+        EGrammaticalCategoryConnection connection = mapper.map(grammaticalCategoryConnection, EGrammaticalCategoryConnection.class);
+        return grammaticalCategoryConnectionRepository.save(connection).getId();
+    }
+
+    public void deleteGrammaticalCategoryConnection(Long connectionId) {
+        grammaticalCategoryConnectionRepository.deleteById(connectionId);
+    }
 }
