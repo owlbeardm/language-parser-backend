@@ -73,4 +73,25 @@ public class CategoryController {
         logger.info("Delete grammatical category connection");
         grammaticalCategoryService.deleteGrammaticalCategoryConnection(connectionId);
     }
+
+    @Operation(summary = "Get grammatical value word connections")
+    @GetMapping("/{wordId}/valuebyword")
+    public List<GrammaticalValueWordConnection> getGrammaticalValuesByWord(@PathVariable Long wordId) {
+        logger.info("Get grammatical value word connections {}", wordId);
+        return grammaticalCategoryService.getGrammaticalValuesByWord(wordId);
+    }
+
+    @Operation(summary = "Replace grammatical value word connections")
+    @PostMapping("/valuebyword/replace")
+    public GrammaticalValueWordConnection replaceGrammaticalValuesByWord(@RequestBody GrammaticalValueWordConnection grammaticalValueWordConnection) {
+        logger.info("Replace grammatical value word connections");
+        return grammaticalCategoryService.replaceGrammaticalValuesByWord(grammaticalValueWordConnection);
+    }
+
+    @Operation(summary = "Remove grammatical value word connections")
+    @DeleteMapping("/valuebyword/{wordId}/{categoryId}")
+    public void removeGrammaticalValuesByWord(@PathVariable Long wordId, @PathVariable Long categoryId) {
+        logger.info("Remove grammatical value word {} connections for category {}", wordId, categoryId);
+        grammaticalCategoryService.removeGrammaticalValuesByWord(wordId, categoryId);
+    }
 }

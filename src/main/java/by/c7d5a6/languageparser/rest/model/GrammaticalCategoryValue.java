@@ -1,8 +1,9 @@
 package by.c7d5a6.languageparser.rest.model;
 
-public class GrammaticalCategoryValue {
+import by.c7d5a6.languageparser.rest.model.base.Base;
 
-    private Long id;
+public class GrammaticalCategoryValue extends Base {
+
     private String name;
     private GrammaticalCategory category;
 

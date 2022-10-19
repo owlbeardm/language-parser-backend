@@ -20,7 +20,7 @@ public class EGrammaticalCategoryValue extends BaseEntity implements Serializabl
     private String name;
     @ManyToOne
     @JoinColumn(name = "gc_id")
-    private EGrammaticalCategory grammaticalCategory;
+    private EGrammaticalCategory category;
 
     public String getName() {
         return name;
@@ -30,11 +30,11 @@ public class EGrammaticalCategoryValue extends BaseEntity implements Serializabl
         this.name = name;
     }
 
-    public EGrammaticalCategory getGrammaticalCategory() {
-        return grammaticalCategory;
+    public EGrammaticalCategory getCategory() {
+        return category;
     }
 
-    public void setGrammaticalCategory(EGrammaticalCategory grammaticalCategory) {
-        this.grammaticalCategory = grammaticalCategory;
+    public void setCategory(EGrammaticalCategory category) {
+        this.category = category;
     }
 }

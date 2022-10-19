@@ -1,14 +1,14 @@
 package by.c7d5a6.languageparser.service;
 
-import by.c7d5a6.languageparser.entity.EGrammaticalCategory;
-import by.c7d5a6.languageparser.entity.EGrammaticalCategoryConnection;
-import by.c7d5a6.languageparser.entity.EGrammaticalCategoryValue;
+import by.c7d5a6.languageparser.entity.*;
 import by.c7d5a6.languageparser.repository.GrammaticalCategoryConnectionRepository;
 import by.c7d5a6.languageparser.repository.GrammaticalCategoryRepository;
 import by.c7d5a6.languageparser.repository.GrammaticalCategoryValueRepository;
+import by.c7d5a6.languageparser.repository.GrammaticalValueWordRepository;
 import by.c7d5a6.languageparser.rest.model.GrammaticalCategory;
 import by.c7d5a6.languageparser.rest.model.GrammaticalCategoryConnection;
 import by.c7d5a6.languageparser.rest.model.GrammaticalCategoryValue;
+import by.c7d5a6.languageparser.rest.model.GrammaticalValueWordConnection;
 import by.c7d5a6.languageparser.rest.security.IsEditor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,15 +24,19 @@ public class GrammaticalCategoryService extends BaseService {
 
     private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
+    private final WordService wordService;
     private final GrammaticalCategoryRepository grammaticalCategoryRepository;
     private final GrammaticalCategoryValueRepository grammaticalCategoryValueRepository;
     private final GrammaticalCategoryConnectionRepository grammaticalCategoryConnectionRepository;
+    private final GrammaticalValueWordRepository grammaticalValueWordRepository;
 
     @Autowired
-    public GrammaticalCategoryService(GrammaticalCategoryRepository grammaticalCategoryRepository, GrammaticalCategoryValueRepository grammaticalCategoryValueRepository, GrammaticalCategoryConnectionRepository grammaticalCategoryConnectionRepository) {
+    public GrammaticalCategoryService(WordService wordService, GrammaticalCategoryRepository grammaticalCategoryRepository, GrammaticalCategoryValueRepository grammaticalCategoryValueRepository, GrammaticalCategoryConnectionRepository grammaticalCategoryConnectionRepository, GrammaticalValueWordRepository grammaticalValueWordRepository) {
+        this.wordService = wordService;
         this.grammaticalCategoryRepository = grammaticalCategoryRepository;
         this.grammaticalCategoryValueRepository = grammaticalCategoryValueRepository;
         this.grammaticalCategoryConnectionRepository = grammaticalCategoryConnectionRepository;
+        this.grammaticalValueWordRepository = grammaticalValueWordRepository;
     }
 
     public List<GrammaticalCategory> getAllCategories() {
@@ -40,7 +44,7 @@ public class GrammaticalCategoryService extends BaseService {
     }
 
     public List<GrammaticalCategoryValue> getCategoryValuesByCategory(Long categoryId) {
-        return grammaticalCategoryValueRepository.findByGrammaticalCategory_Id(categoryId).stream().map((egcv) -> mapper.map(egcv, GrammaticalCategoryValue.class)).collect(Collectors.toList());
+        return grammaticalCategoryValueRepository.findByCategory_Id(categoryId).stream().map((egcv) -> mapper.map(egcv, GrammaticalCategoryValue.class)).collect(Collectors.toList());
     }
 
     @IsEditor
@@ -65,7 +69,7 @@ public class GrammaticalCategoryService extends BaseService {
         } else {
             EGrammaticalCategory category = grammaticalCategoryRepository.getById(grammaticalCategoryValue.getCategory().getId());
             ecategoryValue = new EGrammaticalCategoryValue();
-            ecategoryValue.setGrammaticalCategory(category);
+            ecategoryValue.setCategory(category);
         }
         ecategoryValue.setName(grammaticalCategoryValue.getName());
         EGrammaticalCategoryValue result = grammaticalCategoryValueRepository.save(ecategoryValue);
@@ -84,5 +88,24 @@ public class GrammaticalCategoryService extends BaseService {
 
     public void deleteGrammaticalCategoryConnection(Long connectionId) {
         grammaticalCategoryConnectionRepository.deleteById(connectionId);
+    }
+
+    public List<GrammaticalValueWordConnection> getGrammaticalValuesByWord(Long wordId) {
+        return grammaticalValueWordRepository.findByWord_Id(wordId).stream().map(vwc -> mapper.map(vwc, GrammaticalValueWordConnection.class)).collect(Collectors.toList());
+    }
+
+    public GrammaticalValueWordConnection replaceGrammaticalValuesByWord(GrammaticalValueWordConnection grammaticalValueWordConnection) {
+        grammaticalValueWordRepository.deleteAllByWord_IdAndValue_Category_Id(grammaticalValueWordConnection.getWord().getId(), grammaticalValueWordConnection.getValue().getCategory().getId());
+        EGrammaticalValueWordConnection connection = new EGrammaticalValueWordConnection();
+        EGrammaticalCategoryValue eGrammaticalCategoryValue = grammaticalCategoryValueRepository.findById(grammaticalValueWordConnection.getValue().getId()).orElseThrow(() -> new IllegalArgumentException("no category value with id " + grammaticalValueWordConnection.getValue().getId()));
+        EWord word = wordService.getWordById(grammaticalValueWordConnection.getWord().getId());
+        connection.setWord(word);
+        connection.setValue(eGrammaticalCategoryValue);
+        EGrammaticalValueWordConnection result = grammaticalValueWordRepository.save(connection);
+        return mapper.map(result, GrammaticalValueWordConnection.class);
+    }
+
+    public void removeGrammaticalValuesByWord(Long wordId, Long categoryId) {
+        grammaticalValueWordRepository.deleteAllByWord_IdAndValue_Category_Id(wordId, categoryId);
     }
 }

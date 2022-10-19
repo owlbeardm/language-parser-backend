@@ -270,4 +270,8 @@ public class WordService extends BaseService {
         }).collect(Collectors.toList());
         this.wordsRepository.saveAllAndFlush(collected);
     }
+
+    public EWord getWordById(Long id) {
+        return wordsRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Word " + id + " not found"));
+    }
 }
