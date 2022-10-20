@@ -9,4 +9,5 @@ import java.util.List;
 public interface GrammaticalCategoryConnectionRepository extends IdLongVerRepository<EGrammaticalCategoryConnection> {
 
     List<EGrammaticalCategoryConnection> findByGrammaticalCategory_IdAndLanguage_Id(Long categoryId, Long languageId);
+    List<EGrammaticalCategoryConnection> findByPos_IdAndLanguage_Id(Long posId, Long languageId);
 }

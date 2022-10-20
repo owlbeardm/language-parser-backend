@@ -1,19 +1,14 @@
 package by.c7d5a6.languageparser.service;
 
 import by.c7d5a6.languageparser.entity.*;
-import by.c7d5a6.languageparser.repository.GrammaticalCategoryConnectionRepository;
-import by.c7d5a6.languageparser.repository.GrammaticalCategoryRepository;
-import by.c7d5a6.languageparser.repository.GrammaticalCategoryValueRepository;
-import by.c7d5a6.languageparser.repository.GrammaticalValueWordRepository;
-import by.c7d5a6.languageparser.rest.model.GrammaticalCategory;
-import by.c7d5a6.languageparser.rest.model.GrammaticalCategoryConnection;
-import by.c7d5a6.languageparser.rest.model.GrammaticalCategoryValue;
-import by.c7d5a6.languageparser.rest.model.GrammaticalValueWordConnection;
+import by.c7d5a6.languageparser.repository.*;
+import by.c7d5a6.languageparser.rest.model.*;
 import by.c7d5a6.languageparser.rest.security.IsEditor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.webjars.NotFoundException;
 
 import java.lang.invoke.MethodHandles;
 import java.util.List;
@@ -25,18 +20,22 @@ public class GrammaticalCategoryService extends BaseService {
     private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     private final WordService wordService;
+    private final LanguageService languageService;
     private final GrammaticalCategoryRepository grammaticalCategoryRepository;
     private final GrammaticalCategoryValueRepository grammaticalCategoryValueRepository;
     private final GrammaticalCategoryConnectionRepository grammaticalCategoryConnectionRepository;
     private final GrammaticalValueWordRepository grammaticalValueWordRepository;
+    private final GrammaticalCategoryValueConnectionRepository grammaticalCategoryValueConnectionRepository;
 
     @Autowired
-    public GrammaticalCategoryService(WordService wordService, GrammaticalCategoryRepository grammaticalCategoryRepository, GrammaticalCategoryValueRepository grammaticalCategoryValueRepository, GrammaticalCategoryConnectionRepository grammaticalCategoryConnectionRepository, GrammaticalValueWordRepository grammaticalValueWordRepository) {
+    public GrammaticalCategoryService(WordService wordService, LanguageService languageService, GrammaticalCategoryRepository grammaticalCategoryRepository, GrammaticalCategoryValueRepository grammaticalCategoryValueRepository, GrammaticalCategoryConnectionRepository grammaticalCategoryConnectionRepository, GrammaticalValueWordRepository grammaticalValueWordRepository, GrammaticalCategoryValueConnectionRepository grammaticalCategoryValueConnectionRepository) {
         this.wordService = wordService;
+        this.languageService = languageService;
         this.grammaticalCategoryRepository = grammaticalCategoryRepository;
         this.grammaticalCategoryValueRepository = grammaticalCategoryValueRepository;
         this.grammaticalCategoryConnectionRepository = grammaticalCategoryConnectionRepository;
         this.grammaticalValueWordRepository = grammaticalValueWordRepository;
+        this.grammaticalCategoryValueConnectionRepository = grammaticalCategoryValueConnectionRepository;
     }
 
     public List<GrammaticalCategory> getAllCategories() {
@@ -45,6 +44,10 @@ public class GrammaticalCategoryService extends BaseService {
 
     public List<GrammaticalCategoryValue> getCategoryValuesByCategory(Long categoryId) {
         return grammaticalCategoryValueRepository.findByCategory_Id(categoryId).stream().map((egcv) -> mapper.map(egcv, GrammaticalCategoryValue.class)).collect(Collectors.toList());
+    }
+
+    public List<GrammaticalCategoryValue> getCategoryValuesByCategoryAndLang(Long categoryId, Long langId) {
+        return grammaticalCategoryValueRepository.findByCategoryAndLang(categoryId, langId).stream().map((egcv) -> mapper.map(egcv, GrammaticalCategoryValue.class)).collect(Collectors.toList());
     }
 
     @IsEditor
@@ -111,5 +114,28 @@ public class GrammaticalCategoryService extends BaseService {
     @IsEditor
     public void removeGrammaticalValuesByWord(Long wordId, Long categoryId) {
         grammaticalValueWordRepository.deleteAllByWord_IdAndValue_Category_Id(wordId, categoryId);
+    }
+
+    public List<GrammaticalCategoryValueConnection> getGrammaticalValuesConnectionByLang(Long langId) {
+        return grammaticalCategoryValueConnectionRepository.findByLanguage_Id(langId).stream().map(gcvc -> mapper.map(gcvc, GrammaticalCategoryValueConnection.class)).collect(Collectors.toList());
+    }
+
+    public Long saveGrammaticalValuesConnection(GrammaticalCategoryValueConnection grammaticalCategoryValueConnection) {
+        EGrammaticalCategoryValue eGrammaticalCategoryValue = grammaticalCategoryValueRepository.findById(grammaticalCategoryValueConnection.getValue().getId()).orElseThrow(() -> new NotFoundException("Not found value" + grammaticalCategoryValueConnection.getValue().getId()));
+        ELanguage eLanguage = languageService.getLangById(grammaticalCategoryValueConnection.getLanguage().getId()).orElseThrow(() -> new NotFoundException("Not found language" + grammaticalCategoryValueConnection.getLanguage().getId()));
+        EGrammaticalCategoryValueConnection result = new EGrammaticalCategoryValueConnection();
+        result.setLanguage(eLanguage);
+        result.setValue(eGrammaticalCategoryValue);
+        return grammaticalCategoryValueConnectionRepository.save(result).getId();
+    }
+
+    public void removeGrammaticalValuesConnectionById(Long grammaticalCategoryValueConnectionId) {
+        grammaticalCategoryValueConnectionRepository.deleteById(grammaticalCategoryValueConnectionId);
+    }
+
+
+    public List<GrammaticalCategoryConnection> getGrammaticalCategoryConnectionsForLangAndPos(Long posId, Long languageId) {
+        List<EGrammaticalCategoryConnection> connections = grammaticalCategoryConnectionRepository.findByPos_IdAndLanguage_Id(posId, languageId);
+        return connections.stream().map((con) -> mapper.map(con, GrammaticalCategoryConnection.class)).collect(Collectors.toList());
     }
 }
