@@ -67,6 +67,13 @@ public class CategoryController {
         return grammaticalCategoryService.getGrammaticalCategoryConnectionsForLang(categoryId, languageId);
     }
 
+    @Operation(summary = "Get grammatical category connections")
+    @GetMapping("/{posId}/{languageId}/connectionspos")
+    public List<GrammaticalCategoryConnection> getGrammaticalCategoryConnectionsForLangAndPos(@PathVariable Long posId, @PathVariable Long languageId) {
+        logger.info("Get grammatical category connections for pos {} and language {}", posId, languageId);
+        return grammaticalCategoryService.getGrammaticalCategoryConnectionsForLangAndPos(posId, languageId);
+    }
+
     @Operation(summary = "Save grammatical category connection")
     @PostMapping("/connection")
     public Long saveGrammaticalCategoryConnection(@RequestBody GrammaticalCategoryConnection grammaticalCategoryConnection) {

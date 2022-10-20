@@ -298,4 +298,8 @@ public class LanguageService extends BaseService {
     public List<LanguageConnection> getConnectionsTo(long toLangId) {
         return this.languageConnectionRepository.findByLangTo_Id(toLangId).stream().map(this::convertToRestModel).collect(Collectors.toList());
     }
+
+    public List<LanguageConnection> getConnections() {
+        return this.languageConnectionRepository.findAll().stream().map(this::convertToRestModel).collect(Collectors.toList());
+    }
 }

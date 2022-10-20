@@ -4,7 +4,6 @@ import by.c7d5a6.languageparser.enums.SoundChangePurpose;
 import by.c7d5a6.languageparser.rest.model.*;
 import by.c7d5a6.languageparser.rest.model.base.PageResult;
 import by.c7d5a6.languageparser.rest.model.filter.WordBorrowedListFilter;
-import by.c7d5a6.languageparser.rest.model.filter.WordListFilter;
 import by.c7d5a6.languageparser.rest.model.filter.WordWithEvolutionsListFilter;
 import by.c7d5a6.languageparser.rest.security.IsEditor;
 import by.c7d5a6.languageparser.service.EvolutionService;
@@ -36,6 +35,13 @@ public class EvolveController {
         this.evolutionService = evolutionService;
         this.languageService = languageService;
         this.soundChangesService = soundChangesService;
+    }
+
+    @Operation(summary = "Get connections")
+    @GetMapping("/connection/all")
+    public List<LanguageConnection> getConnections() {
+        logger.info("Get connections");
+        return languageService.getConnections();
     }
 
     @Operation(summary = "Get connection between two languages")

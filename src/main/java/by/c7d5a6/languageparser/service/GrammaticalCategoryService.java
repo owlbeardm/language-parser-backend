@@ -130,4 +130,8 @@ public class GrammaticalCategoryService extends BaseService {
     }
 
 
+    public List<GrammaticalCategoryConnection> getGrammaticalCategoryConnectionsForLangAndPos(Long posId, Long languageId) {
+        List<EGrammaticalCategoryConnection> connections = grammaticalCategoryConnectionRepository.findByPos_IdAndLanguage_Id(posId, languageId);
+        return connections.stream().map((con) -> mapper.map(con, GrammaticalCategoryConnection.class)).collect(Collectors.toList());
+    }
 }
