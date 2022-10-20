@@ -39,6 +39,13 @@ public class CategoryController {
         return grammaticalCategoryService.getCategoryValuesByCategory(categoryId);
     }
 
+    @Operation(summary = "Get grammatical categories values of category and lang")
+    @GetMapping("/{categoryId}/{langId}/values")
+    public List<GrammaticalCategoryValue> getCategoryValuesByCategoryAndLang(@PathVariable Long categoryId, @PathVariable Long langId) {
+        logger.info("Get grammatical categories values of category {} and lang {}", categoryId, langId);
+        return grammaticalCategoryService.getCategoryValuesByCategoryAndLang(categoryId, langId);
+    }
+
     @Operation(summary = "Save grammatical category")
     @PostMapping
     public Long saveGrammaticalCategory(@RequestBody GrammaticalCategory grammaticalCategory) {
@@ -79,6 +86,27 @@ public class CategoryController {
     public List<GrammaticalValueWordConnection> getGrammaticalValuesByWord(@PathVariable Long wordId) {
         logger.info("Get grammatical value word connections {}", wordId);
         return grammaticalCategoryService.getGrammaticalValuesByWord(wordId);
+    }
+
+    @Operation(summary = "Get grammatical values connection by lang")
+    @GetMapping("/{langId}/valuelangconnection")
+    public List<GrammaticalCategoryValueConnection> getGrammaticalValuesConnectionByLang(@PathVariable Long langId) {
+        logger.info("Get grammatical values connection by lang {}", langId);
+        return grammaticalCategoryService.getGrammaticalValuesConnectionByLang(langId);
+    }
+
+    @Operation(summary = "Replace grammatical values connection")
+    @PostMapping("/valuelangconnection")
+    public Long saveGrammaticalCategoryValueConnection(@RequestBody GrammaticalCategoryValueConnection gcvc) {
+        logger.info("Replace grammatical value word connections");
+        return grammaticalCategoryService.saveGrammaticalValuesConnection(gcvc);
+    }
+
+    @Operation(summary = "Remove grammatical values connection")
+    @DeleteMapping("/valuelangconnection/{gcvcId}")
+    public void removeGrammaticalCategoryValueConnection(@PathVariable Long gcvcId) {
+        logger.info("Remove grammatical values connection {}", gcvcId);
+        grammaticalCategoryService.removeGrammaticalValuesConnectionById(gcvcId);
     }
 
     @Operation(summary = "Replace grammatical value word connections")
