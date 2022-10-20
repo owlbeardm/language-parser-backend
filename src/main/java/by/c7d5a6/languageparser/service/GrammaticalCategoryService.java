@@ -81,11 +81,13 @@ public class GrammaticalCategoryService extends BaseService {
         return connections.stream().map((con) -> mapper.map(con, GrammaticalCategoryConnection.class)).collect(Collectors.toList());
     }
 
+    @IsEditor
     public Long saveGrammaticalCategoryConnection(GrammaticalCategoryConnection grammaticalCategoryConnection) {
         EGrammaticalCategoryConnection connection = mapper.map(grammaticalCategoryConnection, EGrammaticalCategoryConnection.class);
         return grammaticalCategoryConnectionRepository.save(connection).getId();
     }
 
+    @IsEditor
     public void deleteGrammaticalCategoryConnection(Long connectionId) {
         grammaticalCategoryConnectionRepository.deleteById(connectionId);
     }
@@ -94,6 +96,7 @@ public class GrammaticalCategoryService extends BaseService {
         return grammaticalValueWordRepository.findByWord_Id(wordId).stream().map(vwc -> mapper.map(vwc, GrammaticalValueWordConnection.class)).collect(Collectors.toList());
     }
 
+    @IsEditor
     public GrammaticalValueWordConnection replaceGrammaticalValuesByWord(GrammaticalValueWordConnection grammaticalValueWordConnection) {
         grammaticalValueWordRepository.deleteAllByWord_IdAndValue_Category_Id(grammaticalValueWordConnection.getWord().getId(), grammaticalValueWordConnection.getValue().getCategory().getId());
         EGrammaticalValueWordConnection connection = new EGrammaticalValueWordConnection();
@@ -105,6 +108,7 @@ public class GrammaticalCategoryService extends BaseService {
         return mapper.map(result, GrammaticalValueWordConnection.class);
     }
 
+    @IsEditor
     public void removeGrammaticalValuesByWord(Long wordId, Long categoryId) {
         grammaticalValueWordRepository.deleteAllByWord_IdAndValue_Category_Id(wordId, categoryId);
     }

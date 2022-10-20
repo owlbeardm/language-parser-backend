@@ -43,7 +43,7 @@ public class WordsController {
 
     @Operation(summary = "Get all words")
     @GetMapping("/all")
-    public PageResult<WordWithWritten> getAllWords(@Valid WordListFilter filter) {
+    public PageResult<WordWithCategoryValues> getAllWords(@Valid WordListFilter filter) {
         return wordService.getAllWords(filter);
     }
 

@@ -5,6 +5,7 @@ import by.c7d5a6.languageparser.entity.specification.EWordSpecification;
 import by.c7d5a6.languageparser.entity.specification.SearchCriteria;
 import by.c7d5a6.languageparser.enums.SoundChangePurpose;
 import by.c7d5a6.languageparser.enums.WordOriginType;
+import by.c7d5a6.languageparser.repository.GrammaticalValueWordRepository;
 import by.c7d5a6.languageparser.repository.WordsOriginSourceRepository;
 import by.c7d5a6.languageparser.repository.WordsRepository;
 import by.c7d5a6.languageparser.rest.model.*;
@@ -32,19 +33,21 @@ public class WordService extends BaseService {
 
     private final WordsRepository wordsRepository;
     private final WordsOriginSourceRepository wordsOriginSourceRepository;
+    private final GrammaticalValueWordRepository grammaticalValueWordRepository;
     private final LanguageService languageService;
     private final POSService posService;
     private final SoundChangesService soundChangesService;
     private final TranslationService translationService;
 
     @Autowired
-    public WordService(TranslationService translationService, SoundChangesService soundChangesService, WordsRepository wordsRepository, WordsOriginSourceRepository wordsOriginSourceRepository, LanguageService languageService, POSService posService) {
+    public WordService(TranslationService translationService, SoundChangesService soundChangesService, WordsRepository wordsRepository, WordsOriginSourceRepository wordsOriginSourceRepository, LanguageService languageService, POSService posService, GrammaticalValueWordRepository grammaticalValueWordRepository) {
         this.wordsRepository = wordsRepository;
         this.wordsOriginSourceRepository = wordsOriginSourceRepository;
         this.languageService = languageService;
         this.posService = posService;
         this.soundChangesService = soundChangesService;
         this.translationService = translationService;
+        this.grammaticalValueWordRepository = grammaticalValueWordRepository;
     }
 
     public List<Word> getAllWordsFromLang(Long langId) {
@@ -53,7 +56,7 @@ public class WordService extends BaseService {
     }
 
 
-    public PageResult<WordWithWritten> getAllWords(WordListFilter filter) {
+    public PageResult<WordWithCategoryValues> getAllWords(WordListFilter filter) {
         ELanguage eLanguage = Optional.ofNullable(filter.getLanguageId()).flatMap(languageService::getLangById).orElse(null);
         EPOS epos = Optional.ofNullable(filter.getPosId()).flatMap(posService::getPOSById).orElse(null);
         EWordSpecification spec1 = new EWordSpecification(new SearchCriteria("word", ":", filter.getWord()));
@@ -61,8 +64,15 @@ public class WordService extends BaseService {
         EWordSpecification spec3 = new EWordSpecification(new SearchCriteria("partOfSpeech", ":", epos));
         return PageResult.from(
                 getAllWordsPage(filter),
-                this::getWordWithWritten
+                this::getWordWithCategoryValues
         );
+    }
+
+    private WordWithCategoryValues getWordWithCategoryValues(EWord word) {
+        WordWithCategoryValues wcv = mapper.map(getWordWithWritten(word), WordWithCategoryValues.class);
+        List<GrammaticalCategoryValue> collect = grammaticalValueWordRepository.findByWord_Id(word.getId()).stream().map(connection -> mapper.map(connection.getValue(), GrammaticalCategoryValue.class)).collect(Collectors.toList());
+        wcv.setGrammaticalValues(collect);
+        return wcv;
     }
 
     public Page<EWord> getAllWordsPage(WordListFilter filter) {
