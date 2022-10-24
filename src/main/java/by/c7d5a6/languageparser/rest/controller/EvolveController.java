@@ -1,5 +1,6 @@
 package by.c7d5a6.languageparser.rest.controller;
 
+import by.c7d5a6.languageparser.entity.EGrammaticalValueEvolution;
 import by.c7d5a6.languageparser.enums.SoundChangePurpose;
 import by.c7d5a6.languageparser.rest.model.*;
 import by.c7d5a6.languageparser.rest.model.base.PageResult;
@@ -7,6 +8,7 @@ import by.c7d5a6.languageparser.rest.model.filter.WordBorrowedListFilter;
 import by.c7d5a6.languageparser.rest.model.filter.WordWithEvolutionsListFilter;
 import by.c7d5a6.languageparser.rest.security.IsEditor;
 import by.c7d5a6.languageparser.service.EvolutionService;
+import by.c7d5a6.languageparser.service.GrammaticalCategoryService;
 import by.c7d5a6.languageparser.service.LanguageService;
 import by.c7d5a6.languageparser.service.SoundChangesService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -29,12 +31,14 @@ public class EvolveController {
     private final EvolutionService evolutionService;
     private final LanguageService languageService;
     private final SoundChangesService soundChangesService;
+    private final GrammaticalCategoryService grammaticalCategoryService;
 
     @Autowired
-    public EvolveController(EvolutionService evolutionService, LanguageService languageService, SoundChangesService soundChangesService) {
+    public EvolveController(EvolutionService evolutionService, LanguageService languageService, SoundChangesService soundChangesService, GrammaticalCategoryService grammaticalCategoryService) {
         this.evolutionService = evolutionService;
         this.languageService = languageService;
         this.soundChangesService = soundChangesService;
+        this.grammaticalCategoryService = grammaticalCategoryService;
     }
 
     @Operation(summary = "Get connections")
@@ -208,6 +212,27 @@ public class EvolveController {
     @GetMapping("/graph")
     public String getLanguageGraph() {
         return evolutionService.getGraph();
+    }
+
+    @Operation(summary = "Get grammatical value evolution")
+    @GetMapping("/grammaticalvalue/{langFromId}/{langToId}/{posId}/{valueFromId}")
+    public GrammaticalValueEvolution getGrammaticalValueEvolution(@PathVariable Long langFromId, @PathVariable Long langToId, @PathVariable Long posId, @PathVariable Long valueFromId) {
+        logger.info("Get grammatical value evolution lang from {}, lang to {}, pos {}, value from {}", langFromId, langToId, posId, valueFromId);
+        return grammaticalCategoryService.getGrammaticalValueEvolution(langFromId, langToId, posId, valueFromId);
+    }
+
+    @Operation(summary = "Save grammatical value evolution")
+    @PostMapping("/grammaticalvalue")
+    public Long saveGrammaticalValueEvolution(@RequestBody GrammaticalValueEvolution grammaticalValueEvolution) {
+        logger.info("Save grammatical value evolution");
+        return grammaticalCategoryService.saveGrammaticalValueEvolution(grammaticalValueEvolution);
+    }
+
+    @Operation(summary = "Delete grammatical value evolution")
+    @DeleteMapping("/grammaticalvalue/{id}")
+    public void removeGrammaticalValueEvolution(@PathVariable Long id) {
+        logger.info("Save grammatical value evolution");
+        grammaticalCategoryService.removeGrammaticalValueEvolution(id);
     }
 
 }

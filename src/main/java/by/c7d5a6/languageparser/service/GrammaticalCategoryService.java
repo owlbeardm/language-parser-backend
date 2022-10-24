@@ -12,6 +12,7 @@ import org.webjars.NotFoundException;
 
 import java.lang.invoke.MethodHandles;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -26,9 +27,17 @@ public class GrammaticalCategoryService extends BaseService {
     private final GrammaticalCategoryConnectionRepository grammaticalCategoryConnectionRepository;
     private final GrammaticalValueWordRepository grammaticalValueWordRepository;
     private final GrammaticalCategoryValueConnectionRepository grammaticalCategoryValueConnectionRepository;
+    private final GrammaticalValueEvolutionRepository grammaticalValueEvolutionRepository;
 
     @Autowired
-    public GrammaticalCategoryService(WordService wordService, LanguageService languageService, GrammaticalCategoryRepository grammaticalCategoryRepository, GrammaticalCategoryValueRepository grammaticalCategoryValueRepository, GrammaticalCategoryConnectionRepository grammaticalCategoryConnectionRepository, GrammaticalValueWordRepository grammaticalValueWordRepository, GrammaticalCategoryValueConnectionRepository grammaticalCategoryValueConnectionRepository) {
+    public GrammaticalCategoryService(WordService wordService,
+                                      LanguageService languageService,
+                                      GrammaticalCategoryRepository grammaticalCategoryRepository,
+                                      GrammaticalCategoryValueRepository grammaticalCategoryValueRepository,
+                                      GrammaticalCategoryConnectionRepository grammaticalCategoryConnectionRepository,
+                                      GrammaticalValueWordRepository grammaticalValueWordRepository,
+                                      GrammaticalCategoryValueConnectionRepository grammaticalCategoryValueConnectionRepository,
+                                      GrammaticalValueEvolutionRepository grammaticalValueEvolutionRepository) {
         this.wordService = wordService;
         this.languageService = languageService;
         this.grammaticalCategoryRepository = grammaticalCategoryRepository;
@@ -36,6 +45,7 @@ public class GrammaticalCategoryService extends BaseService {
         this.grammaticalCategoryConnectionRepository = grammaticalCategoryConnectionRepository;
         this.grammaticalValueWordRepository = grammaticalValueWordRepository;
         this.grammaticalCategoryValueConnectionRepository = grammaticalCategoryValueConnectionRepository;
+        this.grammaticalValueEvolutionRepository = grammaticalValueEvolutionRepository;
     }
 
     public List<GrammaticalCategory> getAllCategories() {
@@ -120,6 +130,7 @@ public class GrammaticalCategoryService extends BaseService {
         return grammaticalCategoryValueConnectionRepository.findByLanguage_Id(langId).stream().map(gcvc -> mapper.map(gcvc, GrammaticalCategoryValueConnection.class)).collect(Collectors.toList());
     }
 
+    @IsEditor
     public Long saveGrammaticalValuesConnection(GrammaticalCategoryValueConnection grammaticalCategoryValueConnection) {
         EGrammaticalCategoryValue eGrammaticalCategoryValue = grammaticalCategoryValueRepository.findById(grammaticalCategoryValueConnection.getValue().getId()).orElseThrow(() -> new NotFoundException("Not found value" + grammaticalCategoryValueConnection.getValue().getId()));
         ELanguage eLanguage = languageService.getLangById(grammaticalCategoryValueConnection.getLanguage().getId()).orElseThrow(() -> new NotFoundException("Not found language" + grammaticalCategoryValueConnection.getLanguage().getId()));
@@ -129,13 +140,32 @@ public class GrammaticalCategoryService extends BaseService {
         return grammaticalCategoryValueConnectionRepository.save(result).getId();
     }
 
+    @IsEditor
     public void removeGrammaticalValuesConnectionById(Long grammaticalCategoryValueConnectionId) {
         grammaticalCategoryValueConnectionRepository.deleteById(grammaticalCategoryValueConnectionId);
     }
 
-
     public List<GrammaticalCategoryConnection> getGrammaticalCategoryConnectionsForLangAndPos(Long posId, Long languageId) {
         List<EGrammaticalCategoryConnection> connections = grammaticalCategoryConnectionRepository.findByPos_IdAndLanguage_Id(posId, languageId);
         return connections.stream().map((con) -> mapper.map(con, GrammaticalCategoryConnection.class)).collect(Collectors.toList());
+    }
+
+    public GrammaticalValueEvolution getGrammaticalValueEvolution(Long langFromId, Long langToId, Long posId, Long valueFromId) {
+        Optional<EGrammaticalValueEvolution> byLanguageFrom_idAndLanguageTo_idAndPos_idAndValueFrom_id = grammaticalValueEvolutionRepository.findByLanguageFrom_IdAndLanguageTo_IdAndPos_IdAndValueFrom_Id(langFromId, langToId, posId, valueFromId);
+        if (byLanguageFrom_idAndLanguageTo_idAndPos_idAndValueFrom_id.isEmpty()) {
+            return null;
+        }
+        return mapper.map(byLanguageFrom_idAndLanguageTo_idAndPos_idAndValueFrom_id.get(), GrammaticalValueEvolution.class);
+    }
+
+    @IsEditor
+    public Long saveGrammaticalValueEvolution(GrammaticalValueEvolution grammaticalValueEvolution) {
+        EGrammaticalValueEvolution gve = mapper.map(grammaticalValueEvolution, EGrammaticalValueEvolution.class);
+        return grammaticalValueEvolutionRepository.save(gve).getId();
+    }
+
+    @IsEditor
+    public void removeGrammaticalValueEvolution(Long id) {
+        grammaticalValueEvolutionRepository.deleteById(id);
     }
 }
