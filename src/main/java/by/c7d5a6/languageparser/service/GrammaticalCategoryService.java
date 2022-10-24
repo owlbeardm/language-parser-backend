@@ -112,13 +112,17 @@ public class GrammaticalCategoryService extends BaseService {
     @IsEditor
     public GrammaticalValueWordConnection replaceGrammaticalValuesByWord(GrammaticalValueWordConnection grammaticalValueWordConnection) {
         grammaticalValueWordRepository.deleteAllByWord_IdAndValue_Category_Id(grammaticalValueWordConnection.getWord().getId(), grammaticalValueWordConnection.getValue().getCategory().getId());
-        EGrammaticalValueWordConnection connection = new EGrammaticalValueWordConnection();
-        EGrammaticalCategoryValue eGrammaticalCategoryValue = grammaticalCategoryValueRepository.findById(grammaticalValueWordConnection.getValue().getId()).orElseThrow(() -> new IllegalArgumentException("no category value with id " + grammaticalValueWordConnection.getValue().getId()));
+        EGrammaticalCategoryValue value = grammaticalCategoryValueRepository.findById(grammaticalValueWordConnection.getValue().getId()).orElseThrow(() -> new IllegalArgumentException("no category value with id " + grammaticalValueWordConnection.getValue().getId()));
         EWord word = wordService.getWordById(grammaticalValueWordConnection.getWord().getId());
+        EGrammaticalValueWordConnection result = saveWordValueConnection(word, value);
+        return mapper.map(result, GrammaticalValueWordConnection.class);
+    }
+
+    private EGrammaticalValueWordConnection saveWordValueConnection(EWord word, EGrammaticalCategoryValue eGrammaticalCategoryValue) {
+        EGrammaticalValueWordConnection connection = new EGrammaticalValueWordConnection();
         connection.setWord(word);
         connection.setValue(eGrammaticalCategoryValue);
-        EGrammaticalValueWordConnection result = grammaticalValueWordRepository.save(connection);
-        return mapper.map(result, GrammaticalValueWordConnection.class);
+        return grammaticalValueWordRepository.save(connection);
     }
 
     @IsEditor
@@ -167,5 +171,18 @@ public class GrammaticalCategoryService extends BaseService {
     @IsEditor
     public void removeGrammaticalValueEvolution(Long id) {
         grammaticalValueEvolutionRepository.deleteById(id);
+    }
+
+    public void addGrammaticalCategoryEvolutionToTheWord(EWord oldWord, EWord newWord) {
+        grammaticalValueWordRepository.findByWord_Id(oldWord.getId()).forEach((vw) -> {
+            Optional<EGrammaticalValueEvolution> newVal = grammaticalValueEvolutionRepository.findByLanguageFrom_IdAndLanguageTo_IdAndPos_IdAndValueFrom_Id(
+                    oldWord.getLanguage().getId(),
+                    newWord.getLanguage().getId(),
+                    oldWord.getPartOfSpeech().getId(),
+                    vw.getValue().getId());
+            newVal.ifPresent(eGrammaticalValueEvolution -> {
+                saveWordValueConnection(newWord, eGrammaticalValueEvolution.getValueTo());
+            });
+        });
     }
 }

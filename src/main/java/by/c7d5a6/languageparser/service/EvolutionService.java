@@ -5,6 +5,7 @@ import by.c7d5a6.languageparser.entity.base.BaseEntity;
 import by.c7d5a6.languageparser.entity.models.EWordWithEvolutionConnectionsIds;
 import by.c7d5a6.languageparser.enums.LanguageConnectionType;
 import by.c7d5a6.languageparser.enums.WordOriginType;
+import by.c7d5a6.languageparser.repository.GrammaticalCategoryValueConnectionRepository;
 import by.c7d5a6.languageparser.repository.LanguageConnectionRepository;
 import by.c7d5a6.languageparser.repository.WordsOriginSourceRepository;
 import by.c7d5a6.languageparser.repository.WordsRepository;
@@ -37,15 +38,23 @@ public class EvolutionService extends BaseService {
     private final LanguageService languageService;
     private final WordService wordService;
     private final SoundChangesService soundChangesService;
+    private final GrammaticalCategoryService grammaticalCategoryService;
 
     @Autowired
-    public EvolutionService(LanguageService languageService, SoundChangesService soundChangesService, WordsRepository wordsRepository, LanguageConnectionRepository languageConnectionRepository, WordsOriginSourceRepository wordsOriginSourceRepository, WordService wordService) {
+    public EvolutionService(LanguageService languageService,
+                            SoundChangesService soundChangesService,
+                            WordsRepository wordsRepository,
+                            LanguageConnectionRepository languageConnectionRepository,
+                            WordsOriginSourceRepository wordsOriginSourceRepository,
+                            WordService wordService,
+                            GrammaticalCategoryService grammaticalCategoryService) {
         this.soundChangesService = soundChangesService;
         this.wordsRepository = wordsRepository;
         this.languageConnectionRepository = languageConnectionRepository;
         this.wordsOriginSourceRepository = wordsOriginSourceRepository;
         this.languageService = languageService;
         this.wordService = wordService;
+        this.grammaticalCategoryService = grammaticalCategoryService;
     }
 
     public List<WordTraceResult> trace(String word, List<Language> languages) {
@@ -176,6 +185,8 @@ public class EvolutionService extends BaseService {
         newWordOriginSource.setWord(newWord);
         wordsOriginSourceRepository.save(newWordOriginSource);
 
+        addGrammaticalCategoryEvolutionToTheWord(wordSource, newWord);
+
         WordWithEvolution wordWithEvolution = new WordWithEvolution();
         wordWithEvolution.setCalculatedEvolution(newWordText);
         wordWithEvolution.setWordEvolved(convertToRestModel(newWord));
@@ -183,6 +194,10 @@ public class EvolutionService extends BaseService {
         wordWithEvolution.setWordEvolvedType(eLanguageConnection.getConnectionType());
         wordWithEvolution.setLanguageConnection(convertToRestModel(eLanguageConnection));
         return wordWithEvolution;
+    }
+
+    private void addGrammaticalCategoryEvolutionToTheWord(EWord oldWord, EWord newWord) {
+        grammaticalCategoryService.addGrammaticalCategoryEvolutionToTheWord(oldWord, newWord);
     }
 
     public String getGraph() {
@@ -269,6 +284,9 @@ public class EvolutionService extends BaseService {
         newWord.setPartOfSpeech(wordSource.getPartOfSpeech());
         newWord.setSourceType(WordOriginType.BORROWED);
         newWord = wordsRepository.save(newWord);
+
+        addGrammaticalCategoryEvolutionToTheWord(wordSource, newWord);
+
         newWordOriginSource.setSourceInitialVersion(wordSource.getWord());
         newWordOriginSource.setWord(newWord);
         newWordOriginSource = wordsOriginSourceRepository.save(newWordOriginSource);
