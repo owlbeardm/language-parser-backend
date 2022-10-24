@@ -1,6 +1,8 @@
 package by.c7d5a6.languageparser.rest.model;
 
-public class GrammaticalValueEvolution {
+import by.c7d5a6.languageparser.rest.model.base.Base;
+
+public class GrammaticalValueEvolution extends Base {
     private POS pos;
     private Language languageFrom;
     private Language languageTo;
