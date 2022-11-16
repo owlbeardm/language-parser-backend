@@ -60,6 +60,10 @@ public class GrammaticalCategoryService extends BaseService {
         return grammaticalCategoryValueRepository.findByCategoryAndLang(categoryId, langId).stream().map((egcv) -> mapper.map(egcv, GrammaticalCategoryValue.class)).collect(Collectors.toList());
     }
 
+    public Optional<EGrammaticalCategory> getGrammaticalCategoryById(long id) {
+        return grammaticalCategoryRepository.findById(id);
+    }
+
     @IsEditor
     public Long saveGrammaticalCategory(GrammaticalCategory grammaticalCategory) {
         EGrammaticalCategory ecategory;

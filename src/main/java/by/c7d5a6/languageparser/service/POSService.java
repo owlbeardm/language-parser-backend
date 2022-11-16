@@ -1,5 +1,6 @@
 package by.c7d5a6.languageparser.service;
 
+import by.c7d5a6.languageparser.entity.EGrammaticalCategory;
 import by.c7d5a6.languageparser.entity.ELanguage;
 import by.c7d5a6.languageparser.entity.ELanguagePOS;
 import by.c7d5a6.languageparser.entity.EPOS;
@@ -18,8 +19,8 @@ import org.springframework.stereotype.Service;
 import java.lang.invoke.MethodHandles;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Stream;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Service
 public class POSService extends BaseService {
@@ -37,6 +38,10 @@ public class POSService extends BaseService {
         this.posRepository = posRepository;
         this.languagePOSRepository = languagePOSRepository;
         this.wordsRepository = wordsRepository;
+    }
+
+    public Optional<EPOS> getPosById(long id) {
+        return posRepository.findById(id);
     }
 
     @IsEditor
@@ -59,7 +64,7 @@ public class POSService extends BaseService {
             if (used.stream().anyMatch((ulp) -> ulp.getPosId().equals(lp.getPosId()))) lp.setUsedInLanguage(true);
         });
         return Stream.concat(
-                used.stream().filter((ulp)-> connected.stream().noneMatch((clp) -> clp.getPosId().equals(ulp.getPosId()))),
+                used.stream().filter((ulp) -> connected.stream().noneMatch((clp) -> clp.getPosId().equals(ulp.getPosId()))),
                 connected.stream()).collect(Collectors.toList());
     }
 
