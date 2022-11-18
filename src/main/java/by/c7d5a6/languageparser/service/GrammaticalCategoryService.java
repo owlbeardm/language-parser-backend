@@ -189,4 +189,8 @@ public class GrammaticalCategoryService extends BaseService {
             });
         });
     }
+
+    public Optional<EGrammaticalCategoryValue> getValueById(Long id) {
+        return grammaticalCategoryValueRepository.findById(id);
+    }
 }

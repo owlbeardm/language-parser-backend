@@ -1,0 +1,1 @@
+DROP TRIGGER declension_grm_value_tbl_trigger ON declension_grm_value_tbl;

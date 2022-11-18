@@ -1,6 +1,7 @@
 package by.c7d5a6.languageparser.rest.controller;
 
 import by.c7d5a6.languageparser.rest.model.DeclensionConnection;
+import by.c7d5a6.languageparser.rest.model.DeclensionFull;
 import by.c7d5a6.languageparser.service.DeclensionService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -44,5 +45,26 @@ public class DeclensionController {
     public void deleteDeclensionConnection(@PathVariable Long connectionId) {
         logger.info("Delete declensions connected");
         declensionService.deleteDeclensionConnection(connectionId);
+    }
+
+    @Operation(summary = "Get declensions by lang and pos")
+    @GetMapping("/declensions/{languageId}/{posId}")
+    public List<DeclensionFull> getDeclensionsByLangAndPos(@PathVariable Long languageId, @PathVariable Long posId) {
+        logger.info("Get declensions by lang {} and pos {}", languageId, posId);
+        return declensionService.getFullDeclensions(languageId, posId);
+    }
+
+    @Operation(summary = "Save declension")
+    @PostMapping("/declension")
+    public DeclensionFull saveDeclension(@RequestBody DeclensionFull newDeclension) {
+        logger.info("Save declensions connected");
+        return declensionService.saveDeclension(newDeclension);
+    }
+
+    @Operation(summary = "Delete declension")
+    @DeleteMapping("/declension/{declensionId}")
+    public void deleteDeclension(@PathVariable Long declensionId) {
+        logger.info("Delete declension {}", declensionId);
+        declensionService.deleteDeclension(declensionId);
     }
 }
