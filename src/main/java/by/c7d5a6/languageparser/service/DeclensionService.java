@@ -3,6 +3,7 @@ package by.c7d5a6.languageparser.service;
 import by.c7d5a6.languageparser.entity.*;
 import by.c7d5a6.languageparser.repository.DeclensionConnectionRepository;
 import by.c7d5a6.languageparser.repository.DeclensionRepository;
+import by.c7d5a6.languageparser.repository.DeclensionRuleRepository;
 import by.c7d5a6.languageparser.rest.model.*;
 import by.c7d5a6.languageparser.rest.security.IsEditor;
 import org.slf4j.Logger;
@@ -13,6 +14,7 @@ import org.webjars.NotFoundException;
 
 import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -25,6 +27,7 @@ public class DeclensionService extends BaseService {
     private final LanguageService languageService;
     private final GrammaticalCategoryService grammaticalCategoryService;
     private final DeclensionRepository declensionRepository;
+    private final DeclensionRuleRepository declensionRuleRepository;
     private final DeclensionConnectionRepository declensionConnectionRepository;
 
     @Autowired
@@ -32,11 +35,13 @@ public class DeclensionService extends BaseService {
                              LanguageService languageService,
                              GrammaticalCategoryService grammaticalCategoryService,
                              DeclensionRepository declensionRepository,
+                             DeclensionRuleRepository declensionRuleRepository,
                              DeclensionConnectionRepository declensionConnectionRepository) {
         this.posService = posService;
         this.languageService = languageService;
         this.grammaticalCategoryService = grammaticalCategoryService;
         this.declensionRepository = declensionRepository;
+        this.declensionRuleRepository = declensionRuleRepository;
         this.declensionConnectionRepository = declensionConnectionRepository;
     }
 
@@ -156,4 +161,42 @@ public class DeclensionService extends BaseService {
         declensionRepository.deleteById(declensionId);
     }
 
+    public List<DeclensionRule> getDeclensionRules(Long declensionId) {
+        return declensionRuleRepository.findByDeclension_Id(declensionId).stream().map(this::convertDeclensionRule).collect(Collectors.toList());
+    }
+
+    private DeclensionRule convertDeclensionRule(EDeclensionRule edr) {
+        DeclensionRule result = mapper.map(edr, DeclensionRule.class);
+        result.getDeclension().setValues(edr.getDeclension().getValues().stream().map(v -> mapper.map(v, GrammaticalCategoryValue.class)).collect(Collectors.toList()));
+        result.setValues(edr.getValues().stream().map(v -> mapper.map(v, GrammaticalCategoryValue.class)).collect(Collectors.toList()));
+        return result;
+    }
+
+    @IsEditor
+    public DeclensionRule saveDeclensionRule(DeclensionRule declensionRule) {
+        EDeclensionRule eDeclensionRule;
+        if (declensionRule.getId() != null) {
+            eDeclensionRule = declensionRuleRepository.findById(declensionRule.getId()).orElseThrow(() -> new NotFoundException("No declension rule"));
+        } else {
+            eDeclensionRule = new EDeclensionRule();
+            EDeclension eDeclension = declensionRepository.findById(declensionRule.getDeclension().getId()).orElseThrow(() -> new NotFoundException("No declension"));
+            eDeclensionRule.setDeclension(eDeclension);
+        }
+        eDeclensionRule.setName(declensionRule.getName());
+        eDeclensionRule.setEnabled(declensionRule.getEnabled());
+        eDeclensionRule.setWordPattern(declensionRule.getWordPattern());
+        eDeclensionRule.setValues(new HashSet<>());
+        if (declensionRule.getValues() != null)
+            for (GrammaticalCategoryValue value : declensionRule.getValues()) {
+                EGrammaticalCategoryValue eGrammaticalCategoryValue = grammaticalCategoryService.getValueById(value.getId()).orElseThrow(() -> new NotFoundException("Not found value " + value.getId()));
+                eDeclensionRule.getValues().add(eGrammaticalCategoryValue);
+            }
+        EDeclensionRule save = declensionRuleRepository.save(eDeclensionRule);
+        return convertDeclensionRule(save);
+    }
+
+    @IsEditor
+    public void deleteDeclensionRule(Long declensionRuleId) {
+        declensionRuleRepository.deleteById(declensionRuleId);
+    }
 }

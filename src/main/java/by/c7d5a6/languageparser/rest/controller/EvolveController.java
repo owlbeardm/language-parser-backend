@@ -1,6 +1,5 @@
 package by.c7d5a6.languageparser.rest.controller;
 
-import by.c7d5a6.languageparser.entity.EGrammaticalValueEvolution;
 import by.c7d5a6.languageparser.enums.SoundChangePurpose;
 import by.c7d5a6.languageparser.rest.model.*;
 import by.c7d5a6.languageparser.rest.model.base.PageResult;
@@ -147,18 +146,32 @@ public class EvolveController {
         return soundChangesService.getSoundChangesByLang(fromLangId, soundChangePurpose);
     }
 
+    @Operation(summary = "Get all sound changes")
+    @GetMapping("/sc/rule/{soundChangePurpose}/{ruleId}")
+    public List<SoundChange> getSoundChangesByRule(@PathVariable SoundChangePurpose soundChangePurpose, @PathVariable long ruleId) {
+        logger.info("Get all sound changes from {}, {}", ruleId, soundChangePurpose);
+        return soundChangesService.getSoundChangesByRule(ruleId, soundChangePurpose);
+    }
+
     @Operation(summary = "Save all sound changes from text form")
     @PostMapping("/sc/raw/lang/{soundChangePurpose}/{fromLangId}/{toLangId}")
     public void saveSoundChangesRawLinesByLangs(@PathVariable SoundChangePurpose soundChangePurpose, @PathVariable long fromLangId, @PathVariable long toLangId, @RequestBody String rawLines) {
         logger.info("Save all sound changes from text form from {}, {}", fromLangId, toLangId, soundChangePurpose);
-        soundChangesService.saveSoundChangesRawLinesByLangs(fromLangId, toLangId, rawLines, soundChangePurpose);
+        soundChangesService.saveSoundChangesRawLinesByLangs(fromLangId, toLangId, null, rawLines, soundChangePurpose);
+    }
+
+    @Operation(summary = "Save all sound changes from text form")
+    @PostMapping("/sc/raw/rule/{soundChangePurpose}/{declensionId}")
+    public void saveSoundChangesRawLinesByRule(@PathVariable SoundChangePurpose soundChangePurpose, @PathVariable long declensionId, @RequestBody String rawLines) {
+        logger.info("Save all sound changes from text form for rule {}, {}", declensionId, soundChangePurpose);
+        soundChangesService.saveSoundChangesRawLinesByLangs(null, null, declensionId, rawLines, soundChangePurpose);
     }
 
     @Operation(summary = "Save all sound changes from text form")
     @PostMapping("/sc/raw/lang/{soundChangePurpose}/{fromLangId}")
     public void saveSoundChangesRawLinesByLang(@PathVariable SoundChangePurpose soundChangePurpose, @PathVariable long fromLangId, @RequestBody String rawLines) {
         logger.info("Save all sound changes from text form from {}, {}", fromLangId, soundChangePurpose);
-        soundChangesService.saveSoundChangesRawLinesByLangs(fromLangId, null, rawLines, soundChangePurpose);
+        soundChangesService.saveSoundChangesRawLinesByLangs(fromLangId, null, null, rawLines, soundChangePurpose);
     }
 
     @Operation(summary = "Get all sound changes in text form")
@@ -173,6 +186,13 @@ public class EvolveController {
     public String getSoundChangesRawLinesByLang(@PathVariable SoundChangePurpose soundChangePurpose, @PathVariable long fromLangId) {
         logger.info("Get all sound changes in text form from {}, {}", fromLangId, soundChangePurpose);
         return soundChangesService.getSoundChangesRawLinesByLangs(fromLangId, null, soundChangePurpose);
+    }
+
+    @Operation(summary = "Get all sound changes in text form")
+    @GetMapping(value = "/sc/raw/rule/{soundChangePurpose}/{declensionId}", produces = "text/plain")
+    public String getSoundChangesRawLinesByRule(@PathVariable SoundChangePurpose soundChangePurpose, @PathVariable long declensionId) {
+        logger.info("Get all sound changes in text form from {}, {}", declensionId, soundChangePurpose);
+        return soundChangesService.getSoundChangesRawLinesByRule(declensionId, soundChangePurpose);
     }
 
     @Operation(summary = "Get all words with evolutions")

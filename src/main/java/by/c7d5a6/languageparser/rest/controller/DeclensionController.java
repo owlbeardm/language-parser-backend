@@ -2,6 +2,7 @@ package by.c7d5a6.languageparser.rest.controller;
 
 import by.c7d5a6.languageparser.rest.model.DeclensionConnection;
 import by.c7d5a6.languageparser.rest.model.DeclensionFull;
+import by.c7d5a6.languageparser.rest.model.DeclensionRule;
 import by.c7d5a6.languageparser.service.DeclensionService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -66,5 +67,26 @@ public class DeclensionController {
     public void deleteDeclension(@PathVariable Long declensionId) {
         logger.info("Delete declension {}", declensionId);
         declensionService.deleteDeclension(declensionId);
+    }
+
+    @Operation(summary = "Get declension rules")
+    @GetMapping("/rules/{declensionId}")
+    public List<DeclensionRule> getDeclensionRules(@PathVariable Long declensionId) {
+        logger.info("Get declension rules {}", declensionId);
+        return declensionService.getDeclensionRules(declensionId);
+    }
+
+    @Operation(summary = "Save declension rule")
+    @PostMapping("/rule")
+    public DeclensionRule saveDeclensionRule(@RequestBody DeclensionRule declensionRule) {
+        logger.info("Save declension rule");
+        return declensionService.saveDeclensionRule(declensionRule);
+    }
+
+    @Operation(summary = "Delete declension rule")
+    @DeleteMapping("/rule/{declensionRuleId}")
+    public void deleteDeclensionRule(@PathVariable Long declensionRuleId) {
+        logger.info("Delete declension rule {}", declensionRuleId);
+        declensionService.deleteDeclensionRule(declensionRuleId);
     }
 }

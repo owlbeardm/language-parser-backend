@@ -9,5 +9,8 @@ import java.util.List;
 public interface SoundChangeRepository extends IdLongVerRepository<ESoundChange> {
     List<ESoundChange> findByLangFrom_IdAndLangTo_IdAndAndSoundChangePurposeOrderByPriority(long langFromId, long langToId, SoundChangePurpose soundChangePurpose);
     List<ESoundChange> findByLangFrom_IdAndSoundChangePurposeOrderByPriority(long langFromId, SoundChangePurpose soundChangePurpose);
-    void deleteByLangFrom_IdAndLangTo_IdAndSoundChangePurpose(long langFromId, Long langToId, SoundChangePurpose soundChangePurpose);
+    List<ESoundChange> findByDeclensionRule_IdAndSoundChangePurposeOrderByPriority(long ruleId, SoundChangePurpose soundChangePurpose);
+    void deleteByLangFrom_IdAndLangTo_IdAndDeclensionRule_IdAndSoundChangePurpose(Long langFromId, Long langToId, Long declensionRuleId, SoundChangePurpose soundChangePurpose);
+
+
 }

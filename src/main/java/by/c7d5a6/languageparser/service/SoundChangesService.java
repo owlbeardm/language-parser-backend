@@ -1,12 +1,10 @@
 package by.c7d5a6.languageparser.service;
 
-import by.c7d5a6.languageparser.entity.ELanguage;
-import by.c7d5a6.languageparser.entity.ELanguageConnection;
-import by.c7d5a6.languageparser.entity.ESoundChange;
-import by.c7d5a6.languageparser.entity.WordWithIdAndLanguage;
+import by.c7d5a6.languageparser.entity.*;
 import by.c7d5a6.languageparser.entity.base.BaseEntity;
 import by.c7d5a6.languageparser.enums.SoundChangePurpose;
 import by.c7d5a6.languageparser.enums.SoundChangeType;
+import by.c7d5a6.languageparser.repository.DeclensionRuleRepository;
 import by.c7d5a6.languageparser.repository.SoundChangeRepository;
 import by.c7d5a6.languageparser.rest.model.Language;
 import by.c7d5a6.languageparser.rest.model.SoundChange;
@@ -31,12 +29,14 @@ public class SoundChangesService extends BaseService {
     private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     private final SoundChangeRepository soundChangeRepository;
+    private final DeclensionRuleRepository declensionRuleRepository;
     private final LanguageService languageService;
     private final IPAService ipaService;
 
     @Autowired
-    public SoundChangesService(SoundChangeRepository soundChangeRepository, LanguageService languageService, IPAService ipaService) {
+    public SoundChangesService(SoundChangeRepository soundChangeRepository, DeclensionRuleRepository declensionRuleRepository, LanguageService languageService, IPAService ipaService) {
         this.soundChangeRepository = soundChangeRepository;
+        this.declensionRuleRepository = declensionRuleRepository;
         this.languageService = languageService;
         this.ipaService = ipaService;
     }
@@ -48,7 +48,7 @@ public class SoundChangesService extends BaseService {
     public ESoundChange getSoundChangesFromLine(String line) {
         ESoundChange soundChange = new ESoundChange();
         String trimed = line.trim();
-        trimed = ipaService.cleanIPA(trimed);
+        trimed = IPAService.cleanIPA(trimed);
         trimed = replaceArrows(trimed);
         if (!trimed.contains("→") && !trimed.contains("»") && !trimed.contains("«")) {
             throw new IllegalArgumentException("Sound change doesn't contain \"to\" symbol: " + line);
@@ -115,16 +115,18 @@ public class SoundChangesService extends BaseService {
     }
 
     @IsEditor
-    public void saveSoundChangesRawLinesByLangs(long fromLangId, Long toLangId, String rawLines, SoundChangePurpose soundChangePurpose) {
-        ELanguage langFrom = languageService.getLangById(fromLangId).orElseThrow(() -> new IllegalArgumentException("Language from with id " + fromLangId + " doesn't exist"));
+    public void saveSoundChangesRawLinesByLangs(Long fromLangId, Long toLangId, Long declensionRuleId, String rawLines, SoundChangePurpose soundChangePurpose) {
+        ELanguage langFrom = fromLangId == null ? null : languageService.getLangById(fromLangId).orElseThrow(() -> new IllegalArgumentException("Language from with id " + fromLangId + " doesn't exist"));
         ELanguage langTo = toLangId == null ? null : languageService.getLangById(toLangId).orElseThrow(() -> new IllegalArgumentException("Language to with id " + fromLangId + " doesn't exist"));
+        EDeclensionRule declensionRule = declensionRuleId == null ? null : declensionRuleRepository.findById(declensionRuleId).orElseThrow(() -> new IllegalArgumentException("Declenstion rule to with id " + fromLangId + " doesn't exist"));
         List<ESoundChange> soundChanges = getSoundChangesFromLines(rawLines);
-        soundChangeRepository.deleteByLangFrom_IdAndLangTo_IdAndSoundChangePurpose(fromLangId, toLangId, soundChangePurpose);
+        soundChangeRepository.deleteByLangFrom_IdAndLangTo_IdAndDeclensionRule_IdAndSoundChangePurpose(fromLangId, toLangId, declensionRuleId, soundChangePurpose);
         for (long i = 0; i < soundChanges.size(); i++) {
             ESoundChange soundChange = soundChanges.get((int) i);
             soundChange.setPriority(i);
             soundChange.setLangFrom(langFrom);
             soundChange.setLangTo(langTo);
+            soundChange.setDeclensionRule(declensionRule);
             soundChange.setSoundChangePurpose(soundChangePurpose);
             soundChangeRepository.save(soundChange);
         }
@@ -254,4 +256,13 @@ public class SoundChangesService extends BaseService {
         return regexp;
     }
 
+    public List<SoundChange> getSoundChangesByRule(long ruleId, SoundChangePurpose soundChangePurpose) {
+        List<ESoundChange> byLangFrom_idAndLangTo_idOrderByPriority = soundChangeRepository.findByDeclensionRule_IdAndSoundChangePurposeOrderByPriority(ruleId, soundChangePurpose);
+        return byLangFrom_idAndLangTo_idOrderByPriority.stream().map(this::convertToSoundChange).collect(Collectors.toList());
+    }
+
+    public String getSoundChangesRawLinesByRule(long declensionId, SoundChangePurpose soundChangePurpose) {
+        List<ESoundChange> soundChanges = soundChangeRepository.findByDeclensionRule_IdAndSoundChangePurposeOrderByPriority(declensionId, soundChangePurpose);
+        return soundChanges.stream().map(this::soundChangeToRawLine).collect(Collectors.joining(System.lineSeparator()));
+    }
 }

@@ -17,7 +17,6 @@ public class ESoundChange extends BaseEntity implements Serializable, IdLongVerP
     protected static final String TABLE_NAME = "sound_change_tbl";
     private static final long serialVersionUID = 1L;
 
-    @NotNull
     @ManyToOne
     @JoinColumn(name = "lang_from_id")
     private ELanguage langFrom;
@@ -25,6 +24,10 @@ public class ESoundChange extends BaseEntity implements Serializable, IdLongVerP
     @ManyToOne
     @JoinColumn(name = "lang_to_id")
     private ELanguage langTo;
+
+    @ManyToOne
+    @JoinColumn(name = "rule_id")
+    private EDeclensionRule declensionRule;
 
     @NotNull
     @Column(name = "priority")
@@ -124,6 +127,14 @@ public class ESoundChange extends BaseEntity implements Serializable, IdLongVerP
 
     public void setSoundChangePurpose(SoundChangePurpose soundChangePurpose) {
         this.soundChangePurpose = soundChangePurpose;
+    }
+
+    public EDeclensionRule getDeclensionRule() {
+        return declensionRule;
+    }
+
+    public void setDeclensionRule(EDeclensionRule declensionRule) {
+        this.declensionRule = declensionRule;
     }
 
     @Override
