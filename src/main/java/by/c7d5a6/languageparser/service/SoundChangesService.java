@@ -265,4 +265,9 @@ public class SoundChangesService extends BaseService {
         List<ESoundChange> soundChanges = soundChangeRepository.findByDeclensionRule_IdAndSoundChangePurposeOrderByPriority(declensionId, soundChangePurpose);
         return soundChanges.stream().map(this::soundChangeToRawLine).collect(Collectors.joining(System.lineSeparator()));
     }
+
+    public String changeWordByRule(String word, EDeclensionRule rule) {
+        List<ESoundChange> changes = soundChangeRepository.findByDeclensionRule_IdAndSoundChangePurposeOrderByPriority(rule.getId(), SoundChangePurpose.DECLENSION);
+        return evolveWord(word, changes);
+    }
 }

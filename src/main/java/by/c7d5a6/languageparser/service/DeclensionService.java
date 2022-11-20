@@ -6,6 +6,7 @@ import by.c7d5a6.languageparser.repository.DeclensionRepository;
 import by.c7d5a6.languageparser.repository.DeclensionRuleRepository;
 import by.c7d5a6.languageparser.rest.model.*;
 import by.c7d5a6.languageparser.rest.security.IsEditor;
+import com.google.common.base.Strings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +17,8 @@ import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 @Service
@@ -24,7 +27,9 @@ public class DeclensionService extends BaseService {
     private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     private final POSService posService;
+    private final WordService wordService;
     private final LanguageService languageService;
+    private final SoundChangesService soundChangesService;
     private final GrammaticalCategoryService grammaticalCategoryService;
     private final DeclensionRepository declensionRepository;
     private final DeclensionRuleRepository declensionRuleRepository;
@@ -32,13 +37,17 @@ public class DeclensionService extends BaseService {
 
     @Autowired
     public DeclensionService(POSService posService,
+                             WordService wordService,
                              LanguageService languageService,
+                             SoundChangesService soundChangesService,
                              GrammaticalCategoryService grammaticalCategoryService,
                              DeclensionRepository declensionRepository,
                              DeclensionRuleRepository declensionRuleRepository,
                              DeclensionConnectionRepository declensionConnectionRepository) {
         this.posService = posService;
+        this.wordService = wordService;
         this.languageService = languageService;
+        this.soundChangesService = soundChangesService;
         this.grammaticalCategoryService = grammaticalCategoryService;
         this.declensionRepository = declensionRepository;
         this.declensionRuleRepository = declensionRuleRepository;
@@ -198,5 +207,54 @@ public class DeclensionService extends BaseService {
     @IsEditor
     public void deleteDeclensionRule(Long declensionRuleId) {
         declensionRuleRepository.deleteById(declensionRuleId);
+    }
+
+    public DeclinedWord getDeclineWord(Long wordId) {
+        final DeclinedWord result = new DeclinedWord();
+        result.setDeclensionList(new ArrayList<>());
+        EWord word = this.wordService.getWordById(wordId);
+        List<DeclensionFull> fullDeclensions = getFullDeclensions(word.getLanguage().getId(), word.getPartOfSpeech().getId());
+        fullDeclensions.forEach(declensionFull -> {
+            if (declensionFull.isDeprecated() || !declensionFull.isExist()) {
+                return;
+            }
+            EDeclension declension = declensionRepository.getById(declensionFull.getId());
+            List<EDeclensionRule> rules = declensionRuleRepository.findByDeclension_Id(declension.getId());
+            List<String> declinedWords = new ArrayList<>();
+            rules.forEach((rule) -> {
+                if (isRuleApply(rule, word)) {
+                    String changedByRule = this.soundChangesService.changeWordByRule(word.getWord(), rule);
+                    declinedWords.add(changedByRule);
+                }
+            });
+            if (!declinedWords.isEmpty()) {
+                WordDeclension wd = new WordDeclension();
+                wd.setDeclension(mapper.map(declension, Declension.class));
+                wd.setWordDeclensions(declinedWords);
+                result.getDeclensionList().add(wd);
+            }
+        });
+        return result;
+    }
+
+    private boolean isRuleApply(EDeclensionRule rule, EWord word) {
+        if (!Strings.isNullOrEmpty(rule.getWordPattern())) {
+            Pattern pattern = Pattern.compile(rule.getWordPattern());
+            Matcher matcher = pattern.matcher(word.getWord());
+            if (!matcher.matches())
+                return false;
+        }
+        if (!rule.getValues().isEmpty()) {
+            List<EGrammaticalCategoryValue> wordValues = grammaticalCategoryService
+                    .findGrammaticalValuesByWord(word.getId())
+                    .stream()
+                    .map(EGrammaticalValueWordConnection::getValue)
+                    .collect(Collectors.toList());
+            for (EGrammaticalCategoryValue value : rule.getValues()) {
+                if (wordValues.stream().noneMatch((wordValue) -> wordValue.getId().equals(value.getId())))
+                    return false;
+            }
+        }
+        return true;
     }
 }

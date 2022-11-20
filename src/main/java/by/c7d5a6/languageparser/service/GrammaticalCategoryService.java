@@ -113,6 +113,10 @@ public class GrammaticalCategoryService extends BaseService {
         return grammaticalValueWordRepository.findByWord_Id(wordId).stream().map(vwc -> mapper.map(vwc, GrammaticalValueWordConnection.class)).collect(Collectors.toList());
     }
 
+    public List<EGrammaticalValueWordConnection> findGrammaticalValuesByWord(Long wordId) {
+        return grammaticalValueWordRepository.findByWord_Id(wordId);
+    }
+
     @IsEditor
     public GrammaticalValueWordConnection replaceGrammaticalValuesByWord(GrammaticalValueWordConnection grammaticalValueWordConnection) {
         grammaticalValueWordRepository.deleteAllByWord_IdAndValue_Category_Id(grammaticalValueWordConnection.getWord().getId(), grammaticalValueWordConnection.getValue().getCategory().getId());

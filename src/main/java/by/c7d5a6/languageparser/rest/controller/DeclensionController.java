@@ -3,6 +3,7 @@ package by.c7d5a6.languageparser.rest.controller;
 import by.c7d5a6.languageparser.rest.model.DeclensionConnection;
 import by.c7d5a6.languageparser.rest.model.DeclensionFull;
 import by.c7d5a6.languageparser.rest.model.DeclensionRule;
+import by.c7d5a6.languageparser.rest.model.DeclinedWord;
 import by.c7d5a6.languageparser.service.DeclensionService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -88,5 +89,12 @@ public class DeclensionController {
     public void deleteDeclensionRule(@PathVariable Long declensionRuleId) {
         logger.info("Delete declension rule {}", declensionRuleId);
         declensionService.deleteDeclensionRule(declensionRuleId);
+    }
+
+    @Operation(summary = "Get declension rules")
+    @GetMapping("/word/{wordId}")
+    public DeclinedWord getDeclineWord(@PathVariable Long wordId) {
+        logger.info("Decline word {}", wordId);
+        return declensionService.getDeclineWord(wordId);
     }
 }
