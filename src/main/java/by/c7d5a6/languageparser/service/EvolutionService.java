@@ -171,7 +171,7 @@ public class EvolutionService extends BaseService {
             newWordOriginSource = new EWordOriginSource();
             newWordOriginSource.setWordSource(wordSource);
         }
-        String newWordText = soundChangesService.evolveWord(wordSource.getWord(), soundChanges);
+        String newWordText = soundChangesService.evolveWord(wordSource, soundChanges);
         newWord.setWord(newWordText);
         newWord.setLanguage(eLanguageConnection.getLangTo());
         newWord.setPartOfSpeech(wordSource.getPartOfSpeech());

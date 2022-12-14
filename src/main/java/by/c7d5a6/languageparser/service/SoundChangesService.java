@@ -6,8 +6,8 @@ import by.c7d5a6.languageparser.enums.SoundChangePurpose;
 import by.c7d5a6.languageparser.enums.SoundChangeType;
 import by.c7d5a6.languageparser.repository.DeclensionRuleRepository;
 import by.c7d5a6.languageparser.repository.SoundChangeRepository;
-import by.c7d5a6.languageparser.rest.model.Language;
-import by.c7d5a6.languageparser.rest.model.SoundChange;
+import by.c7d5a6.languageparser.repository.WordsRepository;
+import by.c7d5a6.languageparser.rest.model.*;
 import by.c7d5a6.languageparser.rest.security.IsEditor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,10 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.lang.invoke.MethodHandles;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -29,13 +26,15 @@ public class SoundChangesService extends BaseService {
     private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     private final SoundChangeRepository soundChangeRepository;
+    private final WordsRepository wordsRepository;
     private final DeclensionRuleRepository declensionRuleRepository;
     private final LanguageService languageService;
     private final IPAService ipaService;
 
     @Autowired
-    public SoundChangesService(SoundChangeRepository soundChangeRepository, DeclensionRuleRepository declensionRuleRepository, LanguageService languageService, IPAService ipaService) {
+    public SoundChangesService(SoundChangeRepository soundChangeRepository, WordsRepository wordsRepository, DeclensionRuleRepository declensionRuleRepository, LanguageService languageService, IPAService ipaService) {
         this.soundChangeRepository = soundChangeRepository;
+        this.wordsRepository = wordsRepository;
         this.declensionRuleRepository = declensionRuleRepository;
         this.languageService = languageService;
         this.ipaService = ipaService;
@@ -223,16 +222,37 @@ public class SoundChangesService extends BaseService {
                 .stream()
                 .filter(word -> word.getLanguage().getId().equals(langFrom.getId()))
                 .forEach(word -> {
-                    result.put(word.getId(), evolveWord(word.getWord(), soundChanges));
+                    result.put(word.getId(), evolveWord(word, soundChanges));
                 });
         return result;
     }
 
-    public String evolveWord(String word, List<ESoundChange> soundChanges) {
-        String result = word;
+    public String evolveWord(WordWithIdAndLanguage word, List<ESoundChange> soundChanges) {
+        String result = word.getWord();
+        result = getMainDeclensionWord(word.getId()).orElse(result);
         for (ESoundChange soundChange : soundChanges) {
             result = evolveWordBySingleSoundChange(result, soundChange);
         }
+        return result;
+    }
+
+    public Optional<String> getMainDeclensionWord(Long wordId) {
+        Optional<EWord> word = wordsRepository.findById(wordId);
+            EDeclension declension = declensionRepository.getById(declensionFull.getId());
+            List<EDeclensionRule> rules = declensionRuleRepository.findByDeclension_Id(declension.getId());
+            List<String> declinedWords = new ArrayList<>();
+            rules.forEach((rule) -> {
+                if (isRuleApply(rule, word)) {
+                    String changedByRule = this.soundChangesService.changeWordByRule(word.getWord(), rule);
+                    declinedWords.add(changedByRule);
+                }
+            });
+            if (!declinedWords.isEmpty()) {
+                WordDeclension wd = new WordDeclension();
+                wd.setDeclension(mapper.map(declension, Declension.class));
+                wd.setWordDeclensions(declinedWords);
+                result.getDeclensionList().add(wd);
+            }
         return result;
     }
 

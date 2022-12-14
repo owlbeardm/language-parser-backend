@@ -266,7 +266,7 @@ public class WordService extends BaseService {
 
     public String getWrittenForm(Word word) {
         List<ESoundChange> soundChangesByLang = soundChangesService.getESoundChangesByLang(word.getLanguage().getId(), SoundChangePurpose.WRITING_SYSTEM);
-        return soundChangesService.evolveWord(word.getWord(), soundChangesByLang);
+        return soundChangesService.evolveWord(word, soundChangesByLang);
     }
 
     public void cleanIPAWords() {
