@@ -257,4 +257,23 @@ public class DeclensionService extends BaseService {
         }
         return true;
     }
+
+    public boolean isMainDelcension(Long declensionId) {
+        return declensionRepository.findById(declensionId).map(EDeclension::isMainDeclension).orElseThrow(() -> new NotFoundException("Not found declension " + declensionId));
+    }
+
+    @IsEditor
+    public void setAsMainDeclension(Long declensionId) {
+        EDeclension eDeclension = declensionRepository.findById(declensionId).orElseThrow(() -> new NotFoundException("Not found declension " + declensionId));
+        declensionRepository.findByLanguage_IdAndPos_Id(eDeclension.getLanguage().getId(), eDeclension.getPos().getId()).forEach((ed) -> {
+            ed.setMainDeclension(false);
+        });
+        eDeclension.setMainDeclension(true);
+    }
+
+    @IsEditor
+    public void removeFromMainDeclension(Long declensionId) {
+        EDeclension eDeclension = declensionRepository.findById(declensionId).orElseThrow(() -> new NotFoundException("Not found declension " + declensionId));
+        eDeclension.setMainDeclension(false);
+    }
 }

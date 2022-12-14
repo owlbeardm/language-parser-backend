@@ -4,10 +4,9 @@ package by.c7d5a6.languageparser.entity;
 import by.c7d5a6.languageparser.entity.base.BaseEntity;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotNull;
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 
@@ -18,11 +17,11 @@ public class EDeclension extends BaseEntity implements Serializable {
     protected static final String ENTITY_NAME = "Declension";
     protected static final String TABLE_NAME = "declension_tbl";
     private static final long serialVersionUID = 1L;
-    @ManyToMany(fetch = FetchType.EAGER, cascade={CascadeType.MERGE,CascadeType.PERSIST})
+    @ManyToMany(fetch = FetchType.EAGER, cascade = {CascadeType.MERGE, CascadeType.PERSIST})
     @JoinTable(
             name = "declension_grm_value_tbl",
-            joinColumns = {@JoinColumn(name = "declension_id", referencedColumnName="id")},
-            inverseJoinColumns = {@JoinColumn(name = "value_id", referencedColumnName="id")}
+            joinColumns = {@JoinColumn(name = "declension_id", referencedColumnName = "id")},
+            inverseJoinColumns = {@JoinColumn(name = "value_id", referencedColumnName = "id")}
     )
     private Set<EGrammaticalCategoryValue> values = new HashSet<>();
     @ManyToOne
@@ -31,6 +30,9 @@ public class EDeclension extends BaseEntity implements Serializable {
     @ManyToOne
     @JoinColumn(name = "pos_id")
     private EPOS pos;
+    @NotNull
+    @Column(name = "main_declension_yn")
+    private boolean mainDeclension;
 
     public ELanguage getLanguage() {
         return language;
@@ -54,5 +56,13 @@ public class EDeclension extends BaseEntity implements Serializable {
 
     public void setValues(Set<EGrammaticalCategoryValue> values) {
         this.values = values;
+    }
+
+    public boolean isMainDeclension() {
+        return mainDeclension;
+    }
+
+    public void setMainDeclension(boolean mainDeclension) {
+        this.mainDeclension = mainDeclension;
     }
 }

@@ -77,6 +77,27 @@ public class DeclensionController {
         return declensionService.getDeclensionRules(declensionId);
     }
 
+    @Operation(summary = "Is main declension")
+    @GetMapping("/ismain/{declensionId}")
+    public boolean isMainDelcension(@PathVariable Long declensionId) {
+        logger.info("Is main declension {}", declensionId);
+        return declensionService.isMainDelcension(declensionId);
+    }
+
+    @Operation(summary = "Set as main declension")
+    @PostMapping("/setmain/{declensionId}")
+    public void setAsMainDeclension(@PathVariable Long declensionId) {
+        logger.info("Set as main declension {}", declensionId);
+        declensionService.setAsMainDeclension(declensionId);
+    }
+
+    @Operation(summary = "Remove from main declension")
+    @PostMapping("/removemain/{declensionId}")
+    public void removeFromMainDeclension(@PathVariable Long declensionId) {
+        logger.info("Remove from main declension {}", declensionId);
+        declensionService.removeFromMainDeclension(declensionId);
+    }
+
     @Operation(summary = "Save declension rule")
     @PostMapping("/rule")
     public DeclensionRule saveDeclensionRule(@RequestBody DeclensionRule declensionRule) {
