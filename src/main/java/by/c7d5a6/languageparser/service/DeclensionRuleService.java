@@ -39,6 +39,8 @@ public class DeclensionRuleService extends BaseService {
     }
 
     public boolean isDeclensionRuleApply(EDeclensionRule rule, EWord word) {
+        if(!rule.getEnabled())
+            return false;
         if (!Strings.isNullOrEmpty(rule.getWordPattern())) {
             Pattern pattern = Pattern.compile(rule.getWordPattern());
             Matcher matcher = pattern.matcher(word.getWord());
