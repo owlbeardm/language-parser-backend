@@ -4,10 +4,12 @@ import by.c7d5a6.languageparser.entity.*;
 import by.c7d5a6.languageparser.entity.base.BaseEntity;
 import by.c7d5a6.languageparser.enums.SoundChangePurpose;
 import by.c7d5a6.languageparser.enums.SoundChangeType;
+import by.c7d5a6.languageparser.repository.DeclensionRepository;
 import by.c7d5a6.languageparser.repository.DeclensionRuleRepository;
 import by.c7d5a6.languageparser.repository.SoundChangeRepository;
 import by.c7d5a6.languageparser.repository.WordsRepository;
-import by.c7d5a6.languageparser.rest.model.*;
+import by.c7d5a6.languageparser.rest.model.Language;
+import by.c7d5a6.languageparser.rest.model.SoundChange;
 import by.c7d5a6.languageparser.rest.security.IsEditor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,16 +29,20 @@ public class SoundChangesService extends BaseService {
 
     private final SoundChangeRepository soundChangeRepository;
     private final WordsRepository wordsRepository;
+    private final DeclensionRepository declensionRepository;
     private final DeclensionRuleRepository declensionRuleRepository;
     private final LanguageService languageService;
+    private final DeclensionRuleService declensionRuleService;
     private final IPAService ipaService;
 
     @Autowired
-    public SoundChangesService(SoundChangeRepository soundChangeRepository, WordsRepository wordsRepository, DeclensionRuleRepository declensionRuleRepository, LanguageService languageService, IPAService ipaService) {
+    public SoundChangesService(SoundChangeRepository soundChangeRepository, WordsRepository wordsRepository, DeclensionRepository declensionRepository, DeclensionRuleRepository declensionRuleRepository, LanguageService languageService, DeclensionRuleService declensionRuleService, IPAService ipaService) {
         this.soundChangeRepository = soundChangeRepository;
         this.wordsRepository = wordsRepository;
+        this.declensionRepository = declensionRepository;
         this.declensionRuleRepository = declensionRuleRepository;
         this.languageService = languageService;
+        this.declensionRuleService = declensionRuleService;
         this.ipaService = ipaService;
     }
 
@@ -230,6 +236,11 @@ public class SoundChangesService extends BaseService {
     public String evolveWord(WordWithIdAndLanguage word, List<ESoundChange> soundChanges) {
         String result = word.getWord();
         result = getMainDeclensionWord(word.getId()).orElse(result);
+        return evolveWord(result, soundChanges);
+    }
+
+    public String evolveWord(String word, List<ESoundChange> soundChanges) {
+        String result = word;
         for (ESoundChange soundChange : soundChanges) {
             result = evolveWordBySingleSoundChange(result, soundChange);
         }
@@ -237,23 +248,23 @@ public class SoundChangesService extends BaseService {
     }
 
     public Optional<String> getMainDeclensionWord(Long wordId) {
-        Optional<EWord> word = wordsRepository.findById(wordId);
-            EDeclension declension = declensionRepository.getById(declensionFull.getId());
-            List<EDeclensionRule> rules = declensionRuleRepository.findByDeclension_Id(declension.getId());
-            List<String> declinedWords = new ArrayList<>();
-            rules.forEach((rule) -> {
-                if (isRuleApply(rule, word)) {
-                    String changedByRule = this.soundChangesService.changeWordByRule(word.getWord(), rule);
-                    declinedWords.add(changedByRule);
-                }
-            });
-            if (!declinedWords.isEmpty()) {
-                WordDeclension wd = new WordDeclension();
-                wd.setDeclension(mapper.map(declension, Declension.class));
-                wd.setWordDeclensions(declinedWords);
-                result.getDeclensionList().add(wd);
-            }
-        return result;
+        Optional<EWord> oword = wordsRepository
+                .findById(wordId);
+        return oword
+                .flatMap((w) -> declensionRepository
+                        .findByLanguage_IdAndPos_Id(w.getLanguage().getId(), w.getPartOfSpeech().getId())
+                        .stream()
+                        .filter(EDeclension::isMainDeclension)
+                        .findFirst())
+                .map((declension) -> {
+                    List<EDeclensionRule> rules = declensionRuleRepository.findByDeclension_Id(declension.getId());
+                    for (EDeclensionRule rule : rules) {
+                        if (declensionRuleService.isDeclensionRuleApply(rule, oword.get())) {
+                            return changeWordByRule(oword.get().getWord(), rule);
+                        }
+                    }
+                    return null;
+                });
     }
 
     private String evolveWordBySingleSoundChange(String result, ESoundChange soundChange) {

@@ -4,6 +4,7 @@ import by.c7d5a6.languageparser.entity.*;
 import by.c7d5a6.languageparser.repository.*;
 import by.c7d5a6.languageparser.rest.model.*;
 import by.c7d5a6.languageparser.rest.security.IsEditor;
+import com.google.common.base.Strings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,6 +14,8 @@ import org.webjars.NotFoundException;
 import java.lang.invoke.MethodHandles;
 import java.util.List;
 import java.util.Optional;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 @Service
@@ -197,4 +200,6 @@ public class GrammaticalCategoryService extends BaseService {
     public Optional<EGrammaticalCategoryValue> getValueById(Long id) {
         return grammaticalCategoryValueRepository.findById(id);
     }
+
+
 }

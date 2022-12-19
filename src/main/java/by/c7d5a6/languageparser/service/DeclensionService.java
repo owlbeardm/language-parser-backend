@@ -31,6 +31,7 @@ public class DeclensionService extends BaseService {
     private final LanguageService languageService;
     private final SoundChangesService soundChangesService;
     private final GrammaticalCategoryService grammaticalCategoryService;
+    private final DeclensionRuleService declensionRuleService;
     private final DeclensionRepository declensionRepository;
     private final DeclensionRuleRepository declensionRuleRepository;
     private final DeclensionConnectionRepository declensionConnectionRepository;
@@ -41,6 +42,7 @@ public class DeclensionService extends BaseService {
                              LanguageService languageService,
                              SoundChangesService soundChangesService,
                              GrammaticalCategoryService grammaticalCategoryService,
+                             DeclensionRuleService declensionRuleService,
                              DeclensionRepository declensionRepository,
                              DeclensionRuleRepository declensionRuleRepository,
                              DeclensionConnectionRepository declensionConnectionRepository) {
@@ -49,6 +51,7 @@ public class DeclensionService extends BaseService {
         this.languageService = languageService;
         this.soundChangesService = soundChangesService;
         this.grammaticalCategoryService = grammaticalCategoryService;
+        this.declensionRuleService = declensionRuleService;
         this.declensionRepository = declensionRepository;
         this.declensionRuleRepository = declensionRuleRepository;
         this.declensionConnectionRepository = declensionConnectionRepository;
@@ -222,7 +225,7 @@ public class DeclensionService extends BaseService {
             List<EDeclensionRule> rules = declensionRuleRepository.findByDeclension_Id(declension.getId());
             List<String> declinedWords = new ArrayList<>();
             rules.forEach((rule) -> {
-                if (isRuleApply(rule, word)) {
+                if (declensionRuleService.isDeclensionRuleApply(rule, word)) {
                     String changedByRule = this.soundChangesService.changeWordByRule(word.getWord(), rule);
                     declinedWords.add(changedByRule);
                 }
@@ -235,27 +238,6 @@ public class DeclensionService extends BaseService {
             }
         });
         return result;
-    }
-
-    private boolean isRuleApply(EDeclensionRule rule, EWord word) {
-        if (!Strings.isNullOrEmpty(rule.getWordPattern())) {
-            Pattern pattern = Pattern.compile(rule.getWordPattern());
-            Matcher matcher = pattern.matcher(word.getWord());
-            if (!matcher.matches())
-                return false;
-        }
-        if (!rule.getValues().isEmpty()) {
-            List<EGrammaticalCategoryValue> wordValues = grammaticalCategoryService
-                    .findGrammaticalValuesByWord(word.getId())
-                    .stream()
-                    .map(EGrammaticalValueWordConnection::getValue)
-                    .collect(Collectors.toList());
-            for (EGrammaticalCategoryValue value : rule.getValues()) {
-                if (wordValues.stream().noneMatch((wordValue) -> wordValue.getId().equals(value.getId())))
-                    return false;
-            }
-        }
-        return true;
     }
 
     public boolean isMainDelcension(Long declensionId) {
