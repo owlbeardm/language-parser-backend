@@ -1,12 +1,12 @@
 plugins {
-    id 'org.springframework.boot' version '2.6.0'
+    id 'org.springframework.boot' version '3.3.3'
     // generating openapi file
     // doesn't work with current version of java
 //	 https://github.com/springdoc/springdoc-openapi-gradle-plugin/issues/63
-    id "com.github.johnrengelman.processes" version "0.5.0"
-    id "org.springdoc.openapi-gradle-plugin" version "1.3.3"
-    id 'io.spring.dependency-management' version '1.0.11.RELEASE'
-    id "pl.allegro.tech.build.axion-release" version "1.14.0"
+//    id "com.github.johnrengelman.processes" version "0.5.0"
+//    id "org.springdoc.openapi-gradle-plugin" version "1.3.3"
+//    id 'io.spring.dependency-management' version '1.0.11.RELEASE'
+//    id "pl.allegro.tech.build.axion-release" version "1.14.0"
     id 'java'
 }
 
@@ -14,8 +14,8 @@ bootJar.enabled = true
 jar.enabled = false
 
 group = 'by.c7d5a6'
-version = scmVersion.version
-sourceCompatibility = '17'
+//version = scmVersion.version
+//sourceCompatibility = '21'
 
 repositories {
     mavenCentral()
@@ -23,25 +23,25 @@ repositories {
 
 // see plugins
 // config for org.springdoc.openapi-gradle-plugin
-openApi {
-    apiDocsUrl.set("http://localhost:8080/v3/api-docs.yaml")
-    outputDir.set(file("../lp-api"))
-    outputFileName.set("openapi.yaml")
-    waitTimeInSeconds.set(10)
-    forkProperties.set("-Dspring.profiles.active=test")
-}
+//openApi {
+//    apiDocsUrl.set("http://localhost:8080/v3/api-docs.yaml")
+//    outputDir.set(file("../lp-api"))
+//    outputFileName.set("openapi.yaml")
+//    waitTimeInSeconds.set(10)
+//    forkProperties.set("-Dspring.profiles.active=test")
+//}
 
 springBoot {
     buildInfo()
 }
 
 dependencies {
-    implementation 'org.springframework.boot:spring-boot-starter-data-jpa:2.6.7'
-    implementation 'org.springframework.boot:spring-boot-starter-web:2.6.7'
-    implementation 'org.springframework.boot:spring-boot-starter-validation:2.6.7'
-    implementation 'org.springframework.boot:spring-boot-starter-security:2.6.7'
-    implementation 'org.springframework.boot:spring-boot-starter-oauth2-resource-server:2.6.7'
-    implementation 'org.springframework.boot:spring-boot-starter-oauth2-client:2.7.2'
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa:3.3.3'
+    implementation 'org.springframework.boot:spring-boot-starter-web:3.3.3'
+    implementation 'org.springframework.boot:spring-boot-starter-validation:3.3.3'
+    implementation 'org.springframework.boot:spring-boot-starter-security:3.3.3'
+    implementation 'org.springframework.boot:spring-boot-starter-oauth2-resource-server:3.3.3'
+    implementation 'org.springframework.boot:spring-boot-starter-oauth2-client:3.3.3'
     implementation 'org.springdoc:springdoc-openapi-ui:1.6.8'
     implementation 'org.springdoc:springdoc-openapi-data-rest:1.6.8'
     implementation 'javax.persistence:javax.persistence-api:2.2'
@@ -63,8 +63,8 @@ test {
     useJUnitPlatform()
 }
 
-tasks.withType(JavaCompile) {
-    options.annotationProcessorGeneratedSourcesDirectory(new File("build/generated-sources/annotations"))
-}
+//tasks.withType(JavaCompile) {
+//    options.annotationProcessorGeneratedSourcesDirectory(new File("build/generated-sources/annotations"))
+//}
 
 //sourceSets.main.java.srcDir(['src/main/java'])
