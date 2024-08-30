@@ -4,13 +4,13 @@ package by.c7d5a6.languageparser.rest.model.filter;
 import by.c7d5a6.languageparser.rest.model.SortDirection;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 
-import javax.validation.constraints.Max;
-import javax.validation.constraints.Min;
 import java.io.Serializable;
 import java.lang.invoke.MethodHandles;
 import java.util.function.Function;

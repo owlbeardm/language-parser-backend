@@ -2,9 +2,9 @@ package by.c7d5a6.languageparser.rest.model;
 
 import by.c7d5a6.languageparser.entity.LanguageWithID;
 import by.c7d5a6.languageparser.rest.model.base.Base;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
 
-import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 
 public class Language extends Base implements LanguageWithID {

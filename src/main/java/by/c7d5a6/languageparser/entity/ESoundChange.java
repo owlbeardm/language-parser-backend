@@ -4,9 +4,9 @@ import by.c7d5a6.languageparser.entity.base.BaseEntity;
 import by.c7d5a6.languageparser.enums.SoundChangePurpose;
 import by.c7d5a6.languageparser.enums.SoundChangeType;
 import by.c7d5a6.languageparser.entity.possessors.IdLongVerPossessor;
+import jakarta.validation.constraints.NotNull;
 
 import javax.persistence.*;
-import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 
 @Entity(name = ESoundChange.ENTITY_NAME)

@@ -5,7 +5,6 @@ import by.c7d5a6.languageparser.entity.possessors.IdLongVerPossessor;
 import by.c7d5a6.languageparser.rest.model.Language;
 
 import javax.persistence.*;
-import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 
 @Entity(name = ELanguagePhoneme.ENTITY_NAME)
