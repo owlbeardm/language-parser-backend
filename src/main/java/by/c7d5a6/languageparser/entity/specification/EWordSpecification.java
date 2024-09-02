@@ -18,7 +18,7 @@ public class EWordSpecification implements Specification<EWord> {
 
     @Override
     public Predicate toPredicate(Root<EWord> root, CriteriaQuery<?> query, CriteriaBuilder builder) {
-        if(criteria.getValue() == null){
+        if (criteria.getValue() == null) {
             return null;
         }
         if (criteria.getOperation().equalsIgnoreCase(">")) {

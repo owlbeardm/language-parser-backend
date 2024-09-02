@@ -1,6 +1,5 @@
 package by.c7d5a6.languageparser.repository;
 
-import by.c7d5a6.languageparser.entity.EGrammaticalCategory;
 import by.c7d5a6.languageparser.entity.EGrammaticalCategoryValue;
 import by.c7d5a6.languageparser.repository.helper.IdLongVerRepository;
 import org.springframework.data.jpa.repository.Query;

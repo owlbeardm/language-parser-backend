@@ -23,13 +23,9 @@ public class FirebaseAuthConfig {
         Resource data = data();
         FirebaseOptions options;
         if (data == null || !data.exists()) {
-            options = FirebaseOptions.builder()
-                    .setCredentials(GoogleCredentials.getApplicationDefault())
-                    .build();
+            options = FirebaseOptions.builder().setCredentials(GoogleCredentials.getApplicationDefault()).build();
         } else {
-            options = FirebaseOptions.builder()
-                    .setCredentials(GoogleCredentials.fromStream(data.getInputStream()))
-                    .build();
+            options = FirebaseOptions.builder().setCredentials(GoogleCredentials.fromStream(data.getInputStream())).build();
         }
         FirebaseApp firebaseApp = FirebaseApp.initializeApp(options);
 
@@ -37,8 +33,7 @@ public class FirebaseAuthConfig {
     }
 
     public Resource data() {
-        return resourceLoader.getResource(
-                "classpath:data/data.json");
+        return resourceLoader.getResource("classpath:data/data.json");
     }
 
 }

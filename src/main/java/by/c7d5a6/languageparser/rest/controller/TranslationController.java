@@ -1,12 +1,10 @@
 package by.c7d5a6.languageparser.rest.controller;
 
-import by.c7d5a6.languageparser.rest.model.*;
+import by.c7d5a6.languageparser.rest.model.Translation;
+import by.c7d5a6.languageparser.rest.model.WordWithTranslations;
 import by.c7d5a6.languageparser.rest.model.base.PageResult;
 import by.c7d5a6.languageparser.rest.model.filter.TranslationListFilter;
-import by.c7d5a6.languageparser.rest.model.filter.WordListFilter;
-import by.c7d5a6.languageparser.rest.model.filter.WordWithEvolutionsListFilter;
 import by.c7d5a6.languageparser.service.TranslationService;
-import by.c7d5a6.languageparser.service.WordService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -45,13 +43,13 @@ public class TranslationController {
 
     @Operation(summary = "Delete translation by id")
     @DeleteMapping("{id}")
-    public void deleteTranslation(@PathVariable Long id){
+    public void deleteTranslation(@PathVariable Long id) {
         translationService.deleteTranslation(id);
     }
 
     @Operation(summary = "Add translation")
     @PostMapping("/")
-    public Long addTranslation(@RequestBody Translation translation){
+    public Long addTranslation(@RequestBody Translation translation) {
         return translationService.addTranlation(translation);
     }
 

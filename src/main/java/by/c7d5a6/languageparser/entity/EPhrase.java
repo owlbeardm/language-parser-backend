@@ -2,9 +2,9 @@ package by.c7d5a6.languageparser.entity;
 
 import by.c7d5a6.languageparser.entity.base.BaseEntity;
 import by.c7d5a6.languageparser.entity.possessors.IdLongVerPossessor;
+import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 
-import jakarta.persistence.*;
 import java.io.Serializable;
 
 @Entity(name = EPhrase.ENTITY_NAME)

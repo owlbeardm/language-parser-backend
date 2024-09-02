@@ -2,9 +2,11 @@ package by.c7d5a6.languageparser.entity;
 
 
 import by.c7d5a6.languageparser.entity.base.BaseEntity;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
 
-import jakarta.persistence.*;
 import java.io.Serializable;
 
 

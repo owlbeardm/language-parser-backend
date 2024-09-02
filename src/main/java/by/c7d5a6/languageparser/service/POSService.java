@@ -1,6 +1,5 @@
 package by.c7d5a6.languageparser.service;
 
-import by.c7d5a6.languageparser.entity.EGrammaticalCategory;
 import by.c7d5a6.languageparser.entity.ELanguage;
 import by.c7d5a6.languageparser.entity.ELanguagePOS;
 import by.c7d5a6.languageparser.entity.EPOS;

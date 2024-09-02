@@ -49,28 +49,20 @@ public class PaginationFilter implements Serializable {
         this.sort = sort;
     }
 
-    public void setPage(int page) {
-        this.page = page;
-    }
-
-    public void setSize(int size) {
-        this.size = size;
-    }
-
-    public void setDir(SortDirection dir) {
-        this.dir = dir;
-    }
-
-    public void setSort(String sort) {
-        this.sort = sort;
-    }
-
     public int getPage() {
         return page;
     }
 
+    public void setPage(int page) {
+        this.page = page;
+    }
+
     public int getSize() {
         return size;
+    }
+
+    public void setSize(int size) {
+        this.size = size;
     }
 
     public int calcOffset() {
@@ -81,12 +73,20 @@ public class PaginationFilter implements Serializable {
         return dir;
     }
 
+    public void setDir(SortDirection dir) {
+        this.dir = dir;
+    }
+
     public Sort.Direction calcSortDirection() {
         return getDir() == SortDirection.desc ? Sort.Direction.DESC : Sort.Direction.ASC;
     }
 
     public String getSort() {
         return sort;
+    }
+
+    public void setSort(String sort) {
+        this.sort = sort;
     }
 
     public PageRequest toPageable() {

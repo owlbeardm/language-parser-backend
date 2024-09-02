@@ -171,7 +171,7 @@ public class LanguageService extends BaseService {
         ELanguage eLanguage = languageRepository.findById(languageId).orElseThrow(() -> new IllegalArgumentException("Language with id " + languageId + " not found"));
         ListOfLanguagePhonemes resultList = new ListOfLanguagePhonemes();
         resultList.setLangId(languageId);
-        String languagePhonemes = ipaService.cleanIPA(getLanguagePhonemes(eLanguage));
+        String languagePhonemes = IPAService.cleanIPA(getLanguagePhonemes(eLanguage));
         List<ELanguagePhoneme> elp = this.languagePhonemeRepository.findByLanguage_Id(languageId);
         String[] allSoundsWithVariants = ipaService.getAllSoundsWithVariants();
         List<String> allSoundsWithVariantsAndLanguagePhonemes = elp.stream().map(ELanguagePhoneme::getPhoneme).collect(Collectors.toList());
@@ -267,7 +267,7 @@ public class LanguageService extends BaseService {
         this.wordsRepository.findByLanguage_Id(languageId).stream()
                 .map(EWord::getWord)
                 .forEach(w -> {
-                    w = ipaService.cleanIPA(w);
+                    w = IPAService.cleanIPA(w);
                     String[] vowelClustersArr = w.split(constRegexp);
                     String[] constClustersArr = w.split(vowelRegexp);
                     getClusters(constClustersStart, constClustersEnd, constClusters, w, constClustersArr);

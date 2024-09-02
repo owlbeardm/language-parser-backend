@@ -2,9 +2,8 @@ package by.c7d5a6.languageparser.entity;
 
 import by.c7d5a6.languageparser.entity.base.BaseEntity;
 import by.c7d5a6.languageparser.entity.possessors.IdLongVerPossessor;
-import by.c7d5a6.languageparser.rest.model.Language;
-
 import jakarta.persistence.*;
+
 import java.io.Serializable;
 
 @Entity(name = ELanguagePhoneme.ENTITY_NAME)
@@ -26,12 +25,12 @@ public class ELanguagePhoneme extends BaseEntity implements Serializable, IdLong
         return language;
     }
 
-    public String getPhoneme() {
-        return phoneme;
-    }
-
     public void setLanguage(ELanguage language) {
         this.language = language;
+    }
+
+    public String getPhoneme() {
+        return phoneme;
     }
 
     public void setPhoneme(String phoneme) {

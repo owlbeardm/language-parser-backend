@@ -1,17 +1,12 @@
 package by.c7d5a6.languageparser.rest.controller;
 
 import by.c7d5a6.languageparser.rest.model.*;
-import by.c7d5a6.languageparser.rest.security.IsEditor;
-import by.c7d5a6.languageparser.rest.security.IsVerifiedUser;
 import by.c7d5a6.languageparser.service.LanguageService;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.access.annotation.Secured;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.web.bind.annotation.*;
 

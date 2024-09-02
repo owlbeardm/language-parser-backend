@@ -1,29 +1,24 @@
 package by.c7d5a6.languageparser.service;
 
-import by.c7d5a6.languageparser.entity.*;
-import by.c7d5a6.languageparser.entity.models.EWordId;
-import by.c7d5a6.languageparser.entity.specification.EWordSpecification;
-import by.c7d5a6.languageparser.entity.specification.SearchCriteria;
+import by.c7d5a6.languageparser.entity.ETranslation;
+import by.c7d5a6.languageparser.entity.EWord;
+import by.c7d5a6.languageparser.entity.WordWithIdAndLanguage;
 import by.c7d5a6.languageparser.repository.TranslationRepository;
 import by.c7d5a6.languageparser.repository.WordsRepository;
-import by.c7d5a6.languageparser.repository.WordsSourceRepository;
-import by.c7d5a6.languageparser.rest.model.*;
+import by.c7d5a6.languageparser.rest.model.Translation;
+import by.c7d5a6.languageparser.rest.model.WordWithTranslations;
 import by.c7d5a6.languageparser.rest.model.base.PageResult;
 import by.c7d5a6.languageparser.rest.model.filter.TranslationListFilter;
-import by.c7d5a6.languageparser.rest.model.filter.WordListFilter;
 import by.c7d5a6.languageparser.rest.security.IsEditor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.Page;
-import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import java.lang.invoke.MethodHandles;
 import java.util.List;
-import java.util.Optional;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Service

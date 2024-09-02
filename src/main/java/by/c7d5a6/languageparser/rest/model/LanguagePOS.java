@@ -18,7 +18,6 @@ public class LanguagePOS extends Base {
     }
 
 
-
     public LanguagePOS() {
     }
 

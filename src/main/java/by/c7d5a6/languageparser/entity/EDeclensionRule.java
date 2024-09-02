@@ -2,9 +2,9 @@ package by.c7d5a6.languageparser.entity;
 
 
 import by.c7d5a6.languageparser.entity.base.BaseEntity;
+import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 
-import jakarta.persistence.*;
 import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
@@ -17,11 +17,11 @@ public class EDeclensionRule extends BaseEntity implements Serializable {
     protected static final String ENTITY_NAME = "DeclensionRule";
     protected static final String TABLE_NAME = "declension_rule_tbl";
     private static final long serialVersionUID = 1L;
-    @ManyToMany(fetch = FetchType.EAGER, cascade={CascadeType.MERGE,CascadeType.PERSIST})
+    @ManyToMany(fetch = FetchType.EAGER, cascade = {CascadeType.MERGE, CascadeType.PERSIST})
     @JoinTable(
             name = "declension_rule_value_tbl",
-            joinColumns = {@JoinColumn(name = "declension_rule_id", referencedColumnName="id")},
-            inverseJoinColumns = {@JoinColumn(name = "value_id", referencedColumnName="id")}
+            joinColumns = {@JoinColumn(name = "declension_rule_id", referencedColumnName = "id")},
+            inverseJoinColumns = {@JoinColumn(name = "value_id", referencedColumnName = "id")}
     )
     private Set<EGrammaticalCategoryValue> values = new HashSet<>();
     @ManyToOne

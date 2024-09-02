@@ -8,6 +8,8 @@ import java.util.Optional;
 
 public interface WordsSourceRepository extends IdLongVerRepository<EWordSource> {
     Optional<EWordSource> findByWordSource_IdAndWord_Language_Id(Long id, Long languageId);
+
     List<EWordSource> findByWordSource_Id(Long id);
+
     Optional<EWordSource> findByWord_Id(Long id);
 }

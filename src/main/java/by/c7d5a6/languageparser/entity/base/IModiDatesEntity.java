@@ -6,9 +6,9 @@ public interface IModiDatesEntity {
 
     Instant getCreatedWhen();
 
-    Instant getModiWhen();
-
     void setCreatedWhen(Instant value);
+
+    Instant getModiWhen();
 
     void setModiWhen(Instant value);
 }

@@ -1,6 +1,5 @@
 package by.c7d5a6.languageparser.rest.model.filter;
 
-import by.c7d5a6.languageparser.rest.model.filter.PaginationFilter;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import io.swagger.v3.oas.annotations.Parameter;

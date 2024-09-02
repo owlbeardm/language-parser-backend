@@ -5,7 +5,6 @@ import by.c7d5a6.languageparser.entity.base.BaseEntity;
 import by.c7d5a6.languageparser.entity.models.EWordWithEvolutionConnectionsIds;
 import by.c7d5a6.languageparser.enums.LanguageConnectionType;
 import by.c7d5a6.languageparser.enums.WordOriginType;
-import by.c7d5a6.languageparser.repository.GrammaticalCategoryValueConnectionRepository;
 import by.c7d5a6.languageparser.repository.LanguageConnectionRepository;
 import by.c7d5a6.languageparser.repository.WordsOriginSourceRepository;
 import by.c7d5a6.languageparser.repository.WordsRepository;
@@ -101,7 +100,8 @@ public class EvolutionService extends BaseService {
                         switch (eWordSource.getWord().getSourceType()) {
                             case EVOLVED -> wordWithEvolution.setWordEvolvedType(LanguageConnectionType.EVOLVING);
                             case BORROWED -> wordWithEvolution.setWordEvolvedType(LanguageConnectionType.BORROWING);
-                            default -> throw new RuntimeException("Word origin type wrong in evolutioin" + eWordSource.getWord().getSourceType());
+                            default ->
+                                    throw new RuntimeException("Word origin type wrong in evolutioin" + eWordSource.getWord().getSourceType());
                         }
 
                     });
@@ -177,7 +177,8 @@ public class EvolutionService extends BaseService {
         switch (eLanguageConnection.getConnectionType()) {
             case BORROWING -> newWord.setSourceType(WordOriginType.BORROWED);
             case EVOLVING -> newWord.setSourceType(WordOriginType.EVOLVED);
-            default -> throw new IllegalArgumentException("Can't evolve word for language connection type " + eLanguageConnection.getConnectionType());
+            default ->
+                    throw new IllegalArgumentException("Can't evolve word for language connection type " + eLanguageConnection.getConnectionType());
         }
         newWord = wordsRepository.save(newWord);
         newWordOriginSource.setSourceInitialVersion(wordSource.getWord());

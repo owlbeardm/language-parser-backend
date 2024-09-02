@@ -5,7 +5,6 @@ import by.c7d5a6.languageparser.rest.security.IsAdmin;
 import by.c7d5a6.languageparser.service.FirebaseService;
 import com.google.firebase.auth.FirebaseAuthException;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

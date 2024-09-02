@@ -5,8 +5,6 @@ import by.c7d5a6.languageparser.rest.model.base.Base;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 
-import java.io.Serializable;
-
 public class Language extends Base implements LanguageWithID {
 
     @NotNull
