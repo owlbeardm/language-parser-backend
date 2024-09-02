@@ -5,7 +5,7 @@ import by.c7d5a6.languageparser.enums.LanguageConnectionType;
 import by.c7d5a6.languageparser.entity.possessors.IdLongVerPossessor;
 import jakarta.validation.constraints.NotNull;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 import java.io.Serializable;
 
 @Entity(name = EWordSource.ENTITY_NAME)

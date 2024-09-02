@@ -4,7 +4,7 @@ import by.c7d5a6.languageparser.entity.base.BaseEntity;
 import by.c7d5a6.languageparser.entity.possessors.IdLongVerPossessor;
 import by.c7d5a6.languageparser.rest.model.Language;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 import java.io.Serializable;
 
 @Entity(name = ELanguagePhoneme.ENTITY_NAME)

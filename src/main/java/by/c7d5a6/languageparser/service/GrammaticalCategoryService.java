@@ -8,7 +8,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.webjars.NotFoundException;
 
 import java.lang.invoke.MethodHandles;
 import java.util.List;
@@ -148,8 +147,8 @@ public class GrammaticalCategoryService extends BaseService {
 
     @IsEditor
     public Long saveGrammaticalValuesConnection(GrammaticalCategoryValueConnection grammaticalCategoryValueConnection) {
-        EGrammaticalCategoryValue eGrammaticalCategoryValue = grammaticalCategoryValueRepository.findById(grammaticalCategoryValueConnection.getValue().getId()).orElseThrow(() -> new NotFoundException("Not found value" + grammaticalCategoryValueConnection.getValue().getId()));
-        ELanguage eLanguage = languageService.getLangById(grammaticalCategoryValueConnection.getLanguage().getId()).orElseThrow(() -> new NotFoundException("Not found language" + grammaticalCategoryValueConnection.getLanguage().getId()));
+        EGrammaticalCategoryValue eGrammaticalCategoryValue = grammaticalCategoryValueRepository.findById(grammaticalCategoryValueConnection.getValue().getId()).orElseThrow(() -> new RuntimeException("Not found value" + grammaticalCategoryValueConnection.getValue().getId()));
+        ELanguage eLanguage = languageService.getLangById(grammaticalCategoryValueConnection.getLanguage().getId()).orElseThrow(() -> new RuntimeException("Not found language" + grammaticalCategoryValueConnection.getLanguage().getId()));
         EGrammaticalCategoryValueConnection result = new EGrammaticalCategoryValueConnection();
         result.setLanguage(eLanguage);
         result.setValue(eGrammaticalCategoryValue);

@@ -4,7 +4,7 @@ import by.c7d5a6.languageparser.entity.base.BaseEntity;
 import by.c7d5a6.languageparser.enums.WordOriginType;
 import jakarta.validation.constraints.NotNull;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 import java.io.Serializable;
 
 @Entity(name = EWord.ENTITY_NAME)

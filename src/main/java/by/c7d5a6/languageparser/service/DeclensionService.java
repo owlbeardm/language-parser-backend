@@ -11,7 +11,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.webjars.NotFoundException;
 
 import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
@@ -63,9 +62,9 @@ public class DeclensionService extends BaseService {
 
     @IsEditor
     public Long saveDeclensionConnection(DeclensionConnection declensionConnection) {
-        EGrammaticalCategory eGrammaticalCategory = grammaticalCategoryService.getGrammaticalCategoryById(declensionConnection.getGrammaticalCategory().getId()).orElseThrow(() -> new NotFoundException("Not found grammatical category" + declensionConnection.getGrammaticalCategory().getId()));
-        ELanguage eLanguage = languageService.getLangById(declensionConnection.getLanguage().getId()).orElseThrow(() -> new NotFoundException("Not found language" + declensionConnection.getLanguage().getId()));
-        EPOS epos = posService.getPosById(declensionConnection.getPos().getId()).orElseThrow(() -> new NotFoundException("Not found pos" + declensionConnection.getPos().getId()));
+        EGrammaticalCategory eGrammaticalCategory = grammaticalCategoryService.getGrammaticalCategoryById(declensionConnection.getGrammaticalCategory().getId()).orElseThrow(() -> new RuntimeException("Not found grammatical category" + declensionConnection.getGrammaticalCategory().getId()));
+        ELanguage eLanguage = languageService.getLangById(declensionConnection.getLanguage().getId()).orElseThrow(() -> new RuntimeException("Not found language" + declensionConnection.getLanguage().getId()));
+        EPOS epos = posService.getPosById(declensionConnection.getPos().getId()).orElseThrow(() -> new RuntimeException("Not found pos" + declensionConnection.getPos().getId()));
         EDeclensionConnection result = new EDeclensionConnection();
         result.setLanguage(eLanguage);
         result.setPos(epos);
@@ -79,8 +78,8 @@ public class DeclensionService extends BaseService {
     }
 
     public List<DeclensionFull> getFullDeclensions(Long languageId, Long posId) {
-        ELanguage eLanguage = languageService.getLangById(languageId).orElseThrow(() -> new NotFoundException("Not found language" + languageId));
-        EPOS epos = posService.getPosById(posId).orElseThrow(() -> new NotFoundException("Not found pos" + posId));
+        ELanguage eLanguage = languageService.getLangById(languageId).orElseThrow(() -> new RuntimeException("Not found language" + languageId));
+        EPOS epos = posService.getPosById(posId).orElseThrow(() -> new RuntimeException("Not found pos" + posId));
         List<List<GrammaticalCategoryValue>> matrix = calculateDeclensionMatrix(languageId, posId);
         List<DeclensionFull> result = declensionRepository.findByLanguage_IdAndPos_Id(languageId, posId).stream().map(ed -> {
             DeclensionFull d = mapper.map(ed, DeclensionFull.class);
@@ -146,12 +145,12 @@ public class DeclensionService extends BaseService {
     @IsEditor
     public DeclensionFull saveDeclension(DeclensionFull declension) {
         final EDeclension eDeclension = new EDeclension();
-        ELanguage eLanguage = languageService.getLangById(declension.getLanguage().getId()).orElseThrow(() -> new NotFoundException("Not found language" + declension.getLanguage().getId()));
-        EPOS epos = posService.getPosById(declension.getPos().getId()).orElseThrow(() -> new NotFoundException("Not found pos" + declension.getPos().getId()));
+        ELanguage eLanguage = languageService.getLangById(declension.getLanguage().getId()).orElseThrow(() -> new RuntimeException("Not found language" + declension.getLanguage().getId()));
+        EPOS epos = posService.getPosById(declension.getPos().getId()).orElseThrow(() -> new RuntimeException("Not found pos" + declension.getPos().getId()));
         eDeclension.setLanguage(eLanguage);
         eDeclension.setPos(epos);
         declension.getValues().forEach((value) -> {
-            EGrammaticalCategoryValue eGrammaticalCategoryValue = grammaticalCategoryService.getValueById(value.getId()).orElseThrow(() -> new NotFoundException("Not found value " + value.getId()));
+            EGrammaticalCategoryValue eGrammaticalCategoryValue = grammaticalCategoryService.getValueById(value.getId()).orElseThrow(() -> new RuntimeException("Not found value " + value.getId()));
             eDeclension.getValues().add(eGrammaticalCategoryValue);
         });
 
@@ -188,10 +187,10 @@ public class DeclensionService extends BaseService {
     public DeclensionRule saveDeclensionRule(DeclensionRule declensionRule) {
         EDeclensionRule eDeclensionRule;
         if (declensionRule.getId() != null) {
-            eDeclensionRule = declensionRuleRepository.findById(declensionRule.getId()).orElseThrow(() -> new NotFoundException("No declension rule"));
+            eDeclensionRule = declensionRuleRepository.findById(declensionRule.getId()).orElseThrow(() -> new RuntimeException("No declension rule"));
         } else {
             eDeclensionRule = new EDeclensionRule();
-            EDeclension eDeclension = declensionRepository.findById(declensionRule.getDeclension().getId()).orElseThrow(() -> new NotFoundException("No declension"));
+            EDeclension eDeclension = declensionRepository.findById(declensionRule.getDeclension().getId()).orElseThrow(() -> new RuntimeException("No declension"));
             eDeclensionRule.setDeclension(eDeclension);
         }
         eDeclensionRule.setName(declensionRule.getName());
@@ -200,7 +199,7 @@ public class DeclensionService extends BaseService {
         eDeclensionRule.setValues(new HashSet<>());
         if (declensionRule.getValues() != null)
             for (GrammaticalCategoryValue value : declensionRule.getValues()) {
-                EGrammaticalCategoryValue eGrammaticalCategoryValue = grammaticalCategoryService.getValueById(value.getId()).orElseThrow(() -> new NotFoundException("Not found value " + value.getId()));
+                EGrammaticalCategoryValue eGrammaticalCategoryValue = grammaticalCategoryService.getValueById(value.getId()).orElseThrow(() -> new RuntimeException("Not found value " + value.getId()));
                 eDeclensionRule.getValues().add(eGrammaticalCategoryValue);
             }
         EDeclensionRule save = declensionRuleRepository.save(eDeclensionRule);
@@ -241,12 +240,12 @@ public class DeclensionService extends BaseService {
     }
 
     public boolean isMainDelcension(Long declensionId) {
-        return declensionRepository.findById(declensionId).map(EDeclension::isMainDeclension).orElseThrow(() -> new NotFoundException("Not found declension " + declensionId));
+        return declensionRepository.findById(declensionId).map(EDeclension::isMainDeclension).orElseThrow(() -> new RuntimeException("Not found declension " + declensionId));
     }
 
     @IsEditor
     public void setAsMainDeclension(Long declensionId) {
-        EDeclension eDeclension = declensionRepository.findById(declensionId).orElseThrow(() -> new NotFoundException("Not found declension " + declensionId));
+        EDeclension eDeclension = declensionRepository.findById(declensionId).orElseThrow(() -> new RuntimeException("Not found declension " + declensionId));
         declensionRepository.findByLanguage_IdAndPos_Id(eDeclension.getLanguage().getId(), eDeclension.getPos().getId()).forEach((ed) -> {
             ed.setMainDeclension(false);
         });
@@ -255,7 +254,7 @@ public class DeclensionService extends BaseService {
 
     @IsEditor
     public void removeFromMainDeclension(Long declensionId) {
-        EDeclension eDeclension = declensionRepository.findById(declensionId).orElseThrow(() -> new NotFoundException("Not found declension " + declensionId));
+        EDeclension eDeclension = declensionRepository.findById(declensionId).orElseThrow(() -> new RuntimeException("Not found declension " + declensionId));
         eDeclension.setMainDeclension(false);
     }
 }

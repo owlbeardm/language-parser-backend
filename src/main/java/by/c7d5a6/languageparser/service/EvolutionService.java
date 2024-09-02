@@ -21,7 +21,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
-import org.webjars.NotFoundException;
 
 import java.lang.invoke.MethodHandles;
 import java.util.*;
@@ -113,8 +112,8 @@ public class EvolutionService extends BaseService {
 
     public PageResult<WordWithBorrowed> getAllBorrowedWords(WordBorrowedListFilter filter) {
         Objects.requireNonNull(filter.getLanguageId(), "Language required");
-        ELanguage langFrom = this.languageService.getLangById(filter.getLanguageId()).orElseThrow(() -> new NotFoundException("There is no language:" + filter.getLanguageId()));
-        ELanguage langTo = this.languageService.getLangById(filter.getLanguageToId()).orElseThrow(() -> new NotFoundException("There is no language:" + filter.getLanguageToId()));
+        ELanguage langFrom = this.languageService.getLangById(filter.getLanguageId()).orElseThrow(() -> new RuntimeException("There is no language:" + filter.getLanguageId()));
+        ELanguage langTo = this.languageService.getLangById(filter.getLanguageToId()).orElseThrow(() -> new RuntimeException("There is no language:" + filter.getLanguageToId()));
         Page<EWord> allWords = this.wordService.getAllWordsPage(filter);
         List<EWord> wordsData = allWords.stream().collect(Collectors.toList());
         List<Long> wordsIds = wordsData.stream().map(EWord::getId).distinct().collect(Collectors.toList());
@@ -262,11 +261,11 @@ public class EvolutionService extends BaseService {
 
     @IsEditor
     public WordWithBorrowed addBorrowedWord(WordToBorrow wordToBorrow) {
-        ELanguageConnection eLanguageConnection = languageConnectionRepository.findByLangFrom_IdAndLangTo_Id(wordToBorrow.getWord().getLanguage().getId(), wordToBorrow.getLanguage().getId()).orElseThrow(() -> new NotFoundException("There is no such language connection"));
+        ELanguageConnection eLanguageConnection = languageConnectionRepository.findByLangFrom_IdAndLangTo_Id(wordToBorrow.getWord().getLanguage().getId(), wordToBorrow.getLanguage().getId()).orElseThrow(() -> new RuntimeException("There is no such language connection"));
         if (eLanguageConnection.getConnectionType() != LanguageConnectionType.BORROWING) {
             throw new IllegalArgumentException("Language connection type is " + eLanguageConnection.getConnectionType());
         }
-        EWord wordSource = this.wordsRepository.findById(wordToBorrow.getWord().getId()).orElseThrow(() -> new NotFoundException("Word not found"));
+        EWord wordSource = this.wordsRepository.findById(wordToBorrow.getWord().getId()).orElseThrow(() -> new RuntimeException("Word not found"));
         EWord newWord;
         EWordOriginSource newWordOriginSource;
         Optional<EWordOriginSource> oWordOriginSource = wordsOriginSourceRepository.findByWordSource_IdAndWord_Language_Id(wordSource.getId(), wordToBorrow.getLanguage().getId());

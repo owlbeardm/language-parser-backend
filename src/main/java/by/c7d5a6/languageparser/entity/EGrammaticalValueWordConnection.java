@@ -3,10 +3,7 @@ package by.c7d5a6.languageparser.entity;
 
 import by.c7d5a6.languageparser.entity.base.BaseEntity;
 
-import javax.persistence.Entity;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.Table;
+import jakarta.persistence.*;
 import java.io.Serializable;
 
 

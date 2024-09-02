@@ -31,7 +31,7 @@ import java.util.logging.Logger;
         @SecurityScheme(name = "oauth", description = "Auth0 access token", type = SecuritySchemeType.HTTP, scheme = "bearer", bearerFormat = "jwt"),
         @SecurityScheme(name = "eth", description = "Eth encoded access token", type = SecuritySchemeType.HTTP, scheme = "bearer", bearerFormat = "jwt")
 })
-@Configuration
+//@Configuration
 public class OpenAPIConfiguration {
 
     private static final Logger logger = Logger.getLogger(MethodHandles.lookup().lookupClass().getName());

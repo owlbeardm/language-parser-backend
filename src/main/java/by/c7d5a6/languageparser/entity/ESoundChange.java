@@ -1,12 +1,14 @@
 package by.c7d5a6.languageparser.entity;
 
 import by.c7d5a6.languageparser.entity.base.BaseEntity;
+import by.c7d5a6.languageparser.entity.possessors.IdLongVerPossessor;
 import by.c7d5a6.languageparser.enums.SoundChangePurpose;
 import by.c7d5a6.languageparser.enums.SoundChangeType;
-import by.c7d5a6.languageparser.entity.possessors.IdLongVerPossessor;
+import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 
-import javax.persistence.*;
 import java.io.Serializable;
 
 @Entity(name = ESoundChange.ENTITY_NAME)
@@ -34,13 +36,13 @@ public class ESoundChange extends BaseEntity implements Serializable, IdLongVerP
     private Long priority;
 
     @NotNull
-    @Enumerated(EnumType.STRING)
     @Column(name = "type")
+    @JdbcTypeCode(SqlTypes.NAMED_ENUM)
     private SoundChangeType type;
 
     @NotNull
-    @Enumerated(EnumType.STRING)
     @Column(name = "change_type")
+    @JdbcTypeCode(SqlTypes.NAMED_ENUM)
     private SoundChangePurpose soundChangePurpose;
 
     @NotNull
@@ -139,12 +141,6 @@ public class ESoundChange extends BaseEntity implements Serializable, IdLongVerP
 
     @Override
     public String toString() {
-        return "ESoundChange{" +
-                ((langFrom != null) ? ("langFrom=" + langFrom.getDisplayName()) : "") +
-                ((langTo != null) ? (", langTo=" + langTo.getDisplayName()) : "") +
-                ", type=" + type +
-                ", priority=" + priority +
-                ", rules='" + soundFrom + " → " + soundTo + " / " + environmentBefore + '_' + environmentAfter + '\'' +
-                '}';
+        return "ESoundChange{" + ((langFrom != null) ? ("langFrom=" + langFrom.getDisplayName()) : "") + ((langTo != null) ? (", langTo=" + langTo.getDisplayName()) : "") + ", type=" + type + ", priority=" + priority + ", rules='" + soundFrom + " → " + soundTo + " / " + environmentBefore + '_' + environmentAfter + '\'' + '}';
     }
 }

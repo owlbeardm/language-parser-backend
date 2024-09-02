@@ -4,7 +4,7 @@ package by.c7d5a6.languageparser.entity;
 import by.c7d5a6.languageparser.entity.base.BaseEntity;
 import jakarta.validation.constraints.NotNull;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
